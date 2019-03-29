@@ -1,0 +1,5 @@
+/build
+!/build/libs/*.jar
+/cpp/cmake-build-debug
+/cpp/cmake-build-release
+.gradle/

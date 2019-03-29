@@ -1,0 +1,62 @@
+SYS := $(shell gcc -dumpmachine)
+$(info  $(SYS))
+OBJFILES := XtpQuoteAdapter.o XtpQuoteApi.o InitGlog.o
+
+ifneq (, $(findstring linux, $(SYS)))
+	######### for linux ##########
+	LIBRARY := libquoteplugin.so
+	INCLUDES := -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux -I./include
+	LIBRARY_PATH :=../lib/linux/
+
+	CXXFLAGS := $(INCLUDES)
+	CXXFLAGS += -fPIC
+	CXXFLAGS += -std=c++11
+
+$(LIBRARY): $(OBJFILES)
+	rm -f libquoteplugin.*
+	$(CXX) -shared -o $@ $^ -lxtpquoteapi  -lglog -L$(LIBRARY_PATH)
+	rm -f *.o
+endif
+
+ifneq (, $(findstring darwin, $(SYS)))
+	######### for mac os ##########
+	# mac os 安装xcode的commond line tools用clang编译,或安装brew并 brew install gcc@7用gcc编译
+	# gcc默认安装到/usr/local/homebrew/Cellar/gcc@7/7/bin/g++-7
+	# 这里需要指定g++的名称  如g++-7
+	#CXX := g++-7
+	# 如果编译时遇到/var/folders/7t/jv75kfbd325198wvftq2yl700000gn/T//cclNMIvG.s:282:suffix
+	# or operands invalid for `movq'这样的错误，则执行如下命令即可解决：
+	# sudo mv /opt/local/ /usr/local/homebrew/Cellar
+	################################
+	LIBRARY := libquoteplugin.jnilib
+	INCLUDES := -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/darwin -I./include
+	LIBRARY_PATH := ../lib/macosx/
+
+	CXXFLAGS := $(INCLUDES)
+	CXXFLAGS += -fPIC
+	CXXFLAGS += -std=c++11
+
+$(LIBRARY): $(OBJFILES)
+	#rm -f libquoteplugin.*
+	$(CXX) -dynamiclib -o $@ $^ -lxtpquoteapi -lglog -L$(LIBRARY_PATH)
+	rm -f *.o
+endif
+
+ifneq (, $(findstring windows, $(SYS)))
+	######### for win ##########
+	# 安装MINGW32（不装64位，win下只编译32位可与64位兼容） 选择安装mingw32-base、mingw32-gcc—g++ package
+	$(info  $(CXX))
+	################################
+	LIBRARY := quoteplugin.dll
+	INCLUDES := -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/win32 -I./include
+	LIBRARY_PATH :=../lib/win32/
+
+	CXXFLAGS := $(INCLUDES)
+	CXXFLAGS += -fPIC
+	CXXFLAGS += -std=c++11
+
+$(LIBRARY): $(OBJFILES)
+	#rm -f quoteplugin.*
+	$(CXX) -shared -o $@ $^ -lxtpquoteapi  -lglog -L$(LIBRARY_PATH)
+	rm -f *.o
+endif
