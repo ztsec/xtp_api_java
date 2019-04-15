@@ -546,6 +546,59 @@ void Trade::OnOrderEvent(XTPOrderInfo *order_info, XTPRI *error_info, uint64_t s
     jvm_->DetachCurrentThread();
 }
 
+
+void Trade::OnCancelOrderError(XTPOrderCancelInfo *cancel_info,XTPRI *error_info, uint64_t session_id){
+    JNIEnv * env;
+    env=preInvoke();
+    jclass traderPluginClass = env->GetObjectClass(trade_plugin_obj_);
+    assert(traderPluginClass != NULL);
+    jmethodID jm_onCancelOrderError = env->GetMethodID(traderPluginClass,"onCancelOrderError",
+   "(Lcom/zts/xtp/trade/model/response/OrderCancelResponse;Lcom/zts/xtp/common/model/ErrorMessage;Ljava/lang/String;)V");
+
+     //generate the error msg object
+     //fetch the errormsg default construct
+    jmethodID defaultErrorConstr = env->GetMethodID(xtp_error_msg_class_, "<init>","()V");
+    if (defaultErrorConstr == NULL) {
+        jvm_->DetachCurrentThread();
+        return;
+    }
+
+     //create the errormsg object
+     jobject errorMsgObj = env->NewObject(xtp_error_msg_class_, defaultErrorConstr);
+     if (errorMsgObj == NULL) {
+         jvm_->DetachCurrentThread();
+         return;
+     }
+   generateErrorMsgObj(env, errorMsgObj,error_info,0);
+
+   jobject traderOrderCancelInfoObj=NULL;
+   int errorCode=error_info->error_id;
+
+   if (errorCode == 0 || NULL != cancel_info) {
+           //fetch the default construct
+           jmethodID defaultConstr = env->GetMethodID(order_cancel_info_class_, "<init>","()V");
+           if (defaultConstr == NULL) {
+              jvm_->DetachCurrentThread();
+              return;
+           }
+
+           //create the object
+           traderOrderCancelInfoObj = env->NewObject(order_cancel_info_class_, defaultConstr);
+           if (traderOrderCancelInfoObj == NULL) {
+              jvm_->DetachCurrentThread();
+              return;
+           }
+           generateCancelInfoObj(env,traderOrderCancelInfoObj,cancel_info,0,true);
+       }
+
+   jstring strSessionId = env->NewStringUTF((std::to_string(session_id)).c_str());
+   env->CallVoidMethod(trade_plugin_obj_, jm_onCancelOrderError, traderOrderCancelInfoObj,errorMsgObj, strSessionId);
+   jvm_->DetachCurrentThread();
+
+}
+
+
+
 //==================For XTP API 1.16===========================
 void Trade::OnQueryStructuredFund(XTPStructuredFundInfo *fund_info, XTPRI *error_info, int request_id, bool is_last, uint64_t session_id) {
     LOG(INFO) << __PRETTY_FUNCTION__ ;
@@ -1043,7 +1096,7 @@ JNIEnv* Trade::preInvoke() {
     }
 
     // attach the current thread to the JVM
-    jint res = jvm_->AttachCurrentThread((void**) &env, &att_args_);
+    jint res = jvm_->AttachCurrentThread((void**) &env, NULL);//&att_args_
 
     if (res !=0) {
         return NULL;
@@ -1167,6 +1220,28 @@ void Trade::generateOrderInfoObj(JNIEnv* env, jobject& tradeOrderInfoObj,XTPOrde
     jmethodID jm_setLastResp = env->GetMethodID(trade_order_info_class_, "setLastResp", "(Z)V");
     assert(jm_setLastResp != NULL);
     env->CallVoidMethod(tradeOrderInfoObj, jm_setLastResp,is_last);
+
+}
+
+void Trade::generateCancelInfoObj(JNIEnv* env, jobject& tradeCancelOrderInfoObj,XTPOrderCancelInfo *cancel_info, int request_id, bool is_last){
+    jmethodID jm_setOrderXtpId = env->GetMethodID(order_cancel_info_class_, "setOrderXtpId", "(Ljava/lang/String;)V");
+    assert(jm_setOrderXtpId != NULL);
+    jstring orderXtpIdStr = env->NewStringUTF((std::to_string(cancel_info->order_xtp_id)).c_str());
+    env->CallVoidMethod(tradeCancelOrderInfoObj, jm_setOrderXtpId, orderXtpIdStr);
+
+    jmethodID jm_setOrderCancelXtpId = env->GetMethodID(order_cancel_info_class_, "setOrderCancelXtpId", "(I)V");
+    env->CallVoidMethod(tradeCancelOrderInfoObj, jm_setOrderCancelXtpId, cancel_info->order_cancel_xtp_id);
+
+    //call setRequestId
+     jmethodID jm_setRequestId = env->GetMethodID(order_cancel_info_class_, "setRequestId", "(I)V");
+     assert(jm_setRequestId != NULL);
+     env->CallVoidMethod(tradeCancelOrderInfoObj,jm_setRequestId, request_id);
+
+     //call setLastResp
+     jmethodID jm_setLastResp = env->GetMethodID(order_cancel_info_class_, "setLastResp", "(Z)V");
+     assert(jm_setLastResp != NULL);
+     env->CallVoidMethod(tradeCancelOrderInfoObj, jm_setLastResp,is_last);
+
 
 }
 

@@ -56,6 +56,7 @@
                                           
             src/test/java/com.zts.xtp/quote/QuoteApiTest.java是行情的单元测试：
             修改QuoteApiTest.java：
+            quoteApi.init((short)18,"/var/log/zts/xtp",XtpLogLevel.XTP_LOG_LEVEL_INFO);
             int login_result = quoteApi.login("xx.xx.xx.xx",1234,"xxxxx","xxxxxx",1);
             login方法第1个参数为xtp行情ip、第2个参数为xtp行情端口、第3个参数为申请到的测试账号、第4个参数为账号密码，
                     实盘环境的环境信息及资金账号请联系官方人员获取。
@@ -136,6 +137,7 @@
                                   
           src/test/java/com.zts.xtp/quote/QuoteApiTest.java是行情的单元测试：
           修改QuoteApiTest.java：
+          quoteApi.init((short)18,"/var/log/zts/xtp",XtpLogLevel.XTP_LOG_LEVEL_INFO);
           int login_result = quoteApi.login("23a71733bba3sd78722319b212e",1234,"xxxxxx","xxxxxx",1);
           login方法第1个参数为xtp行情ip、第2个参数为xtp行情端口、第3个参数为申请到的测试账号、第4个参数为账号密码，
                    实盘环境的环境信息及资金账号请联系官方人员获取。

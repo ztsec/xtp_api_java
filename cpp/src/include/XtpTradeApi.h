@@ -36,6 +36,8 @@ private:
     jclass query_ipo_ticker_rsp_class_;
     jclass query_ipo_quota_rsp_class_;
     jclass query_option_auctionInfo_rsp_class_;
+    jclass order_cancel_info_class_;
+
 
 public:
 
@@ -44,6 +46,8 @@ public:
     void OnError(XTPRI *error_info);
 
     void OnOrderEvent(XTPOrderInfo *order_info, XTPRI *error_info, uint64_t session_id);
+
+    void OnCancelOrderError(XTPOrderCancelInfo *cancel_info,XTPRI *error_info, uint64_t session_id);
 
     void OnTradeEvent(XTPTradeReport *trade_info, uint64_t session_id);
 
@@ -87,6 +91,7 @@ public:
     void setXTPQueryIPOTickerRspClass(jclass jc) {query_ipo_ticker_rsp_class_ = jc;}
     void setXTPQueryIPOQuotaRspClass(jclass jc) {query_ipo_quota_rsp_class_ = jc;}
     void setXtpQueryOptionAuctionInfoRspClass(jclass jc) {query_option_auctionInfo_rsp_class_ = jc;}
+    void setXTPOrderCancelInfoClass(jclass jc){order_cancel_info_class_= jc;}
 
     void setClientId(uint16_t client_id) { client_id_ = client_id; }
     uint16_t getClientId() { return(client_id_); }
@@ -226,6 +231,7 @@ private:
     void  generateIPOTickerObj(JNIEnv* env, jobject& targetObj, XTPQueryIPOTickerRsp *sourceObj,int request_id, bool is_last);
     void  generateIPOQuotaObj(JNIEnv* env, jobject& targetObj, XTPQueryIPOQuotaRsp *sourceObj,int request_id, bool is_last);
     void  generateOptionAuctionInfoObj(JNIEnv* env, jobject& targetObj, XTPQueryOptionAuctionInfoRsp *sourceObj, int request_id, bool is_last);
+    void  generateCancelInfoObj(JNIEnv* env, jobject& tradeCancelOrderInfoObj,XTPOrderCancelInfo *cancel_info, int request_id, bool is_last);
 
     void  generateErrorMsgObj(JNIEnv* env, jobject& errorMsgObj,XTPRI *error_info, int request_id);
   };

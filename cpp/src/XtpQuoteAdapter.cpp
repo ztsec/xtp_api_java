@@ -13,6 +13,16 @@
 
 using namespace std;
 
+JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_initGlog
+        (JNIEnv *env, jobject obj, jstring logFolder,jstring logSubFolder)
+{
+    const char *char_xtp_data_folder = env->GetStringUTFChars(logFolder, 0);
+    string strLogFolder = string(char_xtp_data_folder);
+    const char *char_logSubFolder = env->GetStringUTFChars(logSubFolder, 0);
+    string strLogSubFolder = string(char_logSubFolder);
+    init_glog(strLogFolder, strLogSubFolder);
+}
+
 void copy_tickers(JNIEnv *env,jobjectArray tickers,char *pTickers[],int count)
 {
     for(int i=0; i<count; i++)
@@ -25,14 +35,12 @@ void copy_tickers(JNIEnv *env,jobjectArray tickers,char *pTickers[],int count)
     }
 }
 
-JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_connect (JNIEnv *env,
-    jobject obj, jshort clientId, jstring xtpDataFolder)
+JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_quoteInit(JNIEnv *env,
+    jobject obj, jshort clientId, jstring logFolder, jobject jLogLevel)
 {
-    const char *char_xtp_data_folder = env->GetStringUTFChars(xtpDataFolder, 0);
-    init_glog(char_xtp_data_folder);
-
     XtpQuote *pquote = new XtpQuote();
     pquote->setClientId(clientId);
+    const char *char_xtp_data_folder = env->GetStringUTFChars(logFolder, 0);
     pquote->setFilePath(char_xtp_data_folder);
 
     JavaVM* jvm;
@@ -76,7 +84,12 @@ JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_connect (JNIEnv *env,
     pquote->setXTPTPIClass((jclass)env->NewGlobalRef(xtptpiClass));
 
     pquote->setPluginJobject(env->NewGlobalRef(obj));
-    pquote->Init();
+
+    jclass logLevelClass = env->FindClass("com/zts/xtp/common/enums/XtpLogLevel");
+    jmethodID getLogLevelValue = env->GetMethodID(logLevelClass, "getValue", "()I");
+    XTP_LOG_LEVEL logLevel = (XTP_LOG_LEVEL)env->CallIntMethod(jLogLevel, getLogLevelValue);
+    pquote->Init(logLevel);
+
     setHandle(env, obj, pquote);
 
 }

@@ -10,6 +10,9 @@ import com.zts.xtp.quote.model.response.TickByTickResponse;
 import com.zts.xtp.quote.model.response.TickerInfoResponse;
 import com.zts.xtp.quote.model.response.TickerPriceInfoResponse;
 import com.zts.xtp.quote.spi.QuoteSpi;
+import com.zts.xtp.common.enums.XtpLogLevel;
+import java.io.File;
+import com.zts.xtp.common.jni.JNILoadLibrary;
 
 
 public class QuoteApi {
@@ -27,10 +30,43 @@ public class QuoteApi {
 
     /**
      *  初始化QuoteApi
-     * @param proxyClientId client_id （必须输入）用于区分同一用户的不同客户端，由用户自定义
-     * @param xtpDataFolder 存贮订阅信息文件的目录，请设定一个有可写权限的真实存在的路径
+     * @param clientId（必须输入）用于区分同一用户的不同客户端，由用户自定义
+     * @param logFolder 日志输出的目录，请设定一个真实存在的有可写权限的路径
+     * @param logLevel 日志输出级别
      */
-    public native void connect(short proxyClientId, String xtpDataFolder);
+    public void init(short clientId, String logFolder,XtpLogLevel logLevel){
+        if(!JNILoadLibrary.glogHasInited){
+            JNILoadLibrary.glogHasInited = true;
+            //init glog
+            File file = new File(logFolder);
+            if (!file.exists()) {
+                file.mkdirs();
+            }
+            String logSubFolder = "jni";
+            String smartcpplogFolder = logFolder+File.separator+logSubFolder;
+            file = new File(smartcpplogFolder);
+            if (!file.exists()) {
+                file.mkdirs();
+            }
+            initGlog(logFolder,logSubFolder);
+        }
+        quoteInit(clientId,logFolder,logLevel);
+    }
+
+    /**
+     *  初始化glog-内部方法调用jni
+     * @param logFolder 日志输出的目录，请设定一个真实存在的有可写权限的路径
+     * @param logSubFolder 日志输出的子目录，请设定一个真实存在的有可写权限的路径 在init函数中固化为"jni"
+     */
+    private native void initGlog(String logFolder,String logSubFolder);
+
+    /**
+     *  初始化QuoteApi-内部方法调用jni
+     * @param clientId（必须输入）用于区分同一用户的不同客户端，由用户自定义
+     * @param logFolder 日志输出的目录，请设定一个真实存在的有可写权限的路径
+     * @param logLevel 日志输出级别
+     */
+    private native void quoteInit(short clientId, String logFolder,XtpLogLevel logLevel);
 
     /**
      * 断开于xtp连接

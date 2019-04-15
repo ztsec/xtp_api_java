@@ -46,31 +46,43 @@ public class TradeApi {
      * 如果一个账户需要在多个客户端登录，请使用不同的clientId，系统允许一个账户同时登录多个客户端，但是对于同一账户，相同的clientId只能保持一个session连接，后面的登录在前一个session存续期间，无法连接。系统不支持过夜，请确保每天开盘前重新启动
      * @param clientId 客户端id，用于区分同一用户的不同客户端，由用户自定义
      * @param key 用户开发软件Key，用户申请开户时给予
-     * @param dataFolder 存贮订阅信息文件的目录，请设定一个真实存在的有可写权限的路径
      * @param logLevel 日志输出级别
      */
-    public void init(short clientId, String key, String dataFolder, XtpLogLevel logLevel){
-        File file = new File(dataFolder);
-        if (!file.exists()) {
-            file.mkdirs();
+    public void init(short clientId, String key, String logFolder, XtpLogLevel logLevel){
+        if(!JNILoadLibrary.glogHasInited){
+            JNILoadLibrary.glogHasInited = true;
+            //init glog
+            File file = new File(logFolder);
+            if (!file.exists()) {
+                file.mkdirs();
+            }
+            String logSubFolder = "jni";
+            String smartcpplogFolder = logFolder+File.separator+logSubFolder;
+            file = new File(smartcpplogFolder);
+            if (!file.exists()) {
+                file.mkdirs();
+            }
+            initGlog(logFolder,logSubFolder);
         }
-        String smartcpplogFolder = dataFolder+File.separator+"smartcpplog";
-        file = new File(smartcpplogFolder);
-        if (!file.exists()) {
-            file.mkdirs();
-        }
-        tradeInit(clientId,key,dataFolder,logLevel);
+        tradeInit(clientId,key,logFolder,logLevel);
     }
 
     /**
-     * 初始化交易模块
+     *  初始化glog-内部方法调用jni
+     * @param logFolder 日志输出的目录，请设定一个真实存在的有可写权限的路径
+     * @param logSubFolder 日志输出的子目录，请设定一个真实存在的有可写权限的路径 在init函数中固化为"jni"
+     */
+    private native void initGlog(String logFolder,String logSubFolder);
+
+    /**
+     * 初始化交易模块-内部方法调用jni
      * 如果一个账户需要在多个客户端登录，请使用不同的clientId，系统允许一个账户同时登录多个客户端，但是对于同一账户，相同的clientId只能保持一个session连接，后面的登录在前一个session存续期间，无法连接。系统不支持过夜，请确保每天开盘前重新启动
      * @param clientId 客户端id，用于区分同一用户的不同客户端，由用户自定义
      * @param key 用户开发软件Key，用户申请开户时给予
-     * @param dataFolder 存贮订阅信息文件的目录，请设定一个真实存在的有可写权限的路径
+     * @param logFolder 日志输出的目录，请设定一个真实存在的有可写权限的路径
      * @param logLevel 日志输出级别
      */
-    private native void tradeInit(short clientId, String key, String dataFolder, XtpLogLevel logLevel);
+    private native void tradeInit(short clientId, String key, String logFolder, XtpLogLevel logLevel);
 
     /**
      * 断开连接并清除交易模块

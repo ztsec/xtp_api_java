@@ -151,8 +151,8 @@ public:
 
     ~XtpQuote();
 
-    void Init() {
-        api_ = XTP::API::QuoteApi::CreateQuoteApi(client_id_, file_path_.c_str());
+    void Init(XTP_LOG_LEVEL logLevel) {
+        api_ = XTP::API::QuoteApi::CreateQuoteApi(client_id_, file_path_.c_str(),logLevel);
         api_->RegisterSpi(this);
     }
 

@@ -5,13 +5,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class JNILoadLibrary {
+    public static boolean glogHasInited = false;
     public static void loadLibrary() {
         loadLibrary(null);
     }
     public static void loadLibrary(String libraryPath) {
         if(libraryPath==null) libraryPath = "";
 		String osLibPath = System.getProperty("user.dir");
-        libraryPath = libraryPath+"cpp/src:/usr/local/lib:"+osLibPath+"：c:/windows/system32";
+        libraryPath = libraryPath+"cpp/src:/usr/local/lib:"+osLibPath+":c:/windows/system32";
         String os = System.getProperty("os.name").toLowerCase();
         boolean osIsLinux = (os.indexOf("linux") != -1);
         boolean osIsWindows = false;
@@ -77,5 +78,6 @@ public class JNILoadLibrary {
             }
 
         }
+
     }
 }

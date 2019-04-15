@@ -7,6 +7,14 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/*
+* Class:     com_zts_xtp_trade_api_TradeApi
+* Method:    initGlog
+* Signature: (Ljava/lang/String;Ljava/lang/String;)V
+*/
+JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_initGlog
+        (JNIEnv *, jobject, jstring,jstring);
 /*
  * Class:     com_zts_xtp_trade_api_TradeApi
  * Method:    getApiLastError
@@ -17,7 +25,7 @@ JNIEXPORT jstring JNICALL Java_com_zts_xtp_trade_api_TradeApi_getApiLastError
 
 /*
  * Class:     com_zts_xtp_trade_api_TradeApi
- * Method:    init
+ * Method:    tradeInit
  * Signature: (SLjava/lang/String;Ljava/lang/String;Lcom/zts/xtp/common/enums/XtpLogLevel;)V
  */
 JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_tradeInit

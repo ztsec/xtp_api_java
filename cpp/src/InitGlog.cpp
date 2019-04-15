@@ -6,15 +6,15 @@ using namespace std;
 
 string &replace_all(string &str, const string &old_value, const string &new_value);
 
-void init_glog(const char *log_folder) {
-    string logName = string("smart_proxy_center");
+void init_glog(string log_folder,string log_subFolder) {
+    string logName = log_subFolder;//string("smart_proxy_center");
     try {
         google::InitGoogleLogging(logName.c_str());
 
     } catch (std::exception &e) {
 
     }
-    string str_smart_log_folder = log_folder + string("/smartcpplog");
+    string str_smart_log_folder = log_folder + string("/") + log_subFolder;//string("/smartcpplog");
     FLAGS_log_dir = str_smart_log_folder.c_str();
     google::SetStderrLogging(google::GLOG_INFO);//设置级别高于 google::INFO 的日志同时输出到屏幕
     FLAGS_colorlogtostderr = true; //设置输出到屏幕的日志显示相应颜色

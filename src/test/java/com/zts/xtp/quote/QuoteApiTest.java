@@ -20,9 +20,10 @@ public class QuoteApiTest {
         JNILoadLibrary.loadLibrary();
         TestQuoteSpi testspi = new TestQuoteSpi();
         quoteApi = new QuoteApi(testspi);
-        short client = 20;
-        quoteApi.connect(client,"/var/log/zts/xtp");
-		quoteApi.setUDPBufferSize(512);
+        quoteApi.setUDPBufferSize(512);
+
+        short clientId = 18;
+        quoteApi.init(clientId,"/var/log/zts/xtp",XtpLogLevel.XTP_LOG_LEVEL_INFO);
 
         int login_result = quoteApi.login("xx.xx.xx.xx",1234,"xxxxxx","xxxxxx",1);
         Assert.assertEquals(login_result, 0);

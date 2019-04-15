@@ -15,12 +15,19 @@ using namespace std;
 
 static Trade* ptrade_=NULL;
 
-JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_tradeInit
-  (JNIEnv *env, jobject obj, jshort clientId, jstring key, jstring dataFolder, jobject jLogLevel)
+JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_initGlog
+        (JNIEnv *env, jobject obj, jstring logFolder,jstring logSubFolder)
 {
-    const char *char_xtp_data_folder = env->GetStringUTFChars(dataFolder, 0);
-    init_glog(char_xtp_data_folder);
+    const char *char_xtp_data_folder = env->GetStringUTFChars(logFolder, 0);
+    string strLogFolder = string(char_xtp_data_folder);
+    const char *char_logSubFolder = env->GetStringUTFChars(logSubFolder, 0);
+    string strLogSubFolder = string(char_logSubFolder);
+    init_glog(strLogFolder, strLogSubFolder);
+}
 
+JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_tradeInit
+  (JNIEnv *env, jobject obj, jshort clientId, jstring key, jstring logFolder, jobject jLogLevel)
+{
     Trade *ptrade;
     if(NULL == ptrade_)
     {
@@ -29,6 +36,7 @@ JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_tradeInit
 
         const char *char_serverKey = env->GetStringUTFChars(key, NULL);
         ptrade->setKey(char_serverKey);
+        const char *char_xtp_data_folder = env->GetStringUTFChars(logFolder, 0);
         ptrade->setFilePath(char_xtp_data_folder);
 
         JavaVM* jvm;

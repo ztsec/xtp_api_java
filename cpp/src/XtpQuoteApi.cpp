@@ -30,7 +30,7 @@ JNIEnv* XtpQuote::preInvoke() {
            return NULL;
        }
        // attach the current thread to the JVM
-       jint res = jvm_->AttachCurrentThread((void**) &env, &att_args_);
+       jint res = jvm_->AttachCurrentThread((void**) &env, NULL);//&att_args_
 
        if (res !=0) {
           return NULL;

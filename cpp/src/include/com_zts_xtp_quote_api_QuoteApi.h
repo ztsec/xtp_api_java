@@ -7,13 +7,21 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/*
+* Class:     com_zts_xtp_quote_api_TradeApi
+* Method:    initGlog
+* Signature: (Ljava/lang/String;Ljava/lang/String;)V
+*/
+JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_initGlog
+        (JNIEnv *, jobject, jstring,jstring);
 /*
  * Class:     com_zts_xtp_quote_api_QuoteApi
- * Method:    connect
- * Signature: (SLjava/lang/String;)V
+ * Method:    quoteInit
+ * Signature: (SLjava/lang/String;Lcom/zts/xtp/common/enums/XtpLogLevel;)V
  */
-JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_connect
-  (JNIEnv *, jobject, jshort, jstring);
+JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_quoteInit
+  (JNIEnv *, jobject, jshort, jstring, jobject);
 
 /*
  * Class:     com_zts_xtp_quote_api_QuoteApi
