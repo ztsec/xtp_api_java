@@ -1,0 +1,13 @@
+inner=0
+clientId=18
+serverKey=23a71733bba3sd78722319b212e
+logFolder=/var/log/zts/xtp
+tradeServerIP=xx.xx.xx.xx
+tradeServerPort=1234
+userName=xxxxxx
+userPwd=xxxxxx
+tradeTransferProtocol=tcp
+quoteServerIP=xx.xx.xx.xx
+quoteServerPort=1234
+quoteTransferProtocol=tcp
+udpBufferSize=512

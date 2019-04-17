@@ -11,6 +11,7 @@ import com.zts.xtp.quote.model.response.TickerInfoResponse;
 import com.zts.xtp.quote.model.response.TickerPriceInfoResponse;
 import com.zts.xtp.quote.spi.QuoteSpi;
 import com.zts.xtp.common.enums.XtpLogLevel;
+import com.zts.xtp.common.enums.TransferProtocol;
 import java.io.File;
 import com.zts.xtp.common.jni.JNILoadLibrary;
 
@@ -81,9 +82,9 @@ public class QuoteApi {
      * @param port 服务器端口号
      * @param user 登陆用户名
      * @param password 登陆密码
-     * @param protocol “1”代表TCP，“2”代表UDP
+     * @param transferProtocol 数据传输协议  TransferProtocol.XTP_PROTOCOL_TCP=1   TransferProtocol.XTP_PROTOCOL_UDP=2
      */
-    public native int login(String ip, int port, String user, String password, int protocol);
+    public native int login(String ip, int port, String user, String password, TransferProtocol transferProtocol);
 
     /**
      * 登出

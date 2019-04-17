@@ -79,6 +79,9 @@ JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_tradeInit
         jclass queryOptionAuctionInfoRspClass = env->FindClass("com/zts/xtp/trade/model/response/OptionAuctionInfoResponse");
         ptrade->setXtpQueryOptionAuctionInfoRspClass((jclass)env->NewGlobalRef(queryOptionAuctionInfoRspClass));
 
+        jclass orderCancelInfoRspClass = env->FindClass("com/zts/xtp/trade/model/response/OrderCancelResponse");
+        ptrade->setXTPOrderCancelInfoRspClass((jclass)env->NewGlobalRef(orderCancelInfoRspClass));
+
         ptrade->setTradePluginJobject(env->NewGlobalRef(obj));
 
         jclass logLevelClass = env->FindClass("com/zts/xtp/common/enums/XtpLogLevel");

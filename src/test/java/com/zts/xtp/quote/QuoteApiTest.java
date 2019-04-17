@@ -1,13 +1,12 @@
 package com.zts.xtp.quote;
 
+import com.zts.xtp.common.enums.TransferProtocol;
+import com.zts.xtp.common.enums.XtpLogLevel;
 import com.zts.xtp.common.jni.JNILoadLibrary;
 import com.zts.xtp.quote.api.QuoteApi;
+import com.zts.xtp.userInfo.User;
 import org.junit.*;
 import org.junit.runners.MethodSorters;
-
-import java.io.File;
-
-import static org.junit.Assert.*;
 
 
 @FixMethodOrder(MethodSorters.JVM)
@@ -15,17 +14,31 @@ public class QuoteApiTest {
 
     private static QuoteApi quoteApi;
 
+
+    static {
+        User.readPropToInit();
+    }
+    private static final String XTP_TRADE_SERVER_IP = User.tradeServerIP;//xtp交易server的ip
+    private static final int XTP_TRADE_SERVER_PORT = User.tradeServerPort;//xtp交易server的端口
+    private static final String TRADE_KEY = User.serverKey;//xtp交易serverkey
+    private static final short CLIENT_ID = User.clientId;//xtp允许的clientid
+    private static final String XTP_QUOTE_SERVER_IP = User.quoteServerIP;//xtp行情server的ip
+    private static final int XTP_QUOTE_SERVER_PORT = User.quoteServerPort;//xtp行情server的端口
+    private static final String ACCOUNT = User.userName;//xtp资金账号
+    private static final String PASSWORD = User.userPwd;//xtp密码
+    private static final String DATA_FOLDER = User.logFolder;//java api输出日志的本地目录
+    private static final int UDPBUFFERSIZE = User.udpBufferSize;//如果是udp协议，需要设置缓冲区
+
     @BeforeClass
     public static void setUp() throws Exception {
         JNILoadLibrary.loadLibrary();
         TestQuoteSpi testspi = new TestQuoteSpi();
         quoteApi = new QuoteApi(testspi);
-        quoteApi.setUDPBufferSize(512);
+        quoteApi.setUDPBufferSize(UDPBUFFERSIZE);
 
-        short clientId = 18;
-        quoteApi.init(clientId,"/var/log/zts/xtp",XtpLogLevel.XTP_LOG_LEVEL_INFO);
+        quoteApi.init(CLIENT_ID,DATA_FOLDER,XtpLogLevel.XTP_LOG_LEVEL_INFO);
 
-        int login_result = quoteApi.login("xx.xx.xx.xx",1234,"xxxxxx","xxxxxx",1);
+        int login_result = quoteApi.login(XTP_QUOTE_SERVER_IP,XTP_QUOTE_SERVER_PORT,ACCOUNT,PASSWORD,TransferProtocol.XTP_PROTOCOL_TCP);
         Assert.assertEquals(login_result, 0);
     }
 
@@ -38,7 +51,7 @@ public class QuoteApiTest {
 
     @After
     public void waitSomeTime() throws InterruptedException {
-        Thread.sleep(2000);
+        Thread.sleep(5000);
     }
 
 

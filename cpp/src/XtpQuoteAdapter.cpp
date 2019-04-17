@@ -107,7 +107,7 @@ JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_disconnect (JNIEnv *e
 }
 
 JNIEXPORT jint JNICALL JNICALL Java_com_zts_xtp_quote_api_QuoteApi_login (JNIEnv *env, jobject obj, jstring ip,
-        jint port, jstring userName, jstring password, jint protocol)
+        jint port, jstring userName, jstring password, jobject jProtocol)
 {
     XtpQuote *pquote = getHandle<XtpQuote>(env, obj);
 
@@ -122,7 +122,13 @@ JNIEXPORT jint JNICALL JNICALL Java_com_zts_xtp_quote_api_QuoteApi_login (JNIEnv
     pquote->setServerPort(port);
     pquote->setUsername(strUsername.c_str());
     pquote->setPassword(strPassword.c_str());
-    pquote->setSocketType((XTP_PROTOCOL_TYPE)protocol);
+
+
+    jclass protocolClass = env->FindClass("com/zts/xtp/common/enums/TransferProtocol");
+    jmethodID getProtoColValue = env->GetMethodID(protocolClass, "getValue", "()I");
+    XTP_PROTOCOL_TYPE protocol = (XTP_PROTOCOL_TYPE)env->CallIntMethod(jProtocol, getProtoColValue);
+
+    pquote->setSocketType(protocol);
 
     int sessionId = pquote->Login();
 

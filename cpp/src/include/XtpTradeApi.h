@@ -91,7 +91,7 @@ public:
     void setXTPQueryIPOTickerRspClass(jclass jc) {query_ipo_ticker_rsp_class_ = jc;}
     void setXTPQueryIPOQuotaRspClass(jclass jc) {query_ipo_quota_rsp_class_ = jc;}
     void setXtpQueryOptionAuctionInfoRspClass(jclass jc) {query_option_auctionInfo_rsp_class_ = jc;}
-    void setXTPOrderCancelInfoClass(jclass jc){order_cancel_info_class_= jc;}
+    void setXTPOrderCancelInfoRspClass(jclass jc){order_cancel_info_class_= jc;}
 
     void setClientId(uint16_t client_id) { client_id_ = client_id; }
     uint16_t getClientId() { return(client_id_); }

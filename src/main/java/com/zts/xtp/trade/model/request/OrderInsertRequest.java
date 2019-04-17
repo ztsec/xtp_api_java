@@ -55,8 +55,10 @@ public class OrderInsertRequest {
     }
 
     public int getPositionEffectType() {
-        return positionEffectType.ordinal();
+        if(positionEffectType==null) return 0;//默认为初始化类型  现货适用
+        else return positionEffectType.ordinal();
     }
+
 
     public int getBusinessType() {
         return businessType.ordinal();

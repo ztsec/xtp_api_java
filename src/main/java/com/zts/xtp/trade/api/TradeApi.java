@@ -6,15 +6,7 @@ import com.zts.xtp.common.enums.XtpLogLevel;
 import com.zts.xtp.common.jni.JNILoadLibrary;
 import com.zts.xtp.common.model.ErrorMessage;
 
-import com.zts.xtp.trade.model.request.ETFBaseQueryRequest;
-import com.zts.xtp.trade.model.request.ETFComponentQueryRequest;
-import com.zts.xtp.trade.model.request.FundTransferLogQueryRequest;
-import com.zts.xtp.trade.model.request.OptionAuctionInfoRequest;
-import com.zts.xtp.trade.model.request.OrderInsertRequest;
-import com.zts.xtp.trade.model.request.OrderQueryRequest;
-import com.zts.xtp.trade.model.request.StructuredFundInfoQueryRequest;
-import com.zts.xtp.trade.model.request.TraderQueryRequest;
-import com.zts.xtp.trade.model.request.FundTransferRequest;
+import com.zts.xtp.trade.model.request.*;
 import com.zts.xtp.trade.model.response.*;
 import com.zts.xtp.trade.spi.TradeSpi;
 
@@ -97,7 +89,7 @@ public class TradeApi {
      * @param port 服务器端口号
      * @param user 登录用户名
      * @param password 	登录密码
-     * @param transferProtocol 数据传输协议
+     * @param transferProtocol 数据传输协议  TransferProtocol.XTP_PROTOCOL_TCP=1   TransferProtocol.XTP_PROTOCOL_UDP=2
      * @return 返回的sessionId表明此资金账号登录是否成功，“0”表示登录失败，可以调用GetApiLastError()来获取错误代码，非“0”表示登录成功，此时需要记录下这个返回值sessionId，与登录的资金账户对应
      */
     public native String login(String ip, int port, String user, String password, TransferProtocol transferProtocol);
@@ -304,9 +296,7 @@ public class TradeApi {
 
     private void onQueryETF(ETFBaseResponse etfBaseInfo, ErrorMessage errorMessage, String sessionId) {
         tradeSpi.onQueryETF(etfBaseInfo, errorMessage, sessionId);
-    }/**
- * Created by kunchen on 16/3/18.
- */
+    }
 
     private void onQueryETFBasket(ETFComponentResponse etfComponentInfo, ErrorMessage errorMessage, String sessionId) {
         tradeSpi.onQueryETFBasket(etfComponentInfo, errorMessage, sessionId);

@@ -4,30 +4,34 @@ package com.zts.xtp.trade;
 import com.zts.xtp.common.enums.*;
 import com.zts.xtp.common.jni.JNILoadLibrary;
 import com.zts.xtp.trade.api.TradeApi;
-import com.zts.xtp.trade.model.request.FundTransferRequest;
-import com.zts.xtp.trade.model.request.OrderInsertRequest;
-import com.zts.xtp.trade.model.request.ETFBaseQueryRequest;
-import com.zts.xtp.trade.model.request.ETFComponentQueryRequest;
-import com.zts.xtp.trade.model.request.FundTransferLogQueryRequest;
-import com.zts.xtp.trade.model.request.OrderQueryRequest;
-import com.zts.xtp.trade.model.request.StructuredFundInfoQueryRequest;
-import com.zts.xtp.trade.model.request.TraderQueryRequest;
+import com.zts.xtp.trade.model.request.*;
 import com.zts.xtp.trade.spi.TradeSpi;
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runners.MethodSorters;
+import com.zts.xtp.userInfo.User;
 
 @FixMethodOrder(MethodSorters.JVM)
 public class TradeApiTest {
     private static TradeApi tradeApi;
     private static String sessionId;
+
+
+
+
+    static {
+        User.readPropToInit();
+    }
+    private static final String XTP_TRADE_SERVER_IP = User.tradeServerIP;//xtp交易server的ip
+    private static final int XTP_TRADE_SERVER_PORT = User.tradeServerPort;//xtp交易server的端口
+    private static final String TRADE_KEY = User.serverKey;//xtp交易serverkey
+    private static final short CLIENT_ID = User.clientId;//xtp允许的clientid
+    private static final String XTP_QUOTE_SERVER_IP = User.quoteServerIP;//xtp行情server的ip
+    private static final int XTP_QUOTE_SERVER_PORT = User.quoteServerPort;//xtp行情server的端口
+    private static final String ACCOUNT = User.userName;//xtp资金账号
+    private static final String PASSWORD = User.userPwd;//xtp密码
+    private static final String DATA_FOLDER = User.logFolder;//java api输出日志的本地目录
+
+
 
     /**
      * 初始化xtp api，并登录，在所有case执行前执行一次
@@ -39,13 +43,32 @@ public class TradeApiTest {
         tradeApi = new TradeApi(tradeSpi);
 
         //现货
-        tradeApi.init((short)18, "23a71733bba3sd78722319b212e",
-            "/var/log/zts/xtp", XtpLogLevel.XTP_LOG_LEVEL_INFO);
-        sessionId = tradeApi.login("xx.xx.xx.xx", 1234,
-            "xxxxxx", "xxxxxx", TransferProtocol.XTP_PROTOCOL_TCP);
+        tradeApi.init(CLIENT_ID, TRADE_KEY,
+                DATA_FOLDER, XtpLogLevel.XTP_LOG_LEVEL_INFO);
+        sessionId = tradeApi.login(XTP_TRADE_SERVER_IP, XTP_TRADE_SERVER_PORT,
+                ACCOUNT, PASSWORD, TransferProtocol.XTP_PROTOCOL_TCP);
+
+
+        //现货
+//        tradeApi.init((short)18, "f11dcc367a5963df20be15408df9a86c",
+//            "/var/log/zts/xtp", XtpLogLevel.XTP_LOG_LEVEL_INFO);
+//        sessionId = tradeApi.login("10.26.134.198", 8016,
+//            "testshopt04tgt", "123456", TransferProtocol.XTP_PROTOCOL_TCP);
+
+        //期权
+//        tradeApi.init((short)18, "b8aa7173bba3470e390d787219b2112e",
+//                "/var/log/zts/xtp", XtpLogLevel.XTP_LOG_LEVEL_INFO);
+//        sessionId = tradeApi.login("10.29.181.88", 8002,
+//                "testshopt02", "123456", TransferProtocol.XTP_PROTOCOL_TCP);
+
 
         Assert.assertNotNull("login fail", sessionId);
         Assert.assertNotEquals("login fail", sessionId, "0");
+    }
+
+    @After
+    public void waitSomeTime() throws InterruptedException {
+        Thread.sleep(5000);
     }
 
     /**
@@ -53,13 +76,13 @@ public class TradeApiTest {
      */
     @AfterClass
     public static void tearDown() {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException ex) {
-            System.out.println("sleep error");
-        }
-        tradeApi.logout(sessionId);
-        tradeApi.disconnect();
+//        try {
+//            Thread.sleep(1000);
+//        } catch (InterruptedException ex) {
+//            System.out.println("sleep error");
+//        }
+//        tradeApi.logout(sessionId);
+//        tradeApi.disconnect();
     }
 
     /**

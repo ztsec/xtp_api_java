@@ -37,7 +37,7 @@ JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_disconnect
  * Signature: (Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;I)I
  */
 JNIEXPORT jint JNICALL Java_com_zts_xtp_quote_api_QuoteApi_login
-  (JNIEnv *, jobject, jstring, jint, jstring, jstring, jint);
+  (JNIEnv *, jobject, jstring, jint, jstring, jstring, jobject);
 
 /*
  * Class:     com_zts_xtp_quote_api_QuoteApi

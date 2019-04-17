@@ -2,18 +2,7 @@ package com.zts.xtp.trade.spi;
 
 
 import com.zts.xtp.common.model.ErrorMessage;
-import com.zts.xtp.trade.model.response.AssetResponse;
-import com.zts.xtp.trade.model.response.ETFBaseResponse;
-import com.zts.xtp.trade.model.response.ETFComponentResponse;
-import com.zts.xtp.trade.model.response.FundTransferResponse;
-import com.zts.xtp.trade.model.response.IPOQuotaResponse;
-import com.zts.xtp.trade.model.response.IPOTickerResponse;
-import com.zts.xtp.trade.model.response.OptionAuctionInfoResponse;
-import com.zts.xtp.trade.model.response.OrderCancelResponse;
-import com.zts.xtp.trade.model.response.StockPositionResponse;
-import com.zts.xtp.trade.model.response.StructuredFundResponse;
-import com.zts.xtp.trade.model.response.TradeResponse;
-import com.zts.xtp.trade.model.response.OrderResponse;
+import com.zts.xtp.trade.model.response.*;
 
 
 /**
@@ -190,8 +179,7 @@ public interface TradeSpi {
      * @param errorMessage 撤单被拒绝或者发生错误时错误代码和错误信息
      * @param sessionId 资金账户对应的sessionId，登录时得到
      */
-    default void onCancelOrderError(OrderCancelResponse orderCancelInfo, ErrorMessage errorMessage,
-        String sessionId) {
+    default void onCancelOrderError(OrderCancelResponse orderCancelInfo, ErrorMessage errorMessage, String sessionId) {
 
     }
 

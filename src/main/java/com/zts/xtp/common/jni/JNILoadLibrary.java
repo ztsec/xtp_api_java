@@ -12,7 +12,7 @@ public class JNILoadLibrary {
     public static void loadLibrary(String libraryPath) {
         if(libraryPath==null) libraryPath = "";
 		String osLibPath = System.getProperty("user.dir");
-        libraryPath = libraryPath+"cpp/src:/usr/local/lib:"+osLibPath+":c:/windows/system32";
+        libraryPath = "/usr/local/lib:"+osLibPath+":c:/windows/system32";//libraryPath+"cpp/src:
         String os = System.getProperty("os.name").toLowerCase();
         boolean osIsLinux = (os.indexOf("linux") != -1);
         boolean osIsWindows = false;

@@ -1,6 +1,8 @@
 package com.zts.xtp.demo.quote;
 
 
+import com.zts.xtp.common.enums.TransferProtocol;
+import com.zts.xtp.common.enums.XtpLogLevel;
 import com.zts.xtp.quote.api.QuoteApi;
 import com.zts.xtp.quote.spi.QuoteSpi;
 import java.io.File;
@@ -12,8 +14,8 @@ public class QuoteDemo {
     public QuoteDemo(String ip, int port, String user, String password, short clientId, String dataFolder){
         QuoteSpi quoteSpi = new QuoteSpiImpl();
         quoteApi = new QuoteApi(quoteSpi);
-        quoteApi.connect(clientId, dataFolder);
-        int loginResult = quoteApi.login(ip, port, user, password,1);
+        quoteApi.init(clientId, dataFolder, XtpLogLevel.XTP_LOG_LEVEL_INFO);
+        int loginResult = quoteApi.login(ip, port, user, password, TransferProtocol.XTP_PROTOCOL_TCP);
 
         loginFlag = (loginResult == 0);
     }
