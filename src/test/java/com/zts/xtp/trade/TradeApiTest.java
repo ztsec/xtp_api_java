@@ -42,24 +42,10 @@ public class TradeApiTest {
         TradeSpi tradeSpi = new TradeSpiImpl();
         tradeApi = new TradeApi(tradeSpi);
 
-        //现货
         tradeApi.init(CLIENT_ID, TRADE_KEY,
                 DATA_FOLDER, XtpLogLevel.XTP_LOG_LEVEL_INFO);
         sessionId = tradeApi.login(XTP_TRADE_SERVER_IP, XTP_TRADE_SERVER_PORT,
                 ACCOUNT, PASSWORD, TransferProtocol.XTP_PROTOCOL_TCP);
-
-
-        //现货
-//        tradeApi.init((short)18, "f11dcc367a5963df20be15408df9a86c",
-//            "/var/log/zts/xtp", XtpLogLevel.XTP_LOG_LEVEL_INFO);
-//        sessionId = tradeApi.login("10.26.134.198", 8016,
-//            "testshopt04tgt", "123456", TransferProtocol.XTP_PROTOCOL_TCP);
-
-        //期权
-//        tradeApi.init((short)18, "b8aa7173bba3470e390d787219b2112e",
-//                "/var/log/zts/xtp", XtpLogLevel.XTP_LOG_LEVEL_INFO);
-//        sessionId = tradeApi.login("10.29.181.88", 8002,
-//                "testshopt02", "123456", TransferProtocol.XTP_PROTOCOL_TCP);
 
 
         Assert.assertNotNull("login fail", sessionId);
