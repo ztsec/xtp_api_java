@@ -3,5 +3,5 @@
 /cpp/cmake-build-debug
 /cpp/cmake-build-release
 .gradle/
-user-noCommit.config.properties
 /xtp_api_demo/target
+user-noCommit.config.properites
