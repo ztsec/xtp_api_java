@@ -67,8 +67,8 @@ public class TradeApiTest {
 //        } catch (InterruptedException ex) {
 //            System.out.println("sleep error");
 //        }
-//        tradeApi.logout(sessionId);
-//        tradeApi.disconnect();
+        tradeApi.logout(sessionId);
+        tradeApi.disconnect();
     }
 
     /**

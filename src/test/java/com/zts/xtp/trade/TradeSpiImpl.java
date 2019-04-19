@@ -25,7 +25,11 @@ public class TradeSpiImpl implements TradeSpi {
     @Override
     public void onFundTransfer(FundTransferResponse fundTransferInfo, ErrorMessage errorMessage,
         String sessionId) {
-        System.out.println("onFundTransfer: " + fundTransferInfo.toString());
+        if (fundTransferInfo != null) {
+            System.out.println("onFundTransfer: " + fundTransferInfo.toString());
+        } else {
+            System.out.println("onFundTransfer error: " + errorMessage.toString());
+        }
     }
 
     @Override
@@ -51,7 +55,11 @@ public class TradeSpiImpl implements TradeSpi {
     @Override
     public void onQueryFundTransfer(FundTransferResponse fundTransferInfo, ErrorMessage errorMessage,
         String sessionId) {
-        System.out.println("onQueryFundTransfer: " + fundTransferInfo.toString());
+        if (fundTransferInfo != null) {
+            System.out.println("onQueryFundTransfer: " + fundTransferInfo.toString());
+        } else {
+            System.out.println("onQueryFundTransfer error: " + errorMessage.toString());
+        }
     }
 
     @Override
