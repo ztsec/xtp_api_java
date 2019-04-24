@@ -14,7 +14,7 @@
     
         > linux：
         
-            cp cpp/linux/* /usr/local/lib/
+            cp cpp/lib/linux/* /usr/local/lib/
             cp cpp/buildcpp/linux/libtradeplugin.so /usr/local/lib/
             cp cpp/buildcpp/linux/libquoteplugin.so /usr/local/lib/
             
