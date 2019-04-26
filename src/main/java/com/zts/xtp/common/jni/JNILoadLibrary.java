@@ -26,9 +26,9 @@ public class JNILoadLibrary {
             if(osIsWindows){
                 String arch = System.getProperty("os.arch");
                 if(arch=="x86")
-                    libraryPath = "cpp/lib/win32/dll:"+libraryPath; //加载工程目录下lib/win32下的xtp的dll
+                    libraryPath = "cpp/lib/win32/dll:cpp/buildcpp/win32:"+libraryPath; //加载工程目录下lib/win32下的xtp的dll
                 else
-                    libraryPath = "cpp/lib/win64/dll:"+libraryPath; //加载工程目录下lib/win64下的xtp的dll
+                    libraryPath = "cpp/lib/win64/dll:cpp/buildcpp/win64:"+libraryPath; //加载工程目录下lib/win64下的xtp的dll
             }else{
                 osIsMacOsX = "mac os x".equals(os);
                 libraryPath = "cpp/lib/macosx:"+libraryPath; //加载工程目录下lib/linux下的xtp的dylib
@@ -78,6 +78,49 @@ public class JNILoadLibrary {
             }
 
         }
+
+
+        //如果用遍历定义目录方式没找到（如c:\windows\system32在一些高版本的windows上java用listFiles访问不到，可能需要管理员权限），因此在系统目录用LoadLibrary方式尝试再加载一遍，兜底
+        if(!nativeLibHasLoaded.containsValue("glog"))
+            try{
+                System.loadLibrary("glog");
+                System.out.println("load native lib from Sys Path: "+"glog");
+                nativeLibHasLoaded.put("glog", "1");
+            }catch (Exception e){
+                System.err.println("Fail to load native lib from Sys Path: "+"glog");
+            }
+        if(!nativeLibHasLoaded.containsValue("xtpquoteapi"))
+            try{
+                System.loadLibrary("xtpquoteapi");
+                System.out.println("load native lib from Sys Path: "+"xtpquoteapi");
+                nativeLibHasLoaded.put("xtpquoteapi", "1");
+            }catch (Exception e){
+                System.err.println("Fail to load native lib from Sys Path: "+"xtpquoteapi");
+            }
+        if(!nativeLibHasLoaded.containsValue("xtptraderapi"))
+            try{
+                System.loadLibrary("xtptraderapi");
+                System.out.println("load native lib from Sys Path: "+"xtptraderapi");
+                nativeLibHasLoaded.put("xtptraderapi", "1");
+            }catch (Exception e){
+                System.err.println("Fail to load native lib from Sys Path: "+"xtptraderapi");
+            }
+        if(!nativeLibHasLoaded.containsValue("tradeplugin"))
+            try{
+                System.loadLibrary("tradeplugin");
+                System.out.println("load native lib from Sys Path: "+"tradeplugin");
+                nativeLibHasLoaded.put("tradeplugin", "1");
+            }catch (Exception e){
+                System.err.println("Fail to load native lib from Sys Path: "+"tradeplugin");
+            }
+        if(!nativeLibHasLoaded.containsValue("quoteplugin"))
+            try{
+                System.loadLibrary("quoteplugin");
+                System.out.println("load native lib from Sys Path: "+"quoteplugin");
+                nativeLibHasLoaded.put("quoteplugin", "1");
+            }catch (Exception e){
+                System.err.println("Fail to load native lib from Sys Path: "+"quoteplugin");
+            }
 
     }
 }

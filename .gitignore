@@ -5,3 +5,5 @@
 .gradle/
 /xtp_api_demo/target
 user-noCommit.config.properites
+.idea/
+/cpp/build/
