@@ -20,7 +20,7 @@
 #define MD_API_EXPORT __declspec(dllimport)
 #endif
 #else
-#define MD_API_EXPORT
+#define MD_API_EXPORT 
 #endif
 
 /*!
@@ -110,40 +110,40 @@ namespace XTP {
 			virtual void OnTickByTick(XTPTBT *tbt_data) {};
 
 			///订阅全市场的股票行情应答
-			///@param exchage_id 表示当前全订阅的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
+			///@param exchange_id 表示当前全订阅的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
 			///@param error_info 取消订阅合约时发生错误时返回的错误信息，当error_info为空，或者error_info.error_id为0时，表明没有错误
 			///@remark 需要快速返回
-			virtual void OnSubscribeAllMarketData(XTP_EXCHANGE_TYPE exchage_id, XTPRI *error_info) {};
+			virtual void OnSubscribeAllMarketData(XTP_EXCHANGE_TYPE exchange_id, XTPRI *error_info) {};
 
 			///退订全市场的股票行情应答
-			///@param exchage_id 表示当前全订阅的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
+			///@param exchange_id 表示当前退订的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
 			///@param error_info 取消订阅合约时发生错误时返回的错误信息，当error_info为空，或者error_info.error_id为0时，表明没有错误
 			///@remark 需要快速返回
-			virtual void OnUnSubscribeAllMarketData(XTP_EXCHANGE_TYPE exchage_id, XTPRI *error_info) {};
+			virtual void OnUnSubscribeAllMarketData(XTP_EXCHANGE_TYPE exchange_id, XTPRI *error_info) {};
 
 			///订阅全市场的股票行情订单簿应答
-			///@param exchage_id 表示当前全订阅的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
+			///@param exchange_id 表示当前全订阅的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
 			///@param error_info 取消订阅合约时发生错误时返回的错误信息，当error_info为空，或者error_info.error_id为0时，表明没有错误
 			///@remark 需要快速返回
-			virtual void OnSubscribeAllOrderBook(XTP_EXCHANGE_TYPE exchage_id, XTPRI *error_info) {};
+			virtual void OnSubscribeAllOrderBook(XTP_EXCHANGE_TYPE exchange_id, XTPRI *error_info) {};
 
 			///退订全市场的股票行情订单簿应答
-			///@param exchage_id 表示当前全订阅的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
+			///@param exchange_id 表示当前退订的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
 			///@param error_info 取消订阅合约时发生错误时返回的错误信息，当error_info为空，或者error_info.error_id为0时，表明没有错误
 			///@remark 需要快速返回
-			virtual void OnUnSubscribeAllOrderBook(XTP_EXCHANGE_TYPE exchage_id, XTPRI *error_info) {};
+			virtual void OnUnSubscribeAllOrderBook(XTP_EXCHANGE_TYPE exchange_id, XTPRI *error_info) {};
 
 			///订阅全市场的股票逐笔行情应答
-			///@param exchage_id 表示当前全订阅的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
+			///@param exchange_id 表示当前全订阅的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
 			///@param error_info 取消订阅合约时发生错误时返回的错误信息，当error_info为空，或者error_info.error_id为0时，表明没有错误
 			///@remark 需要快速返回
-			virtual void OnSubscribeAllTickByTick(XTP_EXCHANGE_TYPE exchage_id, XTPRI *error_info) {};
+			virtual void OnSubscribeAllTickByTick(XTP_EXCHANGE_TYPE exchange_id, XTPRI *error_info) {};
 
 			///退订全市场的股票逐笔行情应答
-			///@param exchage_id 表示当前全订阅的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
+			///@param exchange_id 表示当前退订的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
 			///@param error_info 取消订阅合约时发生错误时返回的错误信息，当error_info为空，或者error_info.error_id为0时，表明没有错误
 			///@remark 需要快速返回
-			virtual void OnUnSubscribeAllTickByTick(XTP_EXCHANGE_TYPE exchage_id, XTPRI *error_info) {};
+			virtual void OnUnSubscribeAllTickByTick(XTP_EXCHANGE_TYPE exchange_id, XTPRI *error_info) {};
 
 
 			///查询可交易合约的应答
@@ -159,40 +159,40 @@ namespace XTP {
 			virtual void OnQueryTickersPriceInfo(XTPTPI* ticker_info, XTPRI *error_info, bool is_last) {};
 
 			///订阅全市场的期权行情应答
-			///@param exchage_id 表示当前全订阅的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
+			///@param exchange_id 表示当前全订阅的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
 			///@param error_info 取消订阅合约时发生错误时返回的错误信息，当error_info为空，或者error_info.error_id为0时，表明没有错误
 			///@remark 需要快速返回
-			virtual void OnSubscribeAllOptionMarketData(XTP_EXCHANGE_TYPE exchage_id, XTPRI *error_info) {};
+			virtual void OnSubscribeAllOptionMarketData(XTP_EXCHANGE_TYPE exchange_id, XTPRI *error_info) {};
 
 			///退订全市场的期权行情应答
-			///@param exchage_id 表示当前全订阅的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
+			///@param exchange_id 表示当前退订的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
 			///@param error_info 取消订阅合约时发生错误时返回的错误信息，当error_info为空，或者error_info.error_id为0时，表明没有错误
 			///@remark 需要快速返回
-			virtual void OnUnSubscribeAllOptionMarketData(XTP_EXCHANGE_TYPE exchage_id, XTPRI *error_info) {};
+			virtual void OnUnSubscribeAllOptionMarketData(XTP_EXCHANGE_TYPE exchange_id, XTPRI *error_info) {};
 
 			///订阅全市场的期权行情订单簿应答
-			///@param exchage_id 表示当前全订阅的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
+			///@param exchange_id 表示当前全订阅的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
 			///@param error_info 取消订阅合约时发生错误时返回的错误信息，当error_info为空，或者error_info.error_id为0时，表明没有错误
 			///@remark 需要快速返回
-			virtual void OnSubscribeAllOptionOrderBook(XTP_EXCHANGE_TYPE exchage_id, XTPRI *error_info) {};
+			virtual void OnSubscribeAllOptionOrderBook(XTP_EXCHANGE_TYPE exchange_id, XTPRI *error_info) {};
 
 			///退订全市场的期权行情订单簿应答
-			///@param exchage_id 表示当前全订阅的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
+			///@param exchange_id 表示当前退订的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
 			///@param error_info 取消订阅合约时发生错误时返回的错误信息，当error_info为空，或者error_info.error_id为0时，表明没有错误
 			///@remark 需要快速返回
-			virtual void OnUnSubscribeAllOptionOrderBook(XTP_EXCHANGE_TYPE exchage_id, XTPRI *error_info) {};
+			virtual void OnUnSubscribeAllOptionOrderBook(XTP_EXCHANGE_TYPE exchange_id, XTPRI *error_info) {};
 
 			///订阅全市场的期权逐笔行情应答
-			///@param exchage_id 表示当前全订阅的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
+			///@param exchange_id 表示当前全订阅的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
 			///@param error_info 取消订阅合约时发生错误时返回的错误信息，当error_info为空，或者error_info.error_id为0时，表明没有错误
 			///@remark 需要快速返回
-			virtual void OnSubscribeAllOptionTickByTick(XTP_EXCHANGE_TYPE exchage_id, XTPRI *error_info) {};
+			virtual void OnSubscribeAllOptionTickByTick(XTP_EXCHANGE_TYPE exchange_id, XTPRI *error_info) {};
 
 			///退订全市场的期权逐笔行情应答
-			///@param exchage_id 表示当前全订阅的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
+			///@param exchange_id 表示当前退订的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
 			///@param error_info 取消订阅合约时发生错误时返回的错误信息，当error_info为空，或者error_info.error_id为0时，表明没有错误
 			///@remark 需要快速返回
-			virtual void OnUnSubscribeAllOptionTickByTick(XTP_EXCHANGE_TYPE exchage_id, XTPRI *error_info) {};
+			virtual void OnUnSubscribeAllOptionTickByTick(XTP_EXCHANGE_TYPE exchange_id, XTPRI *error_info) {};
 		};
 	}
 }
@@ -259,81 +259,87 @@ namespace XTP {
 
 			///订阅行情，包括股票、指数和期权。
 			///@return 订阅接口调用是否成功，“0”表示接口调用成功，非“0”表示接口调用出错
-			///@param ticker 合约ID数组，注意合约代码必须以'\0'结尾，不包含空格
+			///@param ticker 合约ID数组，注意合约代码必须以'\0'结尾，不包含空格 
 			///@param count 要订阅/退订行情的合约个数
-			///@param exchage_id 交易所代码
+			///@param exchange_id 交易所代码
 			///@remark 可以一次性订阅同一证券交易所的多个合约，无论用户因为何种问题需要重新登录行情服务器，都需要重新订阅行情
-			virtual int SubscribeMarketData(char *ticker[], int count, XTP_EXCHANGE_TYPE exchage_id) = 0;
+			virtual int SubscribeMarketData(char *ticker[], int count, XTP_EXCHANGE_TYPE exchange_id) = 0;
 
 			///退订行情，包括股票、指数和期权。
 			///@return 取消订阅接口调用是否成功，“0”表示接口调用成功，非“0”表示接口调用出错
-			///@param ticker 合约ID数组，注意合约代码必须以'\0'结尾，不包含空格
+			///@param ticker 合约ID数组，注意合约代码必须以'\0'结尾，不包含空格  
 			///@param count 要订阅/退订行情的合约个数
-			///@param exchage_id 交易所代码
+			///@param exchange_id 交易所代码
 			///@remark 可以一次性取消订阅同一证券交易所的多个合约，需要与订阅行情接口配套使用
-			virtual int UnSubscribeMarketData(char *ticker[], int count, XTP_EXCHANGE_TYPE exchage_id) = 0;
+			virtual int UnSubscribeMarketData(char *ticker[], int count, XTP_EXCHANGE_TYPE exchange_id) = 0;
 
 			///订阅行情订单簿，包括股票、指数和期权。
 			///@return 订阅行情订单簿接口调用是否成功，“0”表示接口调用成功，非“0”表示接口调用出错
-			///@param ticker 合约ID数组，注意合约代码必须以'\0'结尾，不包含空格
+			///@param ticker 合约ID数组，注意合约代码必须以'\0'结尾，不包含空格 
 			///@param count 要订阅/退订行情订单簿的合约个数
-			///@param exchage_id 交易所代码
-			///@remark 可以一次性订阅同一证券交易所的多个合约，无论用户因为何种问题需要重新登录行情服务器，都需要重新订阅行情(暂不支持)
-			virtual int SubscribeOrderBook(char *ticker[], int count, XTP_EXCHANGE_TYPE exchage_id) = 0;
+			///@param exchange_id 交易所代码
+			///@remark 可以一次性订阅同一证券交易所的多个合约，无论用户因为何种问题需要重新登录行情服务器，都需要重新订阅行情(仅支持深交所)
+			virtual int SubscribeOrderBook(char *ticker[], int count, XTP_EXCHANGE_TYPE exchange_id) = 0;
 
 			///退订行情订单簿，包括股票、指数和期权。
 			///@return 取消订阅行情订单簿接口调用是否成功，“0”表示接口调用成功，非“0”表示接口调用出错
-			///@param ticker 合约ID数组，注意合约代码必须以'\0'结尾，不包含空格
+			///@param ticker 合约ID数组，注意合约代码必须以'\0'结尾，不包含空格  
 			///@param count 要订阅/退订行情订单簿的合约个数
-			///@param exchage_id 交易所代码
+			///@param exchange_id 交易所代码
 			///@remark 可以一次性取消订阅同一证券交易所的多个合约，需要与订阅行情订单簿接口配套使用
-			virtual int UnSubscribeOrderBook(char *ticker[], int count, XTP_EXCHANGE_TYPE exchage_id) = 0;
+			virtual int UnSubscribeOrderBook(char *ticker[], int count, XTP_EXCHANGE_TYPE exchange_id) = 0;
 
 			///订阅逐笔行情，包括股票、指数和期权。
 			///@return 订阅逐笔行情接口调用是否成功，“0”表示接口调用成功，非“0”表示接口调用出错
-			///@param ticker 合约ID数组，注意合约代码必须以'\0'结尾，不包含空格
+			///@param ticker 合约ID数组，注意合约代码必须以'\0'结尾，不包含空格  
 			///@param count 要订阅/退订行情订单簿的合约个数
-			///@param exchage_id 交易所代码
-			///@remark 可以一次性订阅同一证券交易所的多个合约，无论用户因为何种问题需要重新登录行情服务器，都需要重新订阅行情(暂不支持)
-			virtual int SubscribeTickByTick(char *ticker[], int count, XTP_EXCHANGE_TYPE exchage_id) = 0;
+			///@param exchange_id 交易所代码
+			///@remark 可以一次性订阅同一证券交易所的多个合约，无论用户因为何种问题需要重新登录行情服务器，都需要重新订阅行情
+			virtual int SubscribeTickByTick(char *ticker[], int count, XTP_EXCHANGE_TYPE exchange_id) = 0;
 
 			///退订逐笔行情，包括股票、指数和期权。
 			///@return 取消订阅逐笔行情接口调用是否成功，“0”表示接口调用成功，非“0”表示接口调用出错
-			///@param ticker 合约ID数组，注意合约代码必须以'\0'结尾，不包含空格
+			///@param ticker 合约ID数组，注意合约代码必须以'\0'结尾，不包含空格  
 			///@param count 要订阅/退订行情订单簿的合约个数
-			///@param exchage_id 交易所代码
+			///@param exchange_id 交易所代码
 			///@remark 可以一次性取消订阅同一证券交易所的多个合约，需要与订阅逐笔行情接口配套使用
-			virtual int UnSubscribeTickByTick(char *ticker[], int count, XTP_EXCHANGE_TYPE exchage_id) = 0;
+			virtual int UnSubscribeTickByTick(char *ticker[], int count, XTP_EXCHANGE_TYPE exchange_id) = 0;
 
 			///订阅全市场的股票行情
 			///@return 订阅全市场行情接口调用是否成功，“0”表示接口调用成功，非“0”表示接口调用出错
+			///@param exchange_id 表示当前全订阅的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
 			///@remark 需要与全市场退订行情接口配套使用
-			virtual int SubscribeAllMarketData(XTP_EXCHANGE_TYPE exchage_id = XTP_EXCHANGE_UNKNOWN) = 0;
+			virtual int SubscribeAllMarketData(XTP_EXCHANGE_TYPE exchange_id = XTP_EXCHANGE_UNKNOWN) = 0;
 
 			///退订全市场的股票行情
 			///@return 退订全市场行情接口调用是否成功，“0”表示接口调用成功，非“0”表示接口调用出错
+			///@param exchange_id 表示当前退订的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
 			///@remark 需要与订阅全市场行情接口配套使用
-			virtual int UnSubscribeAllMarketData(XTP_EXCHANGE_TYPE exchage_id = XTP_EXCHANGE_UNKNOWN) = 0;
+			virtual int UnSubscribeAllMarketData(XTP_EXCHANGE_TYPE exchange_id = XTP_EXCHANGE_UNKNOWN) = 0;
 
 			///订阅全市场的股票行情订单簿
 			///@return 订阅全市场行情订单簿接口调用是否成功，“0”表示接口调用成功，非“0”表示接口调用出错
+			///@param exchange_id 表示当前全订阅的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
 			///@remark 需要与全市场退订行情订单簿接口配套使用
-			virtual int SubscribeAllOrderBook(XTP_EXCHANGE_TYPE exchage_id = XTP_EXCHANGE_UNKNOWN) = 0;
+			virtual int SubscribeAllOrderBook(XTP_EXCHANGE_TYPE exchange_id = XTP_EXCHANGE_UNKNOWN) = 0;
 
 			///退订全市场的股票行情订单簿
 			///@return 退订全市场行情订单簿接口调用是否成功，“0”表示接口调用成功，非“0”表示接口调用出错
+			///@param exchange_id 表示当前退订的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
 			///@remark 需要与订阅全市场行情订单簿接口配套使用
-			virtual int UnSubscribeAllOrderBook(XTP_EXCHANGE_TYPE exchage_id = XTP_EXCHANGE_UNKNOWN) = 0;
+			virtual int UnSubscribeAllOrderBook(XTP_EXCHANGE_TYPE exchange_id = XTP_EXCHANGE_UNKNOWN) = 0;
 
 			///订阅全市场的股票逐笔行情
 			///@return 订阅全市场逐笔行情接口调用是否成功，“0”表示接口调用成功，非“0”表示接口调用出错
+			///@param exchange_id 表示当前全订阅的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
 			///@remark 需要与全市场退订逐笔行情接口配套使用
-			virtual int SubscribeAllTickByTick(XTP_EXCHANGE_TYPE exchage_id = XTP_EXCHANGE_UNKNOWN) = 0;
+			virtual int SubscribeAllTickByTick(XTP_EXCHANGE_TYPE exchange_id = XTP_EXCHANGE_UNKNOWN) = 0;
 
 			///退订全市场的股票逐笔行情
 			///@return 退订全市场逐笔行情接口调用是否成功，“0”表示接口调用成功，非“0”表示接口调用出错
+			///@param exchange_id 表示当前退订的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
 			///@remark 需要与订阅全市场逐笔行情接口配套使用
-			virtual int UnSubscribeAllTickByTick(XTP_EXCHANGE_TYPE exchage_id = XTP_EXCHANGE_UNKNOWN) = 0;
+			virtual int UnSubscribeAllTickByTick(XTP_EXCHANGE_TYPE exchange_id = XTP_EXCHANGE_UNKNOWN) = 0;
 
 			///用户登录请求
 			///@return 登录是否成功，“0”表示登录成功，“-1”表示连接服务器出错，此时用户可以调用GetApiLastError()来获取错误代码，“-2”表示已存在连接，不允许重复登录，如果需要重连，请先logout，“-3”表示输入有错误
@@ -353,13 +359,15 @@ namespace XTP {
 
 			///获取当前交易日可交易合约
 			///@return 查询是否成功，“0”表示查询成功，非“0”表示查询不成功
-			///@param exchage_id 交易所代码
-			virtual int QueryAllTickers(XTP_EXCHANGE_TYPE exchage_id) = 0;
+			///@param exchange_id 交易所代码
+			virtual int QueryAllTickers(XTP_EXCHANGE_TYPE exchange_id) = 0;
 
 			///获取合约的最新价格信息
 			///@return 查询是否成功，“0”表示查询成功，非“0”表示查询不成功
-			///@param exchage_id 交易所代码
-			virtual int QueryTickersPriceInfo(char *ticker[], int count, XTP_EXCHANGE_TYPE exchage_id) = 0;
+			///@param ticker 合约ID数组，注意合约代码必须以'\0'结尾，不包含空格  
+			///@param count 要查询的合约个数
+			///@param exchange_id 交易所代码
+			virtual int QueryTickersPriceInfo(char *ticker[], int count, XTP_EXCHANGE_TYPE exchange_id) = 0;
 
 			///获取所有合约的最新价格信息
 			///@return 查询是否成功，“0”表示查询成功，非“0”表示查询不成功
@@ -367,33 +375,39 @@ namespace XTP {
 
 			///订阅全市场的期权行情
 			///@return 订阅全市期权场行情接口调用是否成功，“0”表示接口调用成功，非“0”表示接口调用出错
+			///@param exchange_id 表示当前全订阅的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
 			///@remark 需要与全市场退订期权行情接口配套使用
-			virtual int SubscribeAllOptionMarketData(XTP_EXCHANGE_TYPE exchage_id = XTP_EXCHANGE_UNKNOWN) = 0;
+			virtual int SubscribeAllOptionMarketData(XTP_EXCHANGE_TYPE exchange_id = XTP_EXCHANGE_UNKNOWN) = 0;
 
 			///退订全市场的期权行情
 			///@return 退订全市场期权行情接口调用是否成功，“0”表示接口调用成功，非“0”表示接口调用出错
+			///@param exchange_id 表示当前退订的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
 			///@remark 需要与订阅全市场期权行情接口配套使用
-			virtual int UnSubscribeAllOptionMarketData(XTP_EXCHANGE_TYPE exchage_id = XTP_EXCHANGE_UNKNOWN) = 0;
+			virtual int UnSubscribeAllOptionMarketData(XTP_EXCHANGE_TYPE exchange_id = XTP_EXCHANGE_UNKNOWN) = 0;
 
 			///订阅全市场的期权行情订单簿
 			///@return 订阅全市场期权行情订单簿接口调用是否成功，“0”表示接口调用成功，非“0”表示接口调用出错
+			///@param exchange_id 表示当前全订阅的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
 			///@remark 需要与全市场退订期权行情订单簿接口配套使用
-			virtual int SubscribeAllOptionOrderBook(XTP_EXCHANGE_TYPE exchage_id = XTP_EXCHANGE_UNKNOWN) = 0;
+			virtual int SubscribeAllOptionOrderBook(XTP_EXCHANGE_TYPE exchange_id = XTP_EXCHANGE_UNKNOWN) = 0;
 
 			///退订全市场的期权行情订单簿
 			///@return 退订全市场期权行情订单簿接口调用是否成功，“0”表示接口调用成功，非“0”表示接口调用出错
+			///@param exchange_id 表示当前退订的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
 			///@remark 需要与订阅全市场期权行情订单簿接口配套使用
-			virtual int UnSubscribeAllOptionOrderBook(XTP_EXCHANGE_TYPE exchage_id = XTP_EXCHANGE_UNKNOWN) = 0;
+			virtual int UnSubscribeAllOptionOrderBook(XTP_EXCHANGE_TYPE exchange_id = XTP_EXCHANGE_UNKNOWN) = 0;
 
 			///订阅全市场的期权逐笔行情
 			///@return 订阅全市场期权逐笔行情接口调用是否成功，“0”表示接口调用成功，非“0”表示接口调用出错
+			///@param exchange_id 表示当前全订阅的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
 			///@remark 需要与全市场退订期权逐笔行情接口配套使用
-			virtual int SubscribeAllOptionTickByTick(XTP_EXCHANGE_TYPE exchage_id = XTP_EXCHANGE_UNKNOWN) = 0;
+			virtual int SubscribeAllOptionTickByTick(XTP_EXCHANGE_TYPE exchange_id = XTP_EXCHANGE_UNKNOWN) = 0;
 
 			///退订全市场的期权逐笔行情
 			///@return 退订全市场期权逐笔行情接口调用是否成功，“0”表示接口调用成功，非“0”表示接口调用出错
+			///@param exchange_id 表示当前退订的市场，如果为XTP_EXCHANGE_UNKNOWN，表示沪深全市场，XTP_EXCHANGE_SH表示为上海全市场，XTP_EXCHANGE_SZ表示为深圳全市场
 			///@remark 需要与订阅全市场期权逐笔行情接口配套使用
-			virtual int UnSubscribeAllOptionTickByTick(XTP_EXCHANGE_TYPE exchage_id = XTP_EXCHANGE_UNKNOWN) = 0;
+			virtual int UnSubscribeAllOptionTickByTick(XTP_EXCHANGE_TYPE exchange_id = XTP_EXCHANGE_UNKNOWN) = 0;
 
 
 		protected:

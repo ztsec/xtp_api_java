@@ -4,19 +4,12 @@ apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 group = 'com.zts.xtp'
-version = '1.1.18.13'
+version = '1.1.18.19'
 
 
 
 buildscript {
     repositories {
-//        maven {
-//            url 'http://artifactory.sh.zts.com.cn:8081/artifactory/plugins-release'
-//            credentials {
-//                username = "${artifactory_user}"
-//                password = "${artifactory_password}"
-//            }
-//        }
         maven {
            url "https://plugins.gradle.org/m2/"
         }
@@ -32,24 +25,23 @@ buildscript {
 
 }
 
-artifactory {
-    contextUrl = "${artifactory_contextUrl}"
-    publish {
-        repository {
-            repoKey = 'libs_xtp_java_api_local'
-            username = "${artifactory_user}"
-            password = "${artifactory_password}"
-        }
-        defaults {
-            // Reference to Gradle publications defined in the build script.
-            // This is how we tell the Artifactory Plugin which artifacts should be
-            // published to Artifactory.
-            publications('mavenJava')
-            publishArtifacts = true
-            publishBuildInfo = false
-    }
-  }
-}
+//artifactory {
+//    publish {
+//        repository {
+//            repoKey = 'libs_xtp_java_api_local'
+//            username = "${artifactory_user}"
+//            password = "${artifactory_password}"
+//        }
+//        defaults {
+//            // Reference to Gradle publications defined in the build script.
+//            // This is how we tell the Artifactory Plugin which artifacts should be
+//            // published to Artifactory.
+//            publications('mavenJava')
+//            publishArtifacts = true
+//            publishBuildInfo = false
+//    }
+//  }
+//}
 
 // Force utf-8 for all compiling tasks
 tasks.withType(AbstractCompile) {
@@ -75,13 +67,7 @@ repositories {
     }
     maven{url "http://maven.ibiblio.org/maven2/"}
     maven{url "http://maven.aliyun.com/nexus/content/groups/public/"}
-//    maven {
-//        url 'http://artifactory.sh.zts.com.cn:8081/artifactory/plugins-release'
-//        credentials {
-//            username = "${artifactory_user}"
-//            password = "${artifactory_password}"
-//        }
-//    }
+
 }
 
 ext {

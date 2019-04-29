@@ -1,11 +1,13 @@
 # 中泰证券量化交易平台XTP JAVA API接口
     本项目是中泰证券XTP极速交易JAVA接口的开源实现，供客户在量化交易中使用JAVA接口快速接入XTP系统。中泰证券XTP是为股票交易而生的极速交易系统，为投资者提供极速交易、极速行情、Level2行情。
 
-    目前支持xtp版本为1.1.18.13，支持win、linux、mac平台运行
+    目前支持xtp版本为1.1.18.19，支持win、linux、mac平台运行
     
     请先到中泰证券xtp官方网站申请测试账号 https://xtp.zts.com.cn/register 及测试环境的连接ip、端口等信息
                                                                                         
     API参考官方C++版本的接口文档https://xtp.zts.com.cn/home
+    
+    如果您的linux是glibc2.12版本，请先手工将cpp/lib/linux_glibc2.12下的两个dll覆盖到cpp/lib/linux下，默认cpp/lib/linux下是同cpp/lib/linux_glibc2.14一样的glibc2.14版本编译的
    
 
 ##如何使用：
@@ -27,24 +29,26 @@
         > win32：
         
             copy cpp\lib\win32\dll\*  c:\windows\system32\
-            copy cpp\buildcpp\win32\libtradeplugin.dll  c:\windows\system32\
-            copy cpp\buildcpp\win32\libquoteplugin.dll  c:\windows\system32\
+            copy cpp\buildcpp\win32\dll\tradeplugin.dll  c:\windows\system32\
+            copy cpp\buildcpp\win32\dll\quoteplugin.dll  c:\windows\system32\
             
          > win64：
                  
             copy cpp\lib\win64\dll\*  c:\windows\system32\
-            copy cpp\buildcpp\win64\libtradeplugin.dll  c:\windows\system32\
-            copy cpp\buildcpp\win64\libquoteplugin.dll  c:\windows\system32\
+            copy cpp\buildcpp\win64\dll\tradeplugin.dll  c:\windows\system32\
+            copy cpp\buildcpp\win64\dll\quoteplugin.dll  c:\windows\system32\
                      
-                     
-    * 2）在量化交易java代码中引入xtpapi-1.1.18.13.jar并使用
+    * 2）确保有JRE8及以上被安装在目标主机，如果是windows还需要安装Visual C++ Redistributable for Visual Studio 2015，下载地址：                 
+         https://www.microsoft.com/zh-CN/download/details.aspx?id=48145
+         
+    * 3）在量化交易java代码中引入xtpapi-1.1.18.13.jar并使用
     
          > 如需进行单元测试：
                            
             src/test/java/com.zts.xtp/trade/TradeApiTest.java是交易的单元测试：
             修改TradeApiTest.java：
             tradeApi.init((short)18, "23a71733bba3sd78722319b212e",
-                       "/var/log/zts/xtp", XtpLogLevel.XTP_LOG_LEVEL_INFO);
+                       "/var/log/zts/xtp", XtpLogLevel.XTP_LOG_LEVEL_INFO, JniLogLevel.JNI_LOG_LEVEL_INFO);
             sessionId = tradeApi.login("xx.xx.xx.xx", 1234,
                        "15001030", "xxxxxx", TransferProtocol.XTP_PROTOCOL_TCP);
             init方法的第1个参数是xtp client id（不超过255），实盘环境配置请联系官方人员获取，
@@ -56,10 +60,12 @@
                                           
             src/test/java/com.zts.xtp/quote/QuoteApiTest.java是行情的单元测试：
             修改QuoteApiTest.java：
-            quoteApi.init((short)18,"/var/log/zts/xtp",XtpLogLevel.XTP_LOG_LEVEL_INFO);
+            quoteApi.init((short)18,"/var/log/zts/xtp",XtpLogLevel.XTP_LOG_LEVEL_INFO, JniLogLevel.JNI_LOG_LEVEL_INFO);
             int login_result = quoteApi.login("xx.xx.xx.xx",1234,"xxxxx","xxxxxx",1);
             login方法第1个参数为xtp行情ip、第2个参数为xtp行情端口、第3个参数为申请到的测试账号、第4个参数为账号密码，
                     实盘环境的环境信息及资金账号请联系官方人员获取。
+                    
+            上述参数也可以通过根目录下user.config.properites中配置。公网测试环境请使用TCP连接，UPD会收不到数据。
                     
             执行./gradlew build -x test进行重新编译java生成xtpapi-1.1.18.13.jar
             分别执行TradeApiTest、QuoteApiTest中的junit单元测试。
@@ -77,7 +83,7 @@
                     private static final String ACCOUNT = "xxxxxx";//xtp资金账号
                     private static final String PASSWORD = "xxxxxx";//xtp密码
                     private static final String DATA_FOLDER = "/var/log/zts/xtp";//java api输出日志的本地目录
-            运行Application.java即可
+            运行Application.java即可，上述参数也可以通过根目录下user.config.properites中配置。公网测试环境请使用TCP连接，UPD会收不到数据。
 
  
 <br/>
@@ -103,29 +109,46 @@
     
         > 根据系统安装对应jdk https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
    
-    * 4）在工程根目录下的mkdir cpp/build,进入到cpp/build目录执行cmake ..
-         如果是linux或mac：则继续执行 make&&make install 进行编译和安装 
-         如果是win：则在cpp/build目录会生成visual studio工程，打开执行编译
-         则在/usr/local/lib(win下需要手工将编译生成的dll从cpp\build\Release拷贝到c:\windows\system32\)下会新增5个动态库：
-    
-        > linux：libglog.so、libxtptraderapi.so、libxtpquoteapi.so、libtradeplugin.so、libquoteplugin.so
-   
-        > mac：libglog.dylib、libxtptraderapi.dylib、libxtpquoteapi.dylib、libtradeplugin.dylib、libquoteplugin.dylib
+    * 4）编译jni部分2个plugin动态库，在工程根目录下的mkdir cpp/build
+                 
+        > 如果是linux或mac：
         
-        > win：libglog.dll、libxtptraderapi.dll、libxtpquoteapi.dll、libtradeplugin.dll、libquoteplugin.dll
+         进入到cpp/build目录执行cmake .. 则继续执行 make&&make install 进行编译和安装 
+         则在/usr/local/lib下会新增5个动态库：
+         
+            linux：libglog.so、libxtptraderapi.so、libxtpquoteapi.so、libtradeplugin.so、libquoteplugin.so
+            
+            mac：libglog.dylib、libxtptraderapi.dylib、libxtpquoteapi.dylib、libtradeplugin.dylib、libquoteplugin.dylib
+                  
+        > 如果是Win：
+        
+         打开CMake GUI，where is the source code选项目下cpp目录，where to build libraries选cpp/build目录, 点configure在弹出的对话框中，
+         specify the generator for this project选择本机Visual stuido对应的版本（请务必先手工打开visual studio，防止license过期等导致不可用进而执行cmake失败），
+         注意如果要编译64位，一定要选择有Win64字样的选项，如Visual Studio 14 2015 Win64,
+         点击finish，点击configure右侧的generate，回到cpp/build目录下回生成cpp.sln文件即为visual stuidio的工程文件。
+         先用管理员权限打开visual studio，然后打开cpp.sln，打开后在cpp解决方案点右键点生成解决方案，
+         若编译都通过，然后选择名为install的工程右键执行生成（若报error MSB3073: 命令“setlocal错误，说明visual studio没有用管理员权限打开，无法写入系统目录，重新用管理员权限打开再执行生成即可），
+         若扔不能通过install工程生成正确，执行则需要手工将编译生成2个plugin dll从cpp\build\Release拷贝到c:\windows\system32\，将cpp/lib/win32或win64/dll/下的3个dll也拷贝到c:\windows\system32\  
+         注：cpp/buildWin32和buildWin64是按照Visual studio2015生成的工程目录，若不能正常使用，请按上述方式在build目录自行生成工程文件。
+         注意visual studio中工具条Debug和Release版本的切换，当前选中哪个，执行生成解决方案就编译的哪个版本，生产环境建议采用Release版本以获取更高的性能。
+
+         则在/usr/local/lib或c:\windows\system32\下会新增5个动态库：
+         
+             win：glog.dll、xtptraderapi.dll、xtpquoteapi.dll、tradeplugin.dll、quoteplugin.dll
     
     * 5）安装并配置gradle
     
     * 6）在工程根目录下执行./gradlew build -x test 执行成功后在项目根目录生成build/libs/xtpapi-1.1.18.13.jar
     
-    * 7）在量化交易java代码中引入xtpapi-1.1.18.13.jar并使用
+    * 7）在量化交易java代码中引入xtpapi-1.1.18.13.jar并使用（注意如果在IDE中打开java代码及java测试用例，需要
+         在IDE中安装lombok插件才能看源码不报错，如果不看源码与测试用例，无需安装）
            
          > 如需进行单元测试：
                    
           src/test/java/com.zts.xtp/trade/TradeApiTest.java是交易的单元测试：
           修改TradeApiTest.java：
           tradeApi.init((short)18, "23a71733bba3sd78722319b212e",
-                                  "/var/log/zts/xtp", XtpLogLevel.XTP_LOG_LEVEL_INFO);
+                                  "/var/log/zts/xtp", XtpLogLevel.XTP_LOG_LEVEL_INFO, JniLogLevel.JNI_LOG_LEVEL_INFO);
           sessionId = tradeApi.login("xx.xx.xx.xx", 1234,
                                             "xxxxxx", "xxxxxx", TransferProtocol.XTP_PROTOCOL_TCP);
           init方法的第1个参数是xtp client id（不超过255），实盘环境配置请联系官方人员获取，
@@ -137,10 +160,12 @@
                                   
           src/test/java/com.zts.xtp/quote/QuoteApiTest.java是行情的单元测试：
           修改QuoteApiTest.java：
-          quoteApi.init((short)18,"/var/log/zts/xtp",XtpLogLevel.XTP_LOG_LEVEL_INFO);
+          quoteApi.init((short)18,"/var/log/zts/xtp",XtpLogLevel.XTP_LOG_LEVEL_INFO, JniLogLevel.JNI_LOG_LEVEL_INFO);
           int login_result = quoteApi.login("23a71733bba3sd78722319b212e",1234,"xxxxxx","xxxxxx",1);
           login方法第1个参数为xtp行情ip、第2个参数为xtp行情端口、第3个参数为申请到的测试账号、第4个参数为账号密码，
                    实盘环境的环境信息及资金账号请联系官方人员获取。
+                   
+          上述参数也可以通过根目录下user.config.properites中配置。公网测试环境请使用TCP连接，UPD会收不到数据。
                    
           执行./gradlew build -x test进行重新编译java生成xtpapi-1.1.18.13.jar
           分别执行TradeApiTest、QuoteApiTest中的junit单元测试。
@@ -158,6 +183,6 @@
                    private static final String ACCOUNT = "xxxxxx";//xtp资金账号
                    private static final String PASSWORD = "xxxxxx";//xtp密码
                    private static final String DATA_FOLDER = "/var/log/zts/xtp";//java api输出日志的本地目录
-          运行Application.java即可
+          运行Application.java即可，上述参数也可以通过根目录下user.config.properites中配置。公网测试环境请使用TCP连接，UPD会收不到数据。
           
           

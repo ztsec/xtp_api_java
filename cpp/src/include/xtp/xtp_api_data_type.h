@@ -47,7 +47,7 @@ typedef enum XTP_LOG_LEVEL {
 typedef enum XTP_PROTOCOL_TYPE
 {
 	XTP_PROTOCOL_TCP = 1,	///<采用TCP方式传输
-	XTP_PROTOCOL_UDP		///<采用UDP方式传输（目前暂未支持）
+	XTP_PROTOCOL_UDP		///<采用UDP方式传输(仅行情接口支持)
 }XTP_PROTOCOL_TYPE;
 
 
@@ -121,12 +121,19 @@ typedef uint8_t XTP_SIDE_TYPE;
 #define XTP_SIDE_REPAY_MARGIN	23
 /// 买券还券
 #define XTP_SIDE_REPAY_STOCK	24
-/// 现金还款
-#define XTP_SIDE_CASH_REPAY_MARGIN	25
+/// 现金还款（不放在普通订单协议，另加请求和查询协议）
+//#define XTP_SIDE_CASH_REPAY_MARGIN	25
 /// 现券还券
 #define XTP_SIDE_STOCK_REPAY_STOCK	26
+/// 余券划转
+#define XTP_SIDE_SURSTK_TRANS       27
+/// 担保品转入
+#define XTP_SIDE_GRTSTK_TRANSIN     28
+/// 担保品转出
+#define XTP_SIDE_GRTSTK_TRANSOUT    29
+
 ///未知或者无效买卖方向
-#define XTP_SIDE_UNKNOWN        27
+#define XTP_SIDE_UNKNOWN        30
 
 
 
@@ -151,8 +158,16 @@ typedef uint8_t XTP_POSITION_EFFECT_TYPE;
 #define XTP_POSITION_EFFECT_FORCEOFF            6
 /// 本地强平
 #define XTP_POSITION_EFFECT_LOCALFORCECLOSE     7
+/// 信用业务追保强平
+#define XTP_POSITION_EFFECT_CREDIT_FORCE_COVER  8
+/// 信用业务清偿强平
+#define XTP_POSITION_EFFECT_CREDIT_FORCE_CLEAR  9
+/// 信用业务合约到期强平
+#define XTP_POSITION_EFFECT_CREDIT_FORCE_DEBT   10
+/// 信用业务无条件强平
+#define XTP_POSITION_EFFECT_CREDIT_FORCE_UNCOND 11
 /// 未知的开平标识类型
-#define XTP_POSITION_EFFECT_UNKNOWN             8
+#define XTP_POSITION_EFFECT_UNKNOWN             12
 
 
 /////////////////////////////////////////////////////////////////////////
@@ -213,6 +228,10 @@ typedef enum ETF_REPLACE_TYPE
     ERT_CASH_FORBIDDEN = 0,             ///<禁止现金替代
     ERT_CASH_OPTIONAL,                  ///<可以现金替代
     ERT_CASH_MUST,                      ///<必须现金替代
+    ERT_CASH_RECOMPUTE_INTER_SZ,        ///<深市退补现金替代
+    ERT_CASH_MUST_INTER_SZ,             ///<深市必须现金替代
+    ERT_CASH_RECOMPUTE_INTER_OTHER,     ///<非沪深市场成分证券退补现金替代
+    ERT_CASH_MUST_INTER_OTHER,          ///<表示非沪深市场成份证券必须现金替代
     EPT_INVALID                         ///<无效值
 }ETF_REPLACE_TYPE;
 
@@ -228,7 +247,7 @@ typedef enum XTP_TICKER_TYPE
 	XTP_TICKER_TYPE_BOND,                 ///<债券
 	XTP_TICKER_TYPE_OPTION,               ///<期权
 	XTP_TICKER_TYPE_UNKNOWN               ///<未知类型
-
+	
 }XTP_TICKER_TYPE;
 
 //////////////////////////////////////////////////////////////////////////
@@ -272,6 +291,8 @@ typedef enum XTP_FUND_TRANSFER_TYPE
 {
     XTP_FUND_TRANSFER_OUT = 0,		///<转出 从XTP转出到柜台
     XTP_FUND_TRANSFER_IN,	        ///<转入 从柜台转入XTP
+    XTP_FUND_INTER_TRANSFER_OUT,    ///<跨节点转出 从本XTP节点1，转出到对端XTP节点2，XTP服务器之间划拨，只能跨账户用户使用
+    XTP_FUND_INTER_TRANSFER_IN,     ///<跨节点转入 从对端XTP节点2，转入到本XTP节点1，XTP服务器之间划拨，只能跨账户用户使用
     XTP_FUND_TRANSFER_UNKNOWN		///<未知类型
 }XTP_FUND_TRANSFER_TYPE;
 
@@ -279,7 +300,7 @@ typedef enum XTP_FUND_TRANSFER_TYPE
 ///@brief XTP_FUND_OPER_STATUS柜台资金操作结果
 /////////////////////////////////////////////////////////////////////////
 typedef enum XTP_FUND_OPER_STATUS {
-    XTP_FUND_OPER_PROCESSING = 0,	///<XOMS已收到，正在处理中
+    XTP_FUND_OPER_PROCESSING = 0,	///<XTP已收到，正在处理中
     XTP_FUND_OPER_SUCCESS,			///<成功
     XTP_FUND_OPER_FAILED,			///<失败
     XTP_FUND_OPER_SUBMITTED,		///<已提交到集中柜台处理
@@ -330,7 +351,14 @@ typedef enum XTP_POSITION_DIRECTION_TYPE {
     XTP_POSITION_DIRECTION_COVERED,     ///<备兑（期权则为备兑义务方）
 }XTP_POSITION_DIRECTION_TYPE;
 
-
+/////////////////////////////////////////////////////////////////////////
+///@brief XTP_CRD_CASH_REPAY_STATUS是一个融资融券直接还款状态类型
+/////////////////////////////////////////////////////////////////////////
+typedef enum XTP_CRD_CR_STATUS {
+    XTP_CRD_CR_INIT = 0,        ///< 初始、未处理状态
+    XTP_CRD_CR_SUCCESS,         ///< 已成功处理状态
+    XTP_CRD_CR_FAILED,          ///< 处理失败状态
+} XTP_CRD_CR_STATUS;
 
 
 /////////////////////////////////////////////////////////////////////////
@@ -344,6 +372,8 @@ typedef char TXTPTradeTypeType;
 #define XTP_TRDT_CASH '1'
 ///一级市场成交
 #define XTP_TRDT_PRIMARY '2'
+///跨市场资金成交
+#define XTP_TRDT_CROSS_MKT_CASH '3'
 
 
 /////////////////////////////////////////////////////////////////////////
