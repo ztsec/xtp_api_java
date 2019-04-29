@@ -1,6 +1,7 @@
 package com.zts.xtp.trade.api;
 
 
+import com.zts.xtp.common.enums.JniLogLevel;
 import com.zts.xtp.common.enums.TransferProtocol;
 import com.zts.xtp.common.enums.XtpLogLevel;
 import com.zts.xtp.common.jni.JNILoadLibrary;
@@ -38,9 +39,10 @@ public class TradeApi {
      * 如果一个账户需要在多个客户端登录，请使用不同的clientId，系统允许一个账户同时登录多个客户端，但是对于同一账户，相同的clientId只能保持一个session连接，后面的登录在前一个session存续期间，无法连接。系统不支持过夜，请确保每天开盘前重新启动
      * @param clientId 客户端id，用于区分同一用户的不同客户端，由用户自定义
      * @param key 用户开发软件Key，用户申请开户时给予
-     * @param logLevel 日志输出级别
+     * @param xtpAPIlogLevel xtp api 日志输出级别
+     * @param jniLogLevel  jni c++部分的日志级别
      */
-    public void init(short clientId, String key, String logFolder, XtpLogLevel logLevel){
+    public void init(short clientId, String key, String logFolder, XtpLogLevel  xtpAPIlogLevel, JniLogLevel jniLogLevel){
         if(!JNILoadLibrary.glogHasInited){
             JNILoadLibrary.glogHasInited = true;
             //init glog
@@ -54,17 +56,25 @@ public class TradeApi {
             if (!file.exists()) {
                 file.mkdirs();
             }
-            initGlog(logFolder,logSubFolder);
+            String strJniLogLevel = "INFO";
+            if(jniLogLevel == JniLogLevel.JNI_LOG_LEVEL_WARNING){
+                strJniLogLevel = "WARNING";
+            }else if(jniLogLevel == JniLogLevel.JNI_LOG_LEVEL_ERROR){
+                strJniLogLevel = "ERROR";
+            }
+
+            initGlog(logFolder,logSubFolder,strJniLogLevel);
         }
-        tradeInit(clientId,key,logFolder,logLevel);
+        tradeInit(clientId,key,logFolder,xtpAPIlogLevel);
     }
 
     /**
      *  初始化glog-内部方法调用jni
      * @param logFolder 日志输出的目录，请设定一个真实存在的有可写权限的路径
      * @param logSubFolder 日志输出的子目录，请设定一个真实存在的有可写权限的路径 在init函数中固化为"jni"
+     * @param jniLogLevel Jni 日志级别 INFO  WARNING ERROR
      */
-    private native void initGlog(String logFolder,String logSubFolder);
+    private native void initGlog(String logFolder,String logSubFolder,String jniLogLevel);
 
     /**
      * 初始化交易模块-内部方法调用jni
@@ -72,7 +82,7 @@ public class TradeApi {
      * @param clientId 客户端id，用于区分同一用户的不同客户端，由用户自定义
      * @param key 用户开发软件Key，用户申请开户时给予
      * @param logFolder 日志输出的目录，请设定一个真实存在的有可写权限的路径
-     * @param logLevel 日志输出级别
+     * @param logLevel xtp api 日志输出级别
      */
     private native void tradeInit(short clientId, String key, String logFolder, XtpLogLevel logLevel);
 

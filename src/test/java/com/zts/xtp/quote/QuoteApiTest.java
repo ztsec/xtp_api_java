@@ -1,5 +1,6 @@
 package com.zts.xtp.quote;
 
+import com.zts.xtp.common.enums.JniLogLevel;
 import com.zts.xtp.common.enums.TransferProtocol;
 import com.zts.xtp.common.enums.XtpLogLevel;
 import com.zts.xtp.common.jni.JNILoadLibrary;
@@ -36,7 +37,7 @@ public class QuoteApiTest {
         quoteApi = new QuoteApi(testspi);
         quoteApi.setUDPBufferSize(UDPBUFFERSIZE);
 
-        quoteApi.init(CLIENT_ID,DATA_FOLDER,XtpLogLevel.XTP_LOG_LEVEL_INFO);
+        quoteApi.init(CLIENT_ID,DATA_FOLDER,XtpLogLevel.XTP_LOG_LEVEL_INFO, JniLogLevel.JNI_LOG_LEVEL_INFO);
 
         int login_result = quoteApi.login(XTP_QUOTE_SERVER_IP,XTP_QUOTE_SERVER_PORT,ACCOUNT,PASSWORD,TransferProtocol.XTP_PROTOCOL_TCP);
         Assert.assertEquals(login_result, 0);

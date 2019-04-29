@@ -1,0 +1,387 @@
+The system is: Windows - 10.0.17134 - AMD64
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler:  
+Build flags: 
+Id flags:  
+
+The output was:
+0
+Microsoft (R) ��������汾 14.0.25420.1
+��Ȩ����(C) Microsoft Corporation����������Ȩ����
+
+��������ʱ��Ϊ 2019/4/29 17:22:53��
+�ڵ� 1 �ϵ���Ŀ��E:\xtp_api_java\cpp\buildWin64\CMakeFiles\3.13.2\CompilerIdC\CompilerIdC.vcxproj��(Ĭ��Ŀ��)��
+PrepareForBuild:
+  ���ڴ���Ŀ¼��Debug\����
+  ���ڴ���Ŀ¼��Debug\CompilerIdC.tlog\����
+InitializeBuildStatus:
+  ���ڴ�����Debug\CompilerIdC.tlog\unsuccessfulbuild������Ϊ��ָ����AlwaysCreate����
+ClCompile:
+  D:\soft\vs2015\VC\bin\x86_amd64\CL.exe /c /nologo /W0 /WX- /Od /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TC /errorReport:queue CMakeCCompilerId.c
+  CMakeCCompilerId.c
+Link:
+  D:\soft\vs2015\VC\bin\x86_amd64\link.exe /ERRORREPORT:QUEUE /OUT:".\CompilerIdC.exe" /INCREMENTAL:NO /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /PDB:".\CompilerIdC.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:".\CompilerIdC.lib" /MACHINE:X64 Debug\CMakeCCompilerId.obj
+  CompilerIdC.vcxproj -> E:\xtp_api_java\cpp\buildWin64\CMakeFiles\3.13.2\CompilerIdC\.\CompilerIdC.exe
+PostBuildEvent:
+  for %%i in (cl.exe) do @echo CMAKE_C_COMPILER=%%~$PATH:i
+  :VCEnd
+  CMAKE_C_COMPILER=D:\soft\vs2015\VC\bin\x86_amd64\cl.exe
+FinalizeBuildStatus:
+  ����ɾ���ļ���Debug\CompilerIdC.tlog\unsuccessfulbuild����
+  ���ڶԡ�Debug\CompilerIdC.tlog\CompilerIdC.lastbuildstate��ִ�� Touch ����
+�����������Ŀ��E:\xtp_api_java\cpp\buildWin64\CMakeFiles\3.13.2\CompilerIdC\CompilerIdC.vcxproj��(Ĭ��Ŀ��)�Ĳ�����
+
+�ѳɹ����ɡ�
+    0 ������
+    0 ������
+
+����ʱ�� 00:00:01.96
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CompilerIdC.exe"
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CompilerIdC.vcxproj"
+
+The C compiler identification is MSVC, found in "E:/xtp_api_java/cpp/buildWin64/CMakeFiles/3.13.2/CompilerIdC/CompilerIdC.exe"
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+Compiler:  
+Build flags: 
+Id flags:  
+
+The output was:
+0
+Microsoft (R) ��������汾 14.0.25420.1
+��Ȩ����(C) Microsoft Corporation����������Ȩ����
+
+��������ʱ��Ϊ 2019/4/29 17:22:55��
+�ڵ� 1 �ϵ���Ŀ��E:\xtp_api_java\cpp\buildWin64\CMakeFiles\3.13.2\CompilerIdCXX\CompilerIdCXX.vcxproj��(Ĭ��Ŀ��)��
+PrepareForBuild:
+  ���ڴ���Ŀ¼��Debug\����
+  ���ڴ���Ŀ¼��Debug\CompilerIdCXX.tlog\����
+InitializeBuildStatus:
+  ���ڴ�����Debug\CompilerIdCXX.tlog\unsuccessfulbuild������Ϊ��ָ����AlwaysCreate����
+ClCompile:
+  D:\soft\vs2015\VC\bin\x86_amd64\CL.exe /c /nologo /W0 /WX- /Od /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /errorReport:queue CMakeCXXCompilerId.cpp
+  CMakeCXXCompilerId.cpp
+Link:
+  D:\soft\vs2015\VC\bin\x86_amd64\link.exe /ERRORREPORT:QUEUE /OUT:".\CompilerIdCXX.exe" /INCREMENTAL:NO /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /PDB:".\CompilerIdCXX.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:".\CompilerIdCXX.lib" /MACHINE:X64 Debug\CMakeCXXCompilerId.obj
+  CompilerIdCXX.vcxproj -> E:\xtp_api_java\cpp\buildWin64\CMakeFiles\3.13.2\CompilerIdCXX\.\CompilerIdCXX.exe
+PostBuildEvent:
+  for %%i in (cl.exe) do @echo CMAKE_CXX_COMPILER=%%~$PATH:i
+  :VCEnd
+  CMAKE_CXX_COMPILER=D:\soft\vs2015\VC\bin\x86_amd64\cl.exe
+FinalizeBuildStatus:
+  ����ɾ���ļ���Debug\CompilerIdCXX.tlog\unsuccessfulbuild����
+  ���ڶԡ�Debug\CompilerIdCXX.tlog\CompilerIdCXX.lastbuildstate��ִ�� Touch ����
+�����������Ŀ��E:\xtp_api_java\cpp\buildWin64\CMakeFiles\3.13.2\CompilerIdCXX\CompilerIdCXX.vcxproj��(Ĭ��Ŀ��)�Ĳ�����
+
+�ѳɹ����ɡ�
+    0 ������
+    0 ������
+
+����ʱ�� 00:00:01.24
+
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.exe"
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.vcxproj"
+
+The CXX compiler identification is MSVC, found in "E:/xtp_api_java/cpp/buildWin64/CMakeFiles/3.13.2/CompilerIdCXX/CompilerIdCXX.exe"
+
+Determining if the C compiler works passed with the following output:
+Change Dir: E:/xtp_api_java/cpp/buildWin64/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/Program Files (x86)/MSBuild/14.0/bin/MSBuild.exe" "cmTC_9fc0a.vcxproj" "/p:Configuration=Debug" "/p:Platform=x64" "/p:VisualStudioVersion=14.0"
+Microsoft (R) 生成引擎版本 14.0.25420.1
+版权所有(C) Microsoft Corporation。保留所有权利。
+
+生成启动时间为 2019/4/29 17:22:57。
+节点 1 上的项目“E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\cmTC_9fc0a.vcxproj”(默认目标)。
+PrepareForBuild:
+  正在创建目录“cmTC_9fc0a.dir\Debug\”。
+  正在创建目录“E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\Debug\”。
+  正在创建目录“cmTC_9fc0a.dir\Debug\cmTC_9fc0a.tlog\”。
+InitializeBuildStatus:
+  正在创建“cmTC_9fc0a.dir\Debug\cmTC_9fc0a.tlog\unsuccessfulbuild”，因为已指定“AlwaysCreate”。
+ClCompile:
+  D:\soft\vs2015\VC\bin\x86_amd64\CL.exe /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_9fc0a.dir\Debug\\" /Fd"cmTC_9fc0a.dir\Debug\vc140.pdb" /Gd /TC /errorReport:queue E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\testCCompiler.c
+  用于 x64 的 Microsoft (R) C/C++ 优化编译器 19.00.24215.1 版
+  版权所有(C) Microsoft Corporation。保留所有权利。
+  
+  cl /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_9fc0a.dir\Debug\\" /Fd"cmTC_9fc0a.dir\Debug\vc140.pdb" /Gd /TC /errorReport:queue E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\testCCompiler.c
+  
+  testCCompiler.c
+Link:
+  D:\soft\vs2015\VC\bin\x86_amd64\link.exe /ERRORREPORT:QUEUE /OUT:"E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\Debug\cmTC_9fc0a.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"E:/xtp_api_java/cpp/buildWin64/CMakeFiles/CMakeTmp/Debug/cmTC_9fc0a.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:/xtp_api_java/cpp/buildWin64/CMakeFiles/CMakeTmp/Debug/cmTC_9fc0a.lib" /MACHINE:X64  /machine:x64 cmTC_9fc0a.dir\Debug\testCCompiler.obj
+  cmTC_9fc0a.vcxproj -> E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\Debug\cmTC_9fc0a.exe
+  cmTC_9fc0a.vcxproj -> E:/xtp_api_java/cpp/buildWin64/CMakeFiles/CMakeTmp/Debug/cmTC_9fc0a.pdb (Full PDB)
+FinalizeBuildStatus:
+  正在删除文件“cmTC_9fc0a.dir\Debug\cmTC_9fc0a.tlog\unsuccessfulbuild”。
+  正在对“cmTC_9fc0a.dir\Debug\cmTC_9fc0a.tlog\cmTC_9fc0a.lastbuildstate”执行 Touch 任务。
+已完成生成项目“E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\cmTC_9fc0a.vcxproj”(默认目标)的操作。
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:01.52
+
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: E:/xtp_api_java/cpp/buildWin64/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/Program Files (x86)/MSBuild/14.0/bin/MSBuild.exe" "cmTC_2a484.vcxproj" "/p:Configuration=Debug" "/p:Platform=x64" "/p:VisualStudioVersion=14.0"
+Microsoft (R) 生成引擎版本 14.0.25420.1
+版权所有(C) Microsoft Corporation。保留所有权利。
+
+生成启动时间为 2019/4/29 17:22:59。
+节点 1 上的项目“E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\cmTC_2a484.vcxproj”(默认目标)。
+PrepareForBuild:
+  正在创建目录“cmTC_2a484.dir\Debug\”。
+  正在创建目录“E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\Debug\”。
+  正在创建目录“cmTC_2a484.dir\Debug\cmTC_2a484.tlog\”。
+InitializeBuildStatus:
+  正在创建“cmTC_2a484.dir\Debug\cmTC_2a484.tlog\unsuccessfulbuild”，因为已指定“AlwaysCreate”。
+ClCompile:
+  D:\soft\vs2015\VC\bin\x86_amd64\CL.exe /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_2a484.dir\Debug\\" /Fd"cmTC_2a484.dir\Debug\vc140.pdb" /Gd /TC /errorReport:queue "C:\Program Files\CMake\share\cmake-3.13\Modules\CMakeCCompilerABI.c"
+  用于 x64 的 Microsoft (R) C/C++ 优化编译器 19.00.24215.1 版
+  版权所有(C) Microsoft Corporation。保留所有权利。
+  
+  cl /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_2a484.dir\Debug\\" /Fd"cmTC_2a484.dir\Debug\vc140.pdb" /Gd /TC /errorReport:queue "C:\Program Files\CMake\share\cmake-3.13\Modules\CMakeCCompilerABI.c"
+  
+  CMakeCCompilerABI.c
+Link:
+  D:\soft\vs2015\VC\bin\x86_amd64\link.exe /ERRORREPORT:QUEUE /OUT:"E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\Debug\cmTC_2a484.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"E:/xtp_api_java/cpp/buildWin64/CMakeFiles/CMakeTmp/Debug/cmTC_2a484.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:/xtp_api_java/cpp/buildWin64/CMakeFiles/CMakeTmp/Debug/cmTC_2a484.lib" /MACHINE:X64  /machine:x64 cmTC_2a484.dir\Debug\CMakeCCompilerABI.obj
+  cmTC_2a484.vcxproj -> E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\Debug\cmTC_2a484.exe
+  cmTC_2a484.vcxproj -> E:/xtp_api_java/cpp/buildWin64/CMakeFiles/CMakeTmp/Debug/cmTC_2a484.pdb (Full PDB)
+FinalizeBuildStatus:
+  正在删除文件“cmTC_2a484.dir\Debug\cmTC_2a484.tlog\unsuccessfulbuild”。
+  正在对“cmTC_2a484.dir\Debug\cmTC_2a484.tlog\cmTC_2a484.lastbuildstate”执行 Touch 任务。
+已完成生成项目“E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\cmTC_2a484.vcxproj”(默认目标)的操作。
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:01.13
+
+
+
+
+Detecting C [] compiler features compiled with the following output:
+Change Dir: E:/xtp_api_java/cpp/buildWin64/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/Program Files (x86)/MSBuild/14.0/bin/MSBuild.exe" "cmTC_32283.vcxproj" "/p:Configuration=Debug" "/p:Platform=x64" "/p:VisualStudioVersion=14.0"
+Microsoft (R) 生成引擎版本 14.0.25420.1
+版权所有(C) Microsoft Corporation。保留所有权利。
+
+生成启动时间为 2019/4/29 17:23:00。
+节点 1 上的项目“E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\cmTC_32283.vcxproj”(默认目标)。
+PrepareForBuild:
+  正在创建目录“cmTC_32283.dir\Debug\”。
+  正在创建目录“E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\Debug\”。
+  正在创建目录“cmTC_32283.dir\Debug\cmTC_32283.tlog\”。
+InitializeBuildStatus:
+  正在创建“cmTC_32283.dir\Debug\cmTC_32283.tlog\unsuccessfulbuild”，因为已指定“AlwaysCreate”。
+ClCompile:
+  D:\soft\vs2015\VC\bin\x86_amd64\CL.exe /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_32283.dir\Debug\\" /Fd"cmTC_32283.dir\Debug\vc140.pdb" /Gd /TC /errorReport:queue E:\xtp_api_java\cpp\buildWin64\CMakeFiles\feature_tests.c
+  用于 x64 的 Microsoft (R) C/C++ 优化编译器 19.00.24215.1 版
+  版权所有(C) Microsoft Corporation。保留所有权利。
+  
+  cl /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_32283.dir\Debug\\" /Fd"cmTC_32283.dir\Debug\vc140.pdb" /Gd /TC /errorReport:queue E:\xtp_api_java\cpp\buildWin64\CMakeFiles\feature_tests.c
+  
+  feature_tests.c
+Link:
+  D:\soft\vs2015\VC\bin\x86_amd64\link.exe /ERRORREPORT:QUEUE /OUT:"E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\Debug\cmTC_32283.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"E:/xtp_api_java/cpp/buildWin64/CMakeFiles/CMakeTmp/Debug/cmTC_32283.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:/xtp_api_java/cpp/buildWin64/CMakeFiles/CMakeTmp/Debug/cmTC_32283.lib" /MACHINE:X64  /machine:x64 cmTC_32283.dir\Debug\feature_tests.obj
+  cmTC_32283.vcxproj -> E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\Debug\cmTC_32283.exe
+  cmTC_32283.vcxproj -> E:/xtp_api_java/cpp/buildWin64/CMakeFiles/CMakeTmp/Debug/cmTC_32283.pdb (Full PDB)
+FinalizeBuildStatus:
+  正在删除文件“cmTC_32283.dir\Debug\cmTC_32283.tlog\unsuccessfulbuild”。
+  正在对“cmTC_32283.dir\Debug\cmTC_32283.tlog\cmTC_32283.lastbuildstate”执行 Touch 任务。
+已完成生成项目“E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\cmTC_32283.vcxproj”(默认目标)的操作。
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:01.12
+
+
+    Feature record: C_FEATURE:1c_function_prototypes
+    Feature record: C_FEATURE:1c_variadic_macros
+Determining if the CXX compiler works passed with the following output:
+Change Dir: E:/xtp_api_java/cpp/buildWin64/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/Program Files (x86)/MSBuild/14.0/bin/MSBuild.exe" "cmTC_a494e.vcxproj" "/p:Configuration=Debug" "/p:Platform=x64" "/p:VisualStudioVersion=14.0"
+Microsoft (R) 生成引擎版本 14.0.25420.1
+版权所有(C) Microsoft Corporation。保留所有权利。
+
+生成启动时间为 2019/4/29 17:23:02。
+节点 1 上的项目“E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\cmTC_a494e.vcxproj”(默认目标)。
+PrepareForBuild:
+  正在创建目录“cmTC_a494e.dir\Debug\”。
+  正在创建目录“E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\Debug\”。
+  正在创建目录“cmTC_a494e.dir\Debug\cmTC_a494e.tlog\”。
+InitializeBuildStatus:
+  正在创建“cmTC_a494e.dir\Debug\cmTC_a494e.tlog\unsuccessfulbuild”，因为已指定“AlwaysCreate”。
+ClCompile:
+  D:\soft\vs2015\VC\bin\x86_amd64\CL.exe /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_a494e.dir\Debug\\" /Fd"cmTC_a494e.dir\Debug\vc140.pdb" /Gd /TP /errorReport:queue E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\testCXXCompiler.cxx
+  用于 x64 的 Microsoft (R) C/C++ 优化编译器 19.00.24215.1 版
+  版权所有(C) Microsoft Corporation。保留所有权利。
+  
+  cl /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_a494e.dir\Debug\\" /Fd"cmTC_a494e.dir\Debug\vc140.pdb" /Gd /TP /errorReport:queue E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\testCXXCompiler.cxx
+  
+  testCXXCompiler.cxx
+Link:
+  D:\soft\vs2015\VC\bin\x86_amd64\link.exe /ERRORREPORT:QUEUE /OUT:"E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\Debug\cmTC_a494e.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"E:/xtp_api_java/cpp/buildWin64/CMakeFiles/CMakeTmp/Debug/cmTC_a494e.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:/xtp_api_java/cpp/buildWin64/CMakeFiles/CMakeTmp/Debug/cmTC_a494e.lib" /MACHINE:X64  /machine:x64 cmTC_a494e.dir\Debug\testCXXCompiler.obj
+  cmTC_a494e.vcxproj -> E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\Debug\cmTC_a494e.exe
+  cmTC_a494e.vcxproj -> E:/xtp_api_java/cpp/buildWin64/CMakeFiles/CMakeTmp/Debug/cmTC_a494e.pdb (Full PDB)
+FinalizeBuildStatus:
+  正在删除文件“cmTC_a494e.dir\Debug\cmTC_a494e.tlog\unsuccessfulbuild”。
+  正在对“cmTC_a494e.dir\Debug\cmTC_a494e.tlog\cmTC_a494e.lastbuildstate”执行 Touch 任务。
+已完成生成项目“E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\cmTC_a494e.vcxproj”(默认目标)的操作。
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:01.01
+
+
+Detecting CXX compiler ABI info compiled with the following output:
+Change Dir: E:/xtp_api_java/cpp/buildWin64/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/Program Files (x86)/MSBuild/14.0/bin/MSBuild.exe" "cmTC_0b2d8.vcxproj" "/p:Configuration=Debug" "/p:Platform=x64" "/p:VisualStudioVersion=14.0"
+Microsoft (R) 生成引擎版本 14.0.25420.1
+版权所有(C) Microsoft Corporation。保留所有权利。
+
+生成启动时间为 2019/4/29 17:23:03。
+节点 1 上的项目“E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\cmTC_0b2d8.vcxproj”(默认目标)。
+PrepareForBuild:
+  正在创建目录“cmTC_0b2d8.dir\Debug\”。
+  正在创建目录“E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\Debug\”。
+  正在创建目录“cmTC_0b2d8.dir\Debug\cmTC_0b2d8.tlog\”。
+InitializeBuildStatus:
+  正在创建“cmTC_0b2d8.dir\Debug\cmTC_0b2d8.tlog\unsuccessfulbuild”，因为已指定“AlwaysCreate”。
+ClCompile:
+  D:\soft\vs2015\VC\bin\x86_amd64\CL.exe /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_0b2d8.dir\Debug\\" /Fd"cmTC_0b2d8.dir\Debug\vc140.pdb" /Gd /TP /errorReport:queue "C:\Program Files\CMake\share\cmake-3.13\Modules\CMakeCXXCompilerABI.cpp"
+  用于 x64 的 Microsoft (R) C/C++ 优化编译器 19.00.24215.1 版
+  版权所有(C) Microsoft Corporation。保留所有权利。
+  
+  cl /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_0b2d8.dir\Debug\\" /Fd"cmTC_0b2d8.dir\Debug\vc140.pdb" /Gd /TP /errorReport:queue "C:\Program Files\CMake\share\cmake-3.13\Modules\CMakeCXXCompilerABI.cpp"
+  
+  CMakeCXXCompilerABI.cpp
+Link:
+  D:\soft\vs2015\VC\bin\x86_amd64\link.exe /ERRORREPORT:QUEUE /OUT:"E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\Debug\cmTC_0b2d8.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"E:/xtp_api_java/cpp/buildWin64/CMakeFiles/CMakeTmp/Debug/cmTC_0b2d8.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:/xtp_api_java/cpp/buildWin64/CMakeFiles/CMakeTmp/Debug/cmTC_0b2d8.lib" /MACHINE:X64  /machine:x64 cmTC_0b2d8.dir\Debug\CMakeCXXCompilerABI.obj
+  cmTC_0b2d8.vcxproj -> E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\Debug\cmTC_0b2d8.exe
+  cmTC_0b2d8.vcxproj -> E:/xtp_api_java/cpp/buildWin64/CMakeFiles/CMakeTmp/Debug/cmTC_0b2d8.pdb (Full PDB)
+FinalizeBuildStatus:
+  正在删除文件“cmTC_0b2d8.dir\Debug\cmTC_0b2d8.tlog\unsuccessfulbuild”。
+  正在对“cmTC_0b2d8.dir\Debug\cmTC_0b2d8.tlog\cmTC_0b2d8.lastbuildstate”执行 Touch 任务。
+已完成生成项目“E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\cmTC_0b2d8.vcxproj”(默认目标)的操作。
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:01.02
+
+
+
+
+Detecting CXX [] compiler features compiled with the following output:
+Change Dir: E:/xtp_api_java/cpp/buildWin64/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/Program Files (x86)/MSBuild/14.0/bin/MSBuild.exe" "cmTC_3242d.vcxproj" "/p:Configuration=Debug" "/p:Platform=x64" "/p:VisualStudioVersion=14.0"
+Microsoft (R) 生成引擎版本 14.0.25420.1
+版权所有(C) Microsoft Corporation。保留所有权利。
+
+生成启动时间为 2019/4/29 17:23:04。
+节点 1 上的项目“E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\cmTC_3242d.vcxproj”(默认目标)。
+PrepareForBuild:
+  正在创建目录“cmTC_3242d.dir\Debug\”。
+  正在创建目录“E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\Debug\”。
+  正在创建目录“cmTC_3242d.dir\Debug\cmTC_3242d.tlog\”。
+InitializeBuildStatus:
+  正在创建“cmTC_3242d.dir\Debug\cmTC_3242d.tlog\unsuccessfulbuild”，因为已指定“AlwaysCreate”。
+ClCompile:
+  D:\soft\vs2015\VC\bin\x86_amd64\CL.exe /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_3242d.dir\Debug\\" /Fd"cmTC_3242d.dir\Debug\vc140.pdb" /Gd /TP /errorReport:queue E:\xtp_api_java\cpp\buildWin64\CMakeFiles\feature_tests.cxx
+  用于 x64 的 Microsoft (R) C/C++ 优化编译器 19.00.24215.1 版
+  版权所有(C) Microsoft Corporation。保留所有权利。
+  
+  cl /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_3242d.dir\Debug\\" /Fd"cmTC_3242d.dir\Debug\vc140.pdb" /Gd /TP /errorReport:queue E:\xtp_api_java\cpp\buildWin64\CMakeFiles\feature_tests.cxx
+  
+  feature_tests.cxx
+Link:
+  D:\soft\vs2015\VC\bin\x86_amd64\link.exe /ERRORREPORT:QUEUE /OUT:"E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\Debug\cmTC_3242d.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"E:/xtp_api_java/cpp/buildWin64/CMakeFiles/CMakeTmp/Debug/cmTC_3242d.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:/xtp_api_java/cpp/buildWin64/CMakeFiles/CMakeTmp/Debug/cmTC_3242d.lib" /MACHINE:X64  /machine:x64 cmTC_3242d.dir\Debug\feature_tests.obj
+  cmTC_3242d.vcxproj -> E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\Debug\cmTC_3242d.exe
+  cmTC_3242d.vcxproj -> E:/xtp_api_java/cpp/buildWin64/CMakeFiles/CMakeTmp/Debug/cmTC_3242d.pdb (Full PDB)
+FinalizeBuildStatus:
+  正在删除文件“cmTC_3242d.dir\Debug\cmTC_3242d.tlog\unsuccessfulbuild”。
+  正在对“cmTC_3242d.dir\Debug\cmTC_3242d.tlog\cmTC_3242d.lastbuildstate”执行 Touch 任务。
+已完成生成项目“E:\xtp_api_java\cpp\buildWin64\CMakeFiles\CMakeTmp\cmTC_3242d.vcxproj”(默认目标)的操作。
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:00.96
+
+
+    Feature record: CXX_FEATURE:0cxx_aggregate_default_initializers
+    Feature record: CXX_FEATURE:1cxx_alias_templates
+    Feature record: CXX_FEATURE:1cxx_alignas
+    Feature record: CXX_FEATURE:1cxx_alignof
+    Feature record: CXX_FEATURE:1cxx_attributes
+    Feature record: CXX_FEATURE:1cxx_attribute_deprecated
+    Feature record: CXX_FEATURE:1cxx_auto_type
+    Feature record: CXX_FEATURE:1cxx_binary_literals
+    Feature record: CXX_FEATURE:1cxx_constexpr
+    Feature record: CXX_FEATURE:1cxx_contextual_conversions
+    Feature record: CXX_FEATURE:1cxx_decltype
+    Feature record: CXX_FEATURE:1cxx_decltype_auto
+    Feature record: CXX_FEATURE:0cxx_decltype_incomplete_return_types
+    Feature record: CXX_FEATURE:1cxx_default_function_template_args
+    Feature record: CXX_FEATURE:1cxx_defaulted_functions
+    Feature record: CXX_FEATURE:1cxx_defaulted_move_initializers
+    Feature record: CXX_FEATURE:1cxx_delegating_constructors
+    Feature record: CXX_FEATURE:1cxx_deleted_functions
+    Feature record: CXX_FEATURE:1cxx_digit_separators
+    Feature record: CXX_FEATURE:1cxx_enum_forward_declarations
+    Feature record: CXX_FEATURE:1cxx_explicit_conversions
+    Feature record: CXX_FEATURE:1cxx_extended_friend_declarations
+    Feature record: CXX_FEATURE:1cxx_extern_templates
+    Feature record: CXX_FEATURE:1cxx_final
+    Feature record: CXX_FEATURE:1cxx_func_identifier
+    Feature record: CXX_FEATURE:1cxx_generalized_initializers
+    Feature record: CXX_FEATURE:1cxx_generic_lambdas
+    Feature record: CXX_FEATURE:1cxx_inheriting_constructors
+    Feature record: CXX_FEATURE:1cxx_inline_namespaces
+    Feature record: CXX_FEATURE:1cxx_lambdas
+    Feature record: CXX_FEATURE:1cxx_lambda_init_captures
+    Feature record: CXX_FEATURE:1cxx_local_type_template_args
+    Feature record: CXX_FEATURE:1cxx_long_long_type
+    Feature record: CXX_FEATURE:1cxx_noexcept
+    Feature record: CXX_FEATURE:1cxx_nonstatic_member_init
+    Feature record: CXX_FEATURE:1cxx_nullptr
+    Feature record: CXX_FEATURE:1cxx_override
+    Feature record: CXX_FEATURE:1cxx_range_for
+    Feature record: CXX_FEATURE:1cxx_raw_string_literals
+    Feature record: CXX_FEATURE:1cxx_reference_qualified_functions
+    Feature record: CXX_FEATURE:1cxx_return_type_deduction
+    Feature record: CXX_FEATURE:1cxx_right_angle_brackets
+    Feature record: CXX_FEATURE:1cxx_rvalue_references
+    Feature record: CXX_FEATURE:1cxx_sizeof_member
+    Feature record: CXX_FEATURE:1cxx_static_assert
+    Feature record: CXX_FEATURE:1cxx_strong_enums
+    Feature record: CXX_FEATURE:1cxx_template_template_parameters
+    Feature record: CXX_FEATURE:1cxx_thread_local
+    Feature record: CXX_FEATURE:1cxx_trailing_return_types
+    Feature record: CXX_FEATURE:1cxx_unicode_literals
+    Feature record: CXX_FEATURE:1cxx_uniform_initialization
+    Feature record: CXX_FEATURE:1cxx_unrestricted_unions
+    Feature record: CXX_FEATURE:1cxx_user_literals
+    Feature record: CXX_FEATURE:1cxx_variable_templates
+    Feature record: CXX_FEATURE:1cxx_variadic_macros
+    Feature record: CXX_FEATURE:1cxx_variadic_templates

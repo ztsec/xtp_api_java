@@ -1,6 +1,7 @@
 package com.zts.xtp.quote.api;
 
 
+import com.zts.xtp.common.enums.JniLogLevel;
 import com.zts.xtp.common.model.ErrorMessage;
 import com.zts.xtp.quote.model.response.DepthMarketDataResponse;
 import com.zts.xtp.quote.model.response.DepthMarketDataExResponse;
@@ -33,9 +34,10 @@ public class QuoteApi {
      *  初始化QuoteApi
      * @param clientId（必须输入）用于区分同一用户的不同客户端，由用户自定义
      * @param logFolder 日志输出的目录，请设定一个真实存在的有可写权限的路径
-     * @param logLevel 日志输出级别
+     * @param xtpAPIlogLevel xtp api 日志输出级别
+     * @param jniLogLevel  jni c++部分的日志级别
      */
-    public void init(short clientId, String logFolder,XtpLogLevel logLevel){
+    public void init(short clientId, String logFolder, XtpLogLevel xtpAPIlogLevel, JniLogLevel jniLogLevel){
         if(!JNILoadLibrary.glogHasInited){
             JNILoadLibrary.glogHasInited = true;
             //init glog
@@ -49,23 +51,31 @@ public class QuoteApi {
             if (!file.exists()) {
                 file.mkdirs();
             }
-            initGlog(logFolder,logSubFolder);
+            String strJniLogLevel = "INFO";
+            if(jniLogLevel == JniLogLevel.JNI_LOG_LEVEL_WARNING){
+                strJniLogLevel = "WARNING";
+            }else if(jniLogLevel == JniLogLevel.JNI_LOG_LEVEL_ERROR){
+                strJniLogLevel = "ERROR";
+            }
+
+            initGlog(logFolder,logSubFolder,strJniLogLevel);
         }
-        quoteInit(clientId,logFolder,logLevel);
+        quoteInit(clientId,logFolder,xtpAPIlogLevel);
     }
 
     /**
      *  初始化glog-内部方法调用jni
      * @param logFolder 日志输出的目录，请设定一个真实存在的有可写权限的路径
      * @param logSubFolder 日志输出的子目录，请设定一个真实存在的有可写权限的路径 在init函数中固化为"jni"
+     * @param jniLogLevel Jni 日志级别 INFO  WARNING ERROR
      */
-    private native void initGlog(String logFolder,String logSubFolder);
+    private native void initGlog(String logFolder,String logSubFolder,String jniLogLevel);
 
     /**
      *  初始化QuoteApi-内部方法调用jni
      * @param clientId（必须输入）用于区分同一用户的不同客户端，由用户自定义
      * @param logFolder 日志输出的目录，请设定一个真实存在的有可写权限的路径
-     * @param logLevel 日志输出级别
+     * @param logLevel xtp api 日志输出级别
      */
     private native void quoteInit(short clientId, String logFolder,XtpLogLevel logLevel);
 

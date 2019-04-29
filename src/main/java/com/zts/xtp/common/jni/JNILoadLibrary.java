@@ -81,7 +81,7 @@ public class JNILoadLibrary {
 
 
         //如果用遍历定义目录方式没找到（如c:\windows\system32在一些高版本的windows上java用listFiles访问不到，可能需要管理员权限），因此在系统目录用LoadLibrary方式尝试再加载一遍，兜底
-        if(!nativeLibHasLoaded.containsValue("glog"))
+        if(!nativeLibHasLoaded.containsKey("glog") && !nativeLibHasLoaded.containsKey("libglog"))
             try{
                 System.loadLibrary("glog");
                 System.out.println("load native lib from Sys Path: "+"glog");
@@ -89,7 +89,7 @@ public class JNILoadLibrary {
             }catch (Exception e){
                 System.err.println("Fail to load native lib from Sys Path: "+"glog");
             }
-        if(!nativeLibHasLoaded.containsValue("xtpquoteapi"))
+        if(!nativeLibHasLoaded.containsKey("xtpquoteapi") && !nativeLibHasLoaded.containsKey("libxtpquoteapi"))
             try{
                 System.loadLibrary("xtpquoteapi");
                 System.out.println("load native lib from Sys Path: "+"xtpquoteapi");
@@ -97,7 +97,7 @@ public class JNILoadLibrary {
             }catch (Exception e){
                 System.err.println("Fail to load native lib from Sys Path: "+"xtpquoteapi");
             }
-        if(!nativeLibHasLoaded.containsValue("xtptraderapi"))
+        if(!nativeLibHasLoaded.containsKey("xtptraderapi") && !nativeLibHasLoaded.containsKey("libxtptraderapi"))
             try{
                 System.loadLibrary("xtptraderapi");
                 System.out.println("load native lib from Sys Path: "+"xtptraderapi");
@@ -105,7 +105,7 @@ public class JNILoadLibrary {
             }catch (Exception e){
                 System.err.println("Fail to load native lib from Sys Path: "+"xtptraderapi");
             }
-        if(!nativeLibHasLoaded.containsValue("tradeplugin"))
+        if(!nativeLibHasLoaded.containsKey("tradeplugin") && !nativeLibHasLoaded.containsKey("libtradeplugin"))
             try{
                 System.loadLibrary("tradeplugin");
                 System.out.println("load native lib from Sys Path: "+"tradeplugin");
@@ -113,7 +113,7 @@ public class JNILoadLibrary {
             }catch (Exception e){
                 System.err.println("Fail to load native lib from Sys Path: "+"tradeplugin");
             }
-        if(!nativeLibHasLoaded.containsValue("quoteplugin"))
+        if(!nativeLibHasLoaded.containsKey("quoteplugin") && !nativeLibHasLoaded.containsKey("libquoteplugin"))
             try{
                 System.loadLibrary("quoteplugin");
                 System.out.println("load native lib from Sys Path: "+"quoteplugin");

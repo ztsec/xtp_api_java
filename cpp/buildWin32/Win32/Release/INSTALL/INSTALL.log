@@ -1,0 +1,15 @@
+﻿  -- Install configuration: "Release"
+  -- Installing: C:/Windows/System32/tradeplugin.lib
+  -- Installing: C:/Windows/System32/tradeplugin.dll
+  -- Installing: C:/Windows/System32/quoteplugin.lib
+  -- Installing: C:/Windows/System32/quoteplugin.dll
+  -- Up-to-date: C:/Windows/System32/glog.dll
+  -- Installing: C:/Windows/System32/xtpquoteapi.dll
+  -- Installing: C:/Windows/System32/xtptraderapi.dll
+  -- Installing: E:/xtp_api_java/cpp/buildcpp/win32/tradeplugin.dll
+  -- Installing: E:/xtp_api_java/cpp/buildcpp/win32/quoteplugin.dll
+  -- Up-to-date: E:/xtp_api_java/cpp/../build/libs/win32/Windows/System32/glog.dll
+  -- Installing: E:/xtp_api_java/cpp/../build/libs/win32/Windows/System32/xtptraderapi.dll
+  -- Installing: E:/xtp_api_java/cpp/../build/libs/win32/Windows/System32/xtpquoteapi.dll
+  -- Installing: E:/xtp_api_java/cpp/../build/libs/win32/Windows/System32/tradeplugin.dll
+  -- Installing: E:/xtp_api_java/cpp/../build/libs/win32/Windows/System32/quoteplugin.dll

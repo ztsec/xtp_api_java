@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="E:\xtp_api_java\cpp\src\InitGlog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xtp_api_java\cpp\src\XtpTradeAdapter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xtp_api_java\cpp\src\XtpTradeApi.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="E:\xtp_api_java\cpp\src\include\gflags\gflags.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xtp_api_java\cpp\src\include\gflags\gflags_completions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xtp_api_java\cpp\src\include\gflags\gflags_declare.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xtp_api_java\cpp\src\include\glog\log_severity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xtp_api_java\cpp\src\include\glog\logging.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xtp_api_java\cpp\src\include\glog\raw_logging.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xtp_api_java\cpp\src\include\glog\stl_logging.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xtp_api_java\cpp\src\include\glog\vlog_is_on.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xtp_api_java\cpp\src\include\xtp\xoms_api_fund_struct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xtp_api_java\cpp\src\include\xtp\xoms_api_struct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xtp_api_java\cpp\src\include\xtp\xquote_api_struct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xtp_api_java\cpp\src\include\xtp\xtp_api_data_type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xtp_api_java\cpp\src\include\xtp\xtp_api_struct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xtp_api_java\cpp\src\include\xtp\xtp_api_struct_common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xtp_api_java\cpp\src\include\xtp\xtp_quote_api.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xtp_api_java\cpp\src\include\xtp\xtp_trader_api.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xtp_api_java\cpp\src\include\com_zts_xtp_quote_api_QuoteApi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xtp_api_java\cpp\src\include\com_zts_xtp_trade_api_TradeApi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xtp_api_java\cpp\src\include\handle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xtp_api_java\cpp\src\include\InitGlog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xtp_api_java\cpp\src\include\XtpTradeApi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="E:\xtp_api_java\cpp\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{5D773816-4656-3E5E-9027-CF962ABF07EB}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{9249C385-BA4E-315F-82EA-0DDC25D9B61B}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

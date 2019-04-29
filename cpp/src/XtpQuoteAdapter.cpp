@@ -14,13 +14,15 @@
 using namespace std;
 
 JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_initGlog
-        (JNIEnv *env, jobject obj, jstring logFolder,jstring logSubFolder)
+        (JNIEnv *env, jobject obj, jstring logFolder,jstring logSubFolder,jstring jniLogLevel)
 {
     const char *char_xtp_data_folder = env->GetStringUTFChars(logFolder, 0);
     string strLogFolder = string(char_xtp_data_folder);
     const char *char_logSubFolder = env->GetStringUTFChars(logSubFolder, 0);
     string strLogSubFolder = string(char_logSubFolder);
-    init_glog(strLogFolder, strLogSubFolder);
+	const char *char_jniLogLevel = env->GetStringUTFChars(jniLogLevel, 0);
+	string strJniLogLevel = string(char_jniLogLevel);
+    init_glog(strLogFolder, strLogSubFolder, strJniLogLevel);
 }
 
 void copy_tickers(JNIEnv *env,jobjectArray tickers,char *pTickers[],int count)

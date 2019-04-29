@@ -11,10 +11,10 @@ extern "C" {
 /*
 * Class:     com_zts_xtp_quote_api_TradeApi
 * Method:    initGlog
-* Signature: (Ljava/lang/String;Ljava/lang/String;)V
+* Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
 */
 JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_initGlog
-        (JNIEnv *, jobject, jstring,jstring);
+        (JNIEnv *, jobject, jstring,jstring,jstring);
 /*
  * Class:     com_zts_xtp_quote_api_QuoteApi
  * Method:    quoteInit

@@ -1,0 +1,14 @@
+C:/Windows/System32/tradeplugin.lib
+C:/Windows/System32/tradeplugin.dll
+C:/Windows/System32/quoteplugin.lib
+C:/Windows/System32/quoteplugin.dll
+C:/Windows/System32/glog.dll
+C:/Windows/System32/xtpquoteapi.dll
+C:/Windows/System32/xtptraderapi.dll
+E:/xtp_api_java/cpp/buildcpp/win32/tradeplugin.dll
+E:/xtp_api_java/cpp/buildcpp/win32/quoteplugin.dll
+E:/xtp_api_java/cpp/../build/libs/win32/Windows/System32/glog.dll
+E:/xtp_api_java/cpp/../build/libs/win32/Windows/System32/xtptraderapi.dll
+E:/xtp_api_java/cpp/../build/libs/win32/Windows/System32/xtpquoteapi.dll
+E:/xtp_api_java/cpp/../build/libs/win32/Windows/System32/tradeplugin.dll
+E:/xtp_api_java/cpp/../build/libs/win32/Windows/System32/quoteplugin.dll

@@ -43,7 +43,7 @@ public class TradeApiTest {
         tradeApi = new TradeApi(tradeSpi);
 
         tradeApi.init(CLIENT_ID, TRADE_KEY,
-                DATA_FOLDER, XtpLogLevel.XTP_LOG_LEVEL_INFO);
+                DATA_FOLDER, XtpLogLevel.XTP_LOG_LEVEL_INFO, JniLogLevel.JNI_LOG_LEVEL_INFO);
         sessionId = tradeApi.login(XTP_TRADE_SERVER_IP, XTP_TRADE_SERVER_PORT,
                 ACCOUNT, PASSWORD, TransferProtocol.XTP_PROTOCOL_TCP);
 
