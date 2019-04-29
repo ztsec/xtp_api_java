@@ -36,8 +36,10 @@
             copy cpp\buildcpp\win64\libtradeplugin.dll  c:\windows\system32\
             copy cpp\buildcpp\win64\libquoteplugin.dll  c:\windows\system32\
                      
-                     
-    * 2）在量化交易java代码中引入xtpapi-1.1.18.13.jar并使用
+    * 2）确保有JRE8及以上被安装在目标主机，如果是windows还需要安装Visual C++ Redistributable for Visual Studio 2015，下载地址：                 
+         https://www.microsoft.com/zh-CN/download/details.aspx?id=48145
+         
+    * 3）在量化交易java代码中引入xtpapi-1.1.18.13.jar并使用
     
          > 如需进行单元测试：
                            
@@ -118,7 +120,8 @@
     
     * 6）在工程根目录下执行./gradlew build -x test 执行成功后在项目根目录生成build/libs/xtpapi-1.1.18.13.jar
     
-    * 7）在量化交易java代码中引入xtpapi-1.1.18.13.jar并使用
+    * 7）在量化交易java代码中引入xtpapi-1.1.18.13.jar并使用（注意如果在IDE中打开java代码及java测试用例，需要
+         在IDE中安装lombok插件才能看源码不报错，如果不看源码与测试用例，无需安装）
            
          > 如需进行单元测试：
                    
