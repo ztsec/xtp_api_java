@@ -1,11 +1,6 @@
 package com.zts.xtp.demo.trade;
 
-import com.zts.xtp.common.enums.BusinessType;
-import com.zts.xtp.common.enums.MarketType;
-import com.zts.xtp.common.enums.PriceType;
-import com.zts.xtp.common.enums.SideType;
-import com.zts.xtp.common.enums.TransferProtocol;
-import com.zts.xtp.common.enums.XtpLogLevel;
+import com.zts.xtp.common.enums.*;
 import com.zts.xtp.trade.api.TradeApi;
 import com.zts.xtp.trade.model.request.OrderInsertRequest;
 import com.zts.xtp.trade.spi.TradeSpi;
@@ -18,7 +13,7 @@ public class TradeDemo {
     public TradeDemo(String ip, int port, String user, String password, short clientId, String key, String dataFolder){
         TradeSpi tradeSpi = new TradeSpiImpl();
         tradeApi = new TradeApi(tradeSpi);
-        tradeApi.init(clientId, key, dataFolder, XtpLogLevel.XTP_LOG_LEVEL_INFO);
+        tradeApi.init(clientId, key, dataFolder, XtpLogLevel.XTP_LOG_LEVEL_INFO, JniLogLevel.JNI_LOG_LEVEL_INFO);
         sessionId = tradeApi.login(ip, port, user, password, TransferProtocol.XTP_PROTOCOL_TCP);
         System.out.println("login OMS result: " + sessionId);
     }
