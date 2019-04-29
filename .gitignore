@@ -1,5 +1,5 @@
 /build
-!/build/libs/*.jar
+!/build/libs/
 /cpp/cmake-build-debug
 /cpp/cmake-build-release
 .gradle/
