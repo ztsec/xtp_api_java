@@ -7,3 +7,5 @@
 user-noCommit.config.properites
 .idea/
 /cpp/build/
+/cpp/buildWin64/CMakeFiles/3.13.2/CompilerIdC/Debug/CompilerIdC.tlog
+/cpp/buildWin32/CMakeFiles/3.13.2/CompilerIdC/Debug/CompilerIdC.tlog

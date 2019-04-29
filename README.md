@@ -29,14 +29,14 @@
         > win32：
         
             copy cpp\lib\win32\dll\*  c:\windows\system32\
-            copy cpp\buildcpp\win32\libtradeplugin.dll  c:\windows\system32\
-            copy cpp\buildcpp\win32\libquoteplugin.dll  c:\windows\system32\
+            copy cpp\buildcpp\win32\dll\tradeplugin.dll  c:\windows\system32\
+            copy cpp\buildcpp\win32\dll\quoteplugin.dll  c:\windows\system32\
             
          > win64：
                  
             copy cpp\lib\win64\dll\*  c:\windows\system32\
-            copy cpp\buildcpp\win64\libtradeplugin.dll  c:\windows\system32\
-            copy cpp\buildcpp\win64\libquoteplugin.dll  c:\windows\system32\
+            copy cpp\buildcpp\win64\dll\tradeplugin.dll  c:\windows\system32\
+            copy cpp\buildcpp\win64\dll\quoteplugin.dll  c:\windows\system32\
                      
     * 2）确保有JRE8及以上被安装在目标主机，如果是windows还需要安装Visual C++ Redistributable for Visual Studio 2015，下载地址：                 
          https://www.microsoft.com/zh-CN/download/details.aspx?id=48145
