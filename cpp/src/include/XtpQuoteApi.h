@@ -27,6 +27,14 @@ private:
     JavaVMAttachArgs att_args_;
     jobject quote_plugin_obj_;
 
+    //OnTickByTick里的缓存
+    bool bAttachedTickByTick = false;
+    JNIEnv* env = NULL;
+    jclass pluginClass = NULL;
+    jmethodID jm_onTickByTickEntrust = NULL;
+    jmethodID jm_onTickByTickTrade = NULL;
+    //=================
+
     jclass xtp_error_msg_class_;
     jclass xtp_specific_ticker_class_;
     jclass xtp_market_data_class_;

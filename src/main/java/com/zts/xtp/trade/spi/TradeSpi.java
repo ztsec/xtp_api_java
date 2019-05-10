@@ -17,17 +17,13 @@ public interface TradeSpi {
      * @param sessionId 资金账户对应的sessionId，登录时得到
      * @param reason 	错误原因，请与错误代码表对应
      */
-    default void onDisconnect(String sessionId, int reason) {
-
-    }
+    void onDisconnect(String sessionId, int reason) ;
 
     /**
      * 错误应答
      * @param errorMessage 当服务器响应发生错误时的具体的错误代码和错误信息，当errorMessage为空，或者errorMessage.errorId为0时，表明没有错误
      */
-    default void onError(ErrorMessage errorMessage) {
-
-    }
+    void onError(ErrorMessage errorMessage) ;
 
     /**
      * 资金划拨通知
@@ -36,10 +32,8 @@ public interface TradeSpi {
      * @param errorMessage 资金划拨订单被拒绝或者发生错误时错误代码和错误信息，当errorMessage为空，或者errorMessage.errorId为0时，表明没有错误
      * @param sessionId 资金账户对应的sessionId，登录时得到
      */
-    default void onFundTransfer(FundTransferResponse fundTransferInfo, ErrorMessage errorMessage,
-        String sessionId) {
-
-    }
+    void onFundTransfer(FundTransferResponse fundTransferInfo, ErrorMessage errorMessage,
+        String sessionId) ;
 
     /**
      * 报单通知
@@ -48,10 +42,8 @@ public interface TradeSpi {
      * @param errorMessage 订单被拒绝或者发生错误时错误代码和错误信息，当errorMessage为空，或者errorMessage.errorId为0时，表明没有错误
      * @param sessionId 资金账户对应的sessionId，登录时得到
      */
-    default void onOrderEvent(OrderResponse orderInfo, ErrorMessage errorMessage,
-        String sessionId) {
-
-    }
+    void onOrderEvent(OrderResponse orderInfo, ErrorMessage errorMessage,
+        String sessionId) ;
 
     /**
      * 请求查询资金账户响应，需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线
@@ -59,9 +51,7 @@ public interface TradeSpi {
      * @param errorMessage 查询资金账户发生错误时返回的错误信息，当errorMessage为空，或者errorMessage.errorId为0时，表明没有错误
      * @param sessionId 资金账户对应的sessionId，登录时得到
      */
-    default void onQueryAsset(AssetResponse assetInfo, ErrorMessage errorMessage, String sessionId) {
-
-    }
+    void onQueryAsset(AssetResponse assetInfo, ErrorMessage errorMessage, String sessionId) ;
 
     /**
      * 请求查询ETF清单文件的响应，需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线
@@ -69,9 +59,7 @@ public interface TradeSpi {
      * @param errorMessage 	查询ETF清单文件发生错误时返回的错误信息，当errorMessage为空，或者errorMessage.errorId为0时，表明没有错误
      * @param sessionId 资金账户对应的sessionId，登录时得到
      */
-    default void onQueryETF(ETFBaseResponse etfBaseInfo, ErrorMessage errorMessage, String sessionId) {
-
-    }
+    void onQueryETF(ETFBaseResponse etfBaseInfo, ErrorMessage errorMessage, String sessionId) ;
 
     /**
      * 请求查询ETF股票篮的响应，需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线
@@ -79,10 +67,8 @@ public interface TradeSpi {
      * @param errorMessage 查询ETF股票篮发生错误时返回的错误信息，当errorMessage为空，或者errorMessage.errorId为0时，表明没有错误
      * @param sessionId 资金账户对应的sessionId，登录时得到
      */
-    default void onQueryETFBasket(ETFComponentResponse etfComponentInfo, ErrorMessage errorMessage,
-        String sessionId) {
-
-    }
+    void onQueryETFBasket(ETFComponentResponse etfComponentInfo, ErrorMessage errorMessage,
+        String sessionId) ;
 
     /**
      * 请求查询资金划拨订单响应，需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线
@@ -90,10 +76,8 @@ public interface TradeSpi {
      * @param errorMessage 查询资金账户发生错误时返回的错误信息，当errorMessage为空，或者errorMessage.errorId为0时，表明没有错误
      * @param sessionId 资金账户对应的sessionId，登录时得到
      */
-    default void onQueryFundTransfer(FundTransferResponse fundTransferInfo, ErrorMessage errorMessage,
-        String sessionId) {
-
-    }
+    void onQueryFundTransfer(FundTransferResponse fundTransferInfo, ErrorMessage errorMessage,
+        String sessionId) ;
 
     /**
      * 请求查询今日新股申购信息列表的响应，需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线
@@ -101,10 +85,8 @@ public interface TradeSpi {
      * @param errorMessage 查询今日新股申购信息列表发生错误时返回的错误信息，当errorMessage为空，或者errorMessage.errorId为0时，表明没有错误
      * @param sessionId 资金账户对应的sessionId，登录时得到
      */
-    default void onQueryIPOInfoList(IPOTickerResponse ipoTickerInfo, ErrorMessage errorMessage,
-        String sessionId) {
-
-    }
+    void onQueryIPOInfoList(IPOTickerResponse ipoTickerInfo, ErrorMessage errorMessage,
+        String sessionId) ;
 
     /**
      * 请求查询用户新股申购额度信息的响应，需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线
@@ -112,10 +94,8 @@ public interface TradeSpi {
      * @param errorMessage 查询用户新股申购额度信息发生错误时返回的错误信息，当errorMessage为空，或者errorMessage.errorId为0时，表明没有错误
      * @param sessionId 资金账户对应的sessionId，登录时得到
      */
-    default void onQueryIPOQuotaInfo(IPOQuotaResponse ipoQuotaInfo, ErrorMessage errorMessage,
-        String sessionId) {
-
-    }
+    void onQueryIPOQuotaInfo(IPOQuotaResponse ipoQuotaInfo, ErrorMessage errorMessage,
+        String sessionId) ;
 
     /**
      * 请求查询报单响应
@@ -124,10 +104,8 @@ public interface TradeSpi {
      * @param errorMessage 查询报单时发生错误时，返回的错误信息，当errorMessage为空，或者errorMessage.errorId为0时，表明没有错误
      * @param sessionId 资金账户对应的sessionId，登录时得到
      */
-    default void onQueryOrder(OrderResponse orderInfo, ErrorMessage errorMessage,
-        String sessionId) {
-
-    }
+    void onQueryOrder(OrderResponse orderInfo, ErrorMessage errorMessage,
+        String sessionId) ;
 
     /**
      * 请求查询投资者持仓响应
@@ -136,10 +114,8 @@ public interface TradeSpi {
      * @param errorMessage 	查询账户持仓发生错误时返回的错误信息，当errorMessage为空，或者errorMessage.errorId为0时，表明没有错误
      * @param sessionId 资金账户对应的sessionId，登录时得到
      */
-    default void onQueryPosition(StockPositionResponse stockPositionInfo, ErrorMessage errorMessage,
-        String sessionId) {
-
-    }
+    void onQueryPosition(StockPositionResponse stockPositionInfo, ErrorMessage errorMessage,
+        String sessionId) ;
 
     /**
      * 请求查询分级基金信息响应，需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线
@@ -147,10 +123,8 @@ public interface TradeSpi {
      * @param errorMessage 	查询分级基金发生错误时返回的错误信息，当errorMessage为空，或者errorMessage.errorId为0时，表明没有错误
      * @param sessionId 资金账户对应的sessionId，登录时得到
      */
-    default void onQueryStructuredFund(StructuredFundResponse structuredFundInfo,
-        ErrorMessage errorMessage, String sessionId) {
-
-    }
+    void onQueryStructuredFund(StructuredFundResponse structuredFundInfo,
+        ErrorMessage errorMessage, String sessionId) ;
 
     /**
      * 请求查询成交响应
@@ -159,9 +133,7 @@ public interface TradeSpi {
      * @param errorMessage 	查询成交回报发生错误时返回的错误信息，当errorMessage为空，或者errorMessage.errorId为0时，表明没有错误
      * @param sessionId 资金账户对应的sessionId，登录时得到
      */
-    default void onQueryTrade(TradeResponse tradeInfo, ErrorMessage errorMessage, String sessionId) {
-
-    }
+    void onQueryTrade(TradeResponse tradeInfo, ErrorMessage errorMessage, String sessionId) ;
 
     /**
      * 成交通知
@@ -169,9 +141,7 @@ public interface TradeSpi {
      * @param tradeInfo 成交回报的具体信息，用户可以通过trade_info.order_xtp_id来管理订单，通过GetClientIDByXTPID() == client_id来过滤自己的订单。对于上交所，exec_id可以唯一标识一笔成交。当发现2笔成交回报拥有相同的exec_id，则可以认为此笔交易自成交了。对于深交所，exec_id是唯一的，暂时无此判断机制。report_index+market字段可以组成唯一标识表示成交回报。
      * @param sessionId 资金账户对应的sessionId，登录时得到
      */
-    default void onTradeEvent(TradeResponse tradeInfo, String sessionId) {
-
-    }
+    void onTradeEvent(TradeResponse tradeInfo, String sessionId) ;
 
     /**
      * 撤单出错响应
@@ -179,13 +149,16 @@ public interface TradeSpi {
      * @param errorMessage 撤单被拒绝或者发生错误时错误代码和错误信息
      * @param sessionId 资金账户对应的sessionId，登录时得到
      */
-    default void onCancelOrderError(OrderCancelResponse orderCancelInfo, ErrorMessage errorMessage, String sessionId) {
+    void onCancelOrderError(OrderCancelResponse orderCancelInfo, ErrorMessage errorMessage, String sessionId) ;
 
-    }
-
-    default void OnQueryOptionAuctionInfo(OptionAuctionInfoResponse optionAuctionInfoResponse, ErrorMessage errorMessage, String sessionId){
-
-    }
+    /**
+     * 查询期权合约响应
+     * 需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线
+     * @param optionAuctionInfoResponse 查询到的期权合约情况
+     * @param errorMessage 撤单被拒绝或者发生错误时错误代码和错误信息
+     * @param sessionId 资金账户对应的sessionId，登录时得到
+     */
+    void OnQueryOptionAuctionInfo(OptionAuctionInfoResponse optionAuctionInfoResponse, ErrorMessage errorMessage, String sessionId);
 
 
 

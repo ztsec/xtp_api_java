@@ -2,19 +2,14 @@ package com.zts.xtp.quote.api;
 
 
 import com.zts.xtp.common.enums.JniLogLevel;
-import com.zts.xtp.common.model.ErrorMessage;
-import com.zts.xtp.quote.model.response.DepthMarketDataResponse;
-import com.zts.xtp.quote.model.response.DepthMarketDataExResponse;
-import com.zts.xtp.quote.model.response.OrderBookResponse;
-import com.zts.xtp.quote.model.response.SpecificTickerResponse;
-import com.zts.xtp.quote.model.response.TickByTickResponse;
-import com.zts.xtp.quote.model.response.TickerInfoResponse;
-import com.zts.xtp.quote.model.response.TickerPriceInfoResponse;
-import com.zts.xtp.quote.spi.QuoteSpi;
-import com.zts.xtp.common.enums.XtpLogLevel;
 import com.zts.xtp.common.enums.TransferProtocol;
-import java.io.File;
+import com.zts.xtp.common.enums.XtpLogLevel;
 import com.zts.xtp.common.jni.JNILoadLibrary;
+import com.zts.xtp.common.model.ErrorMessage;
+import com.zts.xtp.quote.model.response.*;
+import com.zts.xtp.quote.spi.QuoteSpi;
+
+import java.io.File;
 
 
 public class QuoteApi {
@@ -342,12 +337,52 @@ public class QuoteApi {
     }
 
     /**
-     *  逐笔行情通知，包括股票、指数和期权
+     *  逐笔行情通知 改为onTickByTickEntrust（逐笔委托）、onTickByTickTrade（逐笔成交）代替
      * @param rsp 逐笔行情数据，包括逐笔委托和逐笔成交，此为共用结构体，需要根据type来区分是逐笔委托还是逐笔成交，需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线
      */
-    private void onTickByTick(TickByTickResponse rsp) {
-        quoteSpi.onTickByTick(rsp);
+//    private void onTickByTick(TickByTickResponse rsp) {
+//        quoteSpi.onTickByTick(rsp);
+//    }
+
+    /**
+     * 逐笔委托行情通知  需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线
+     * @param exchange_id 交易所代码   1:深圳   2:上海   3:未知
+     * @param ticker 合约代码（不包含交易所信息）
+     * @param seq 预留
+     * @param data_time 委托时间 or 成交时间
+     * @param type 委托 or 成交   1:委托    2:成交
+     * @param channel_no 频道代码
+     * @param order_seq 委托序号(在同一个channel_no内唯一，从1开始连续)
+     * @param price 委托价格
+     * @param qty 委托数量
+     * @param side 方向  '1':买; '2':卖; 'G':借入; 'F':出借
+     * @param ord_type 订单类别  '1': 市价; '2': 限价; 'U': 本方最优
+     */
+    void onTickByTickEntrust(int exchange_id,String ticker,long seq,long data_time,int type,int channel_no,int order_seq,double price,long qty, char side,char ord_type){
+        quoteSpi.onTickByTickEntrust(exchange_id, ticker, seq, data_time, type, channel_no, order_seq, price, qty,  side, ord_type);
     }
+
+    /**
+     * 逐笔成交行情通知  需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线
+     * @param exchange_id 交易所代码   1:深圳   2:上海   3:未知
+     * @param ticker 合约代码（不包含交易所信息）
+     * @param seq 预留
+     * @param data_time 委托时间 or 成交时间
+     * @param type 委托 or 成交   1:委托    2:成交
+     * @param channel_no 频道代码
+     * @param order_seq 委托序号(在同一个channel_no内唯一，从1开始连续)
+     * @param price 委托价格
+     * @param qty 委托数量
+     * @param money 成交金额(仅适用上交所)
+     * @param bid_no 买方订单号
+     * @param ask_no 卖方订单号
+     * @param trade_flag 上海: 内外盘标识('B':主动买; 'S':主动卖; 'N':未知)   深圳: 成交标识('4':撤; 'F':成交)
+     */
+    void onTickByTickTrade(int exchange_id,String ticker,long seq,long data_time,int type,int channel_no,int order_seq,double price,long qty, double money,long bid_no,long ask_no,char trade_flag){
+        quoteSpi.onTickByTickTrade(exchange_id,ticker, seq, data_time, type, channel_no, order_seq, price, qty,  money, bid_no, ask_no, trade_flag);
+    }
+
+
 
     /**
      *  订阅全市场的股票行情应答,需要快速返回

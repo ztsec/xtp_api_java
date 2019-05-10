@@ -9,6 +9,9 @@
     
     如果您的linux是glibc2.12版本，请先手工将cpp/lib/linux_glibc2.12下的两个dll覆盖到cpp/lib/linux下，默认cpp/lib/linux下是同cpp/lib/linux_glibc2.14一样的glibc2.14版本编译的
    
+#Version history
+    v1.1.18.19-1.0.1 优化逐笔行情推送性能，废除原逐笔行情推送java接口onTickByTick，改为逐笔委托onTickByTickEntrust和逐笔成交行情推送onTickByTickTrade两个java api实现，对应的quoteplugin动态库也进行了修改。
+    v1.1.18.19-1.0.0 支持xtp 1.1.18.19
 
 ##如何使用：
 * **方式一：直接使用成品**
@@ -41,7 +44,7 @@
     * 2）确保有JRE8及以上被安装在目标主机，如果是windows还需要安装Visual C++ Redistributable for Visual Studio 2015，下载地址：                 
          https://www.microsoft.com/zh-CN/download/details.aspx?id=48145
          
-    * 3）在量化交易java代码中引入xtpapi-1.1.18.13.jar并使用
+    * 3）在量化交易java代码中引入build/libs/xtpapi-1.1.18.19.jar并使用
     
          > 如需进行单元测试：
                            
@@ -67,7 +70,7 @@
                     
             上述参数也可以通过根目录下user.config.properites中配置。公网测试环境请使用TCP连接，UPD会收不到数据。
                     
-            执行./gradlew build -x test进行重新编译java生成xtpapi-1.1.18.13.jar
+            执行./gradlew build -x test进行重新编译java生成build/libs/xtpapi-1.1.18.19.jar
             分别执行TradeApiTest、QuoteApiTest中的junit单元测试。
                   
          > 如需进行demo测试：
@@ -138,9 +141,9 @@
     
     * 5）安装并配置gradle
     
-    * 6）在工程根目录下执行./gradlew build -x test 执行成功后在项目根目录生成build/libs/xtpapi-1.1.18.13.jar
+    * 6）在工程根目录下执行./gradlew build -x test 执行成功后在项目根目录生成build/libs/xtpapi-1.1.18.19.jar
     
-    * 7）在量化交易java代码中引入xtpapi-1.1.18.13.jar并使用（注意如果在IDE中打开java代码及java测试用例，需要
+    * 7）在量化交易java代码中引入build/libs/xtpapi-1.1.18.19.jar并使用（注意如果在IDE中打开java代码及java测试用例，需要
          在IDE中安装lombok插件才能看源码不报错，如果不看源码与测试用例，无需安装）
            
          > 如需进行单元测试：
@@ -167,7 +170,7 @@
                    
           上述参数也可以通过根目录下user.config.properites中配置。公网测试环境请使用TCP连接，UPD会收不到数据。
                    
-          执行./gradlew build -x test进行重新编译java生成xtpapi-1.1.18.13.jar
+          执行./gradlew build -x test进行重新编译java生成build/libs/xtpapi-1.1.18.19.jar
           分别执行TradeApiTest、QuoteApiTest中的junit单元测试。
           
          > 如需进行demo测试：
@@ -185,4 +188,6 @@
                    private static final String DATA_FOLDER = "/var/log/zts/xtp";//java api输出日志的本地目录
           运行Application.java即可，上述参数也可以通过根目录下user.config.properites中配置。公网测试环境请使用TCP连接，UPD会收不到数据。
           
-          
+        
+ #License 
+    Licensed under the MIT License.  

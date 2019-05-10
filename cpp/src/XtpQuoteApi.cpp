@@ -571,56 +571,26 @@ void XtpQuote::OnUnSubTickByTick(XTPST *ticker, XTPRI *error_info, bool is_last)
 void XtpQuote::OnTickByTick(XTPTBT *tbt_data) {
     //LOG(INFO) << __PRETTY_FUNCTION__ ;
 
-    JNIEnv* env;
-    // prepare the invocation
-    env = preInvoke();
-    jclass pluginClass = env->GetObjectClass(quote_plugin_obj_);
-    assert(pluginClass != NULL);
-    jmethodID jm_event = env->GetMethodID(pluginClass, "onTickByTick", "(Lcom/zts/xtp/quote/model/response/TickByTickResponse;)V");
-
-    jmethodID defaultConstr = env->GetMethodID(xtp_tick_by_tick_class_, "<init>","()V");
-    if (defaultConstr == NULL) {
-       jvm_->DetachCurrentThread();
-       return;
+    if(jvm_ == NULL){
+        LOG(ERROR) << "XtpQuoteApi OnTickByTick very fatal error eccored: jvm_ == NULL , this tickByTick Msg dropped." ;
+        return;
     }
 
-    jobject rspObj=NULL;
-    //create the object
-    rspObj = env->NewObject(xtp_tick_by_tick_class_, defaultConstr);
-    if (rspObj == NULL) {
-       jvm_->DetachCurrentThread();
-       return;
+    if (!bAttachedTickByTick || env==NULL)
+    {
+        // attach the current thread to the JVM
+        jint res = jvm_->AttachCurrentThread((void**)&env, &att_args_);
+        if (res != 0) {
+            LOG(ERROR) << "XtpQuoteApi OnTickByTick AttachCurrentThread failed." ;
+        }
+        bAttachedTickByTick = true;
     }
 
-    jmethodID jm_setExchangeType = env->GetMethodID(xtp_tick_by_tick_class_, "setExchangeType", "(I)V");
-    assert(jm_setExchangeType != NULL);
-    env->CallVoidMethod(rspObj, jm_setExchangeType, tbt_data->exchange_id);
-
+    if (pluginClass == NULL) {
+        pluginClass = env->GetObjectClass(quote_plugin_obj_);
+        LOG(INFO)  << "OnTickByTick pluginClass is "<< pluginClass ;
+    }
     jstring jstr_ticker = env->NewStringUTF(tbt_data->ticker);
-    jmethodID jm_setTicker = env->GetMethodID(xtp_tick_by_tick_class_, "setTicker", "(Ljava/lang/String;)V");
-    env->CallVoidMethod(rspObj, jm_setTicker, jstr_ticker);
-
-    jmethodID jm_setSeq = env->GetMethodID(xtp_tick_by_tick_class_, "setSeq", "(J)V");
-    env->CallVoidMethod(rspObj, jm_setSeq, tbt_data->seq);
-
-    jmethodID jm_setDataTime = env->GetMethodID(xtp_tick_by_tick_class_, "setDataTime", "(J)V");
-    env->CallVoidMethod(rspObj, jm_setDataTime, tbt_data->data_time);
-
-    jmethodID jm_setType = env->GetMethodID(xtp_tick_by_tick_class_, "setType", "(I)V");
-    assert(jm_setType != NULL);
-    env->CallVoidMethod(rspObj, jm_setType, tbt_data->type);
-
-    // set entrust or trade according to tbt type
-    jmethodID jm_inner_setChannelNo;
-    jmethodID jm_inner_setSeq;
-    jmethodID jm_inner_setPrice;
-    jmethodID jm_inner_setQty;
-    jmethodID jm_inner_setSide;
-    jmethodID jm_inner_setOrdType;
-    jmethodID jm_inner_setMoney;
-    jmethodID jm_inner_setBidNo;
-    jmethodID jm_inner_setAskNo;
-    jmethodID jm_inner_setTradeFlag;
 
     switch(tbt_data->type)
     {
@@ -631,46 +601,18 @@ void XtpQuote::OnTickByTick(XTPTBT *tbt_data) {
             XTPTickByTickEntrust *xtp_tbt_entrust = &(tbt_data->entrust);
             if (xtp_tbt_entrust == NULL)
             {
-                jvm_->DetachCurrentThread();
+                LOG(ERROR) << "OnTickByTick xtp_tbt_entrust is NULL," << tbt_data->seq ;
                 return;
             }
-
-            jmethodID defaultConstrEntrust = env->GetMethodID(xtp_tick_by_tick_entrust_class_, "<init>", "()V");
-            if (defaultConstr == NULL)
-            {
-                jvm_->DetachCurrentThread();
-                return;
+            if (jm_onTickByTickEntrust == NULL) {
+                jm_onTickByTickEntrust = env->GetMethodID(pluginClass, "onTickByTickEntrust", "(ILjava/lang/String;JJIIJDJCC)V");
+                LOG(INFO) << "OnTickByTick jm_onTickByTickEntrust is " << jm_onTickByTickEntrust ;
             }
-
-            jobject entrustObj = NULL;
-            entrustObj = env->NewObject(xtp_tick_by_tick_entrust_class_, defaultConstrEntrust);
-            if (entrustObj == NULL)
-            {
-                jvm_->DetachCurrentThread();
-                return;
-            }
-
-            jm_inner_setChannelNo = env->GetMethodID(xtp_tick_by_tick_entrust_class_, "setChannelNo", "(I)V");
-            env->CallVoidMethod(entrustObj, jm_inner_setChannelNo, xtp_tbt_entrust->channel_no);
-
-            jm_inner_setSeq = env->GetMethodID(xtp_tick_by_tick_entrust_class_, "setSeq", "(J)V");
-            env->CallVoidMethod(entrustObj, jm_inner_setSeq, xtp_tbt_entrust->seq);
-
-            jm_inner_setPrice = env->GetMethodID(xtp_tick_by_tick_entrust_class_, "setPrice", "(D)V");
-            env->CallVoidMethod(entrustObj, jm_inner_setPrice, xtp_tbt_entrust->price);
-
-            jm_inner_setQty = env->GetMethodID(xtp_tick_by_tick_entrust_class_, "setQty", "(J)V");
-            env->CallVoidMethod(entrustObj, jm_inner_setQty, xtp_tbt_entrust->qty);
-
-            jm_inner_setSide = env->GetMethodID(xtp_tick_by_tick_entrust_class_, "setSide", "(C)V");
-            env->CallVoidMethod(entrustObj, jm_inner_setSide, xtp_tbt_entrust->side);
-
-            jm_inner_setOrdType = env->GetMethodID(xtp_tick_by_tick_entrust_class_, "setOrdType", "(C)V");
-            env->CallVoidMethod(entrustObj, jm_inner_setOrdType, xtp_tbt_entrust->ord_type);
-
-            jmethodID jm_setEntrust = env->GetMethodID(xtp_tick_by_tick_class_, "setEntrust",
-                "(Lcom/zts/xtp/quote/model/response/TickByTickEntrustResponse;)V");
-            env->CallVoidMethod(rspObj, jm_setEntrust, entrustObj);
+            //cout << "OnTickByTick Entrust:" <<tbt_data->exchange_id<<","<<jstr_ticker<<","<<tbt_data->seq<<","<<tbt_data->data_time<<","<<tbt_data->type<<","<<", subPart="<<
+            //	xtp_tbt_entrust->channel_no<<","<<xtp_tbt_entrust->seq<<","<<xtp_tbt_entrust->price<<","<<xtp_tbt_entrust->qty<<","<<xtp_tbt_entrust->side<<","<<xtp_tbt_entrust->ord_type << endl;
+            env->CallVoidMethod(quote_plugin_obj_, jm_onTickByTickEntrust,
+                                tbt_data->exchange_id, jstr_ticker, tbt_data->seq, tbt_data->data_time, tbt_data->type,
+                                xtp_tbt_entrust->channel_no, xtp_tbt_entrust->seq, xtp_tbt_entrust->price, xtp_tbt_entrust->qty, xtp_tbt_entrust->side, xtp_tbt_entrust->ord_type);
             break;
         }
         // when type is trade
@@ -680,58 +622,199 @@ void XtpQuote::OnTickByTick(XTPTBT *tbt_data) {
             XTPTickByTickTrade *xtp_tbt_trade = &(tbt_data->trade);
             if (xtp_tbt_trade == NULL)
             {
-                jvm_->DetachCurrentThread();
+                LOG(ERROR) << "OnTickByTick xtp_tbt_trade is NULL," << tbt_data->seq ;
                 return;
             }
-
-            jmethodID defaultConstrTrade = env->GetMethodID(xtp_tick_by_tick_trade_class_, "<init>", "()V");
-            if (defaultConstrTrade == NULL)
-            {
-                jvm_->DetachCurrentThread();
-                return;
+            if (jm_onTickByTickTrade == NULL) {
+                jm_onTickByTickTrade = env->GetMethodID(pluginClass, "onTickByTickTrade", "(ILjava/lang/String;JJIIJDJDJJC)V");
+                LOG(INFO) << "OnTickByTick jm_onTickByTickTrade is " << jm_onTickByTickTrade ;
             }
-
-            jobject tradeObj = NULL;
-            tradeObj = env->NewObject(xtp_tick_by_tick_trade_class_, defaultConstrTrade);
-            if (tradeObj == NULL)
-            {
-                jvm_->DetachCurrentThread();
-                return;
-            }
-
-            jm_inner_setChannelNo = env->GetMethodID(xtp_tick_by_tick_trade_class_, "setChannelNo", "(I)V");
-            env->CallVoidMethod(tradeObj, jm_inner_setChannelNo, xtp_tbt_trade->channel_no);
-
-            jm_inner_setSeq = env->GetMethodID(xtp_tick_by_tick_trade_class_, "setSeq", "(J)V");
-            env->CallVoidMethod(tradeObj, jm_inner_setSeq, xtp_tbt_trade->seq);
-
-            jm_inner_setPrice = env->GetMethodID(xtp_tick_by_tick_trade_class_, "setPrice", "(D)V");
-            env->CallVoidMethod(tradeObj, jm_inner_setPrice, xtp_tbt_trade->price);
-
-            jm_inner_setQty = env->GetMethodID(xtp_tick_by_tick_trade_class_, "setQty", "(J)V");
-            env->CallVoidMethod(tradeObj, jm_inner_setQty, xtp_tbt_trade->qty);
-
-            jm_inner_setMoney = env->GetMethodID(xtp_tick_by_tick_trade_class_, "setMoney", "(D)V");
-            env->CallVoidMethod(tradeObj, jm_inner_setMoney, jm_inner_setMoney, xtp_tbt_trade->money);
-
-            jm_inner_setBidNo = env->GetMethodID(xtp_tick_by_tick_trade_class_, "setBidNo", "(J)V");
-            env->CallVoidMethod(tradeObj, jm_inner_setBidNo, jm_inner_setBidNo, xtp_tbt_trade->bid_no);
-
-            jm_inner_setAskNo = env->GetMethodID(xtp_tick_by_tick_trade_class_, "setAskNo", "(J)V");
-            env->CallVoidMethod(tradeObj, jm_inner_setAskNo, xtp_tbt_trade->ask_no);
-
-            jm_inner_setTradeFlag = env->GetMethodID(xtp_tick_by_tick_trade_class_, "setTradeFlag", "(C)V");
-            env->CallVoidMethod(tradeObj, jm_inner_setTradeFlag, xtp_tbt_trade->trade_flag);
-
-            jmethodID jm_setTrade = env->GetMethodID(xtp_tick_by_tick_class_, "setTrade",
-                "(Lcom/zts/xtp/quote/model/response/TickByTickTradeResponse;)V");
-            env->CallVoidMethod(rspObj, jm_setTrade, tradeObj);
+            //cout << "OnTickByTick Entrust:" << tbt_data->exchange_id <<","<< jstr_ticker <<","<< tbt_data->seq <<","<< tbt_data->data_time <<","<< tbt_data->type <<","<< ", subPart=" <<
+            //	xtp_tbt_trade->channel_no << "," << xtp_tbt_trade->seq<<","<< xtp_tbt_trade->price<<","<< xtp_tbt_trade->qty<<","<< xtp_tbt_trade->money<<","<< xtp_tbt_trade->bid_no<<","<< xtp_tbt_trade->ask_no<<","<< xtp_tbt_trade->trade_flag << endl;
+            env->CallVoidMethod(quote_plugin_obj_, jm_onTickByTickTrade,
+                                tbt_data->exchange_id, jstr_ticker, tbt_data->seq, tbt_data->data_time, tbt_data->type,
+                                xtp_tbt_trade->channel_no, xtp_tbt_trade->seq, xtp_tbt_trade->price, xtp_tbt_trade->qty, xtp_tbt_trade->money, xtp_tbt_trade->bid_no, xtp_tbt_trade->ask_no, xtp_tbt_trade->trade_flag);
             break;
         }
     }
 
-    env->CallVoidMethod(quote_plugin_obj_, jm_event, rspObj);
-    jvm_->DetachCurrentThread();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //==================  原组装对象的方式  效率低  ===================================
+//    JNIEnv* env;
+//     prepare the invocation
+//    env = preInvoke();
+//
+//    jclass pluginClass = env->GetObjectClass(quote_plugin_obj_);
+//    assert(pluginClass != NULL);
+//    jmethodID jm_event = env->GetMethodID(pluginClass, "onTickByTick", "(Lcom/zts/xtp/quote/model/response/TickByTickResponse;)V");
+//
+//    jmethodID defaultConstr = env->GetMethodID(xtp_tick_by_tick_class_, "<init>","()V");
+//    if (defaultConstr == NULL) {
+//       jvm_->DetachCurrentThread();
+//       return;
+//    }
+//
+//    jobject rspObj=NULL;
+//    //create the object
+//    rspObj = env->NewObject(xtp_tick_by_tick_class_, defaultConstr);
+//    if (rspObj == NULL) {
+//       jvm_->DetachCurrentThread();
+//       return;
+//    }
+//
+//    jmethodID jm_setExchangeType = env->GetMethodID(xtp_tick_by_tick_class_, "setExchangeType", "(I)V");
+//    assert(jm_setExchangeType != NULL);
+//    env->CallVoidMethod(rspObj, jm_setExchangeType, tbt_data->exchange_id);
+//
+//    jstring jstr_ticker = env->NewStringUTF(tbt_data->ticker);
+//    jmethodID jm_setTicker = env->GetMethodID(xtp_tick_by_tick_class_, "setTicker", "(Ljava/lang/String;)V");
+//    env->CallVoidMethod(rspObj, jm_setTicker, jstr_ticker);
+//
+//    jmethodID jm_setSeq = env->GetMethodID(xtp_tick_by_tick_class_, "setSeq", "(J)V");
+//    env->CallVoidMethod(rspObj, jm_setSeq, tbt_data->seq);
+//
+//    jmethodID jm_setDataTime = env->GetMethodID(xtp_tick_by_tick_class_, "setDataTime", "(J)V");
+//    env->CallVoidMethod(rspObj, jm_setDataTime, tbt_data->data_time);
+//
+//    jmethodID jm_setType = env->GetMethodID(xtp_tick_by_tick_class_, "setType", "(I)V");
+//    assert(jm_setType != NULL);
+//    env->CallVoidMethod(rspObj, jm_setType, tbt_data->type);
+//
+//    // set entrust or trade according to tbt type
+//    jmethodID jm_inner_setChannelNo;
+//    jmethodID jm_inner_setSeq;
+//    jmethodID jm_inner_setPrice;
+//    jmethodID jm_inner_setQty;
+//    jmethodID jm_inner_setSide;
+//    jmethodID jm_inner_setOrdType;
+//    jmethodID jm_inner_setMoney;
+//    jmethodID jm_inner_setBidNo;
+//    jmethodID jm_inner_setAskNo;
+//    jmethodID jm_inner_setTradeFlag;
+//
+//    switch(tbt_data->type)
+//    {
+//        // when type is entrust
+//        case XTP_TBT_ENTRUST:
+//        {
+//            // tbt entrust should not be null
+//            XTPTickByTickEntrust *xtp_tbt_entrust = &(tbt_data->entrust);
+//            if (xtp_tbt_entrust == NULL)
+//            {
+//                jvm_->DetachCurrentThread();
+//                return;
+//            }
+//
+//            jmethodID defaultConstrEntrust = env->GetMethodID(xtp_tick_by_tick_entrust_class_, "<init>", "()V");
+//            if (defaultConstr == NULL)
+//            {
+//                jvm_->DetachCurrentThread();
+//                return;
+//            }
+//
+//            jobject entrustObj = NULL;
+//            entrustObj = env->NewObject(xtp_tick_by_tick_entrust_class_, defaultConstrEntrust);
+//            if (entrustObj == NULL)
+//            {
+//                jvm_->DetachCurrentThread();
+//                return;
+//            }
+//
+//            jm_inner_setChannelNo = env->GetMethodID(xtp_tick_by_tick_entrust_class_, "setChannelNo", "(I)V");
+//            env->CallVoidMethod(entrustObj, jm_inner_setChannelNo, xtp_tbt_entrust->channel_no);
+//
+//            jm_inner_setSeq = env->GetMethodID(xtp_tick_by_tick_entrust_class_, "setSeq", "(J)V");
+//            env->CallVoidMethod(entrustObj, jm_inner_setSeq, xtp_tbt_entrust->seq);
+//
+//            jm_inner_setPrice = env->GetMethodID(xtp_tick_by_tick_entrust_class_, "setPrice", "(D)V");
+//            env->CallVoidMethod(entrustObj, jm_inner_setPrice, xtp_tbt_entrust->price);
+//
+//            jm_inner_setQty = env->GetMethodID(xtp_tick_by_tick_entrust_class_, "setQty", "(J)V");
+//            env->CallVoidMethod(entrustObj, jm_inner_setQty, xtp_tbt_entrust->qty);
+//
+//            jm_inner_setSide = env->GetMethodID(xtp_tick_by_tick_entrust_class_, "setSide", "(C)V");
+//            env->CallVoidMethod(entrustObj, jm_inner_setSide, xtp_tbt_entrust->side);
+//
+//            jm_inner_setOrdType = env->GetMethodID(xtp_tick_by_tick_entrust_class_, "setOrdType", "(C)V");
+//            env->CallVoidMethod(entrustObj, jm_inner_setOrdType, xtp_tbt_entrust->ord_type);
+//
+//            jmethodID jm_setEntrust = env->GetMethodID(xtp_tick_by_tick_class_, "setEntrust",
+//                "(Lcom/zts/xtp/quote/model/response/TickByTickEntrustResponse;)V");
+//            env->CallVoidMethod(rspObj, jm_setEntrust, entrustObj);
+//            break;
+//        }
+//        // when type is trade
+//        case XTP_TBT_TRADE:
+//        {
+//            // tbt trade should not be null
+//            XTPTickByTickTrade *xtp_tbt_trade = &(tbt_data->trade);
+//            if (xtp_tbt_trade == NULL)
+//            {
+//                jvm_->DetachCurrentThread();
+//                return;
+//            }
+//
+//            jmethodID defaultConstrTrade = env->GetMethodID(xtp_tick_by_tick_trade_class_, "<init>", "()V");
+//            if (defaultConstrTrade == NULL)
+//            {
+//                jvm_->DetachCurrentThread();
+//                return;
+//            }
+//
+//            jobject tradeObj = NULL;
+//            tradeObj = env->NewObject(xtp_tick_by_tick_trade_class_, defaultConstrTrade);
+//            if (tradeObj == NULL)
+//            {
+//                jvm_->DetachCurrentThread();
+//                return;
+//            }
+//
+//            jm_inner_setChannelNo = env->GetMethodID(xtp_tick_by_tick_trade_class_, "setChannelNo", "(I)V");
+//            env->CallVoidMethod(tradeObj, jm_inner_setChannelNo, xtp_tbt_trade->channel_no);
+//
+//            jm_inner_setSeq = env->GetMethodID(xtp_tick_by_tick_trade_class_, "setSeq", "(J)V");
+//            env->CallVoidMethod(tradeObj, jm_inner_setSeq, xtp_tbt_trade->seq);
+//
+//            jm_inner_setPrice = env->GetMethodID(xtp_tick_by_tick_trade_class_, "setPrice", "(D)V");
+//            env->CallVoidMethod(tradeObj, jm_inner_setPrice, xtp_tbt_trade->price);
+//
+//            jm_inner_setQty = env->GetMethodID(xtp_tick_by_tick_trade_class_, "setQty", "(J)V");
+//            env->CallVoidMethod(tradeObj, jm_inner_setQty, xtp_tbt_trade->qty);
+//
+//            jm_inner_setMoney = env->GetMethodID(xtp_tick_by_tick_trade_class_, "setMoney", "(D)V");
+//            env->CallVoidMethod(tradeObj, jm_inner_setMoney, jm_inner_setMoney, xtp_tbt_trade->money);
+//
+//            jm_inner_setBidNo = env->GetMethodID(xtp_tick_by_tick_trade_class_, "setBidNo", "(J)V");
+//            env->CallVoidMethod(tradeObj, jm_inner_setBidNo, jm_inner_setBidNo, xtp_tbt_trade->bid_no);
+//
+//            jm_inner_setAskNo = env->GetMethodID(xtp_tick_by_tick_trade_class_, "setAskNo", "(J)V");
+//            env->CallVoidMethod(tradeObj, jm_inner_setAskNo, xtp_tbt_trade->ask_no);
+//
+//            jm_inner_setTradeFlag = env->GetMethodID(xtp_tick_by_tick_trade_class_, "setTradeFlag", "(C)V");
+//            env->CallVoidMethod(tradeObj, jm_inner_setTradeFlag, xtp_tbt_trade->trade_flag);
+//
+//            jmethodID jm_setTrade = env->GetMethodID(xtp_tick_by_tick_class_, "setTrade",
+//                "(Lcom/zts/xtp/quote/model/response/TickByTickTradeResponse;)V");
+//            env->CallVoidMethod(rspObj, jm_setTrade, tradeObj);
+//            break;
+//        }
+//    }
+//
+//    env->CallVoidMethod(quote_plugin_obj_, jm_event, rspObj);
+//    jvm_->DetachCurrentThread();
 }
 
 void XtpQuote::OnSubscribeAllMarketData(XTP_EXCHANGE_TYPE exchange_id, XTPRI *error_info) {
