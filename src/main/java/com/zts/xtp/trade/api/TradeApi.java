@@ -6,6 +6,7 @@ import com.zts.xtp.common.enums.TransferProtocol;
 import com.zts.xtp.common.enums.XtpLogLevel;
 import com.zts.xtp.common.jni.JNILoadLibrary;
 import com.zts.xtp.common.model.ErrorMessage;
+import com.zts.xtp.common.enums.XtpTeResumeType;
 
 import com.zts.xtp.trade.model.request.*;
 import com.zts.xtp.trade.model.response.*;
@@ -42,7 +43,7 @@ public class TradeApi {
      * @param xtpAPIlogLevel xtp api 日志输出级别
      * @param jniLogLevel  jni c++部分的日志级别
      */
-    public void init(short clientId, String key, String logFolder, XtpLogLevel  xtpAPIlogLevel, JniLogLevel jniLogLevel){
+    public void init(short clientId, String key, String logFolder, XtpLogLevel  xtpAPIlogLevel, JniLogLevel jniLogLevel,XtpTeResumeType resumeType){
         if(!JNILoadLibrary.glogHasInited){
             JNILoadLibrary.glogHasInited = true;
             //init glog
@@ -65,7 +66,7 @@ public class TradeApi {
 
             initGlog(logFolder,logSubFolder,strJniLogLevel);
         }
-        tradeInit(clientId,key,logFolder,xtpAPIlogLevel);
+        tradeInit(clientId,key,logFolder,xtpAPIlogLevel,resumeType);
     }
 
     /**
@@ -83,8 +84,18 @@ public class TradeApi {
      * @param key 用户开发软件Key，用户申请开户时给予
      * @param logFolder 日志输出的目录，请设定一个真实存在的有可写权限的路径
      * @param logLevel xtp api 日志输出级别
+     * @param resumeType XTP_TERT_RESTART:从本交易日开始重传 XTP_TERT_RESUME:(保留字段，此方式暂未支持)从上次收到的续传 XTP_TERT_QUICK:只传送登录后公共流的内容  详细查看subscribePublicTopic方法 通过这里设置和通过subscribePublicTopic是二选一的两种方式。
      */
-    private native void tradeInit(short clientId, String key, String logFolder, XtpLogLevel logLevel);
+    private native void tradeInit(short clientId, String key, String logFolder, XtpLogLevel logLevel,XtpTeResumeType resumeType);
+
+
+
+    /**
+     * 设置公共流（订单响应、成交回报）重传方式
+     * 该方法要在Login方法前调用，或通过tradeInit传入resumeType调用。注意在用户断线后，如果不登出就login()，公共流订阅方式不会起作用。用户只会收到断线后的所有消息。如果先logout()再login()，那么公共流订阅方式会起作用，用户收到的数据会根据用户的选择方式而定。jvm中所有用户公用同一个重传方式，以最后一次设置为准。
+     * @param resumeType XTP_TERT_RESTART:从本交易日开始重传 XTP_TERT_RESUME:(保留字段，此方式暂未支持)从上次收到的续传 XTP_TERT_QUICK:只传送登录后公共流的内容
+     */
+    public native void subscribePublicTopic(XtpTeResumeType resumeType);
 
     /**
      * 断开连接并清除交易模块

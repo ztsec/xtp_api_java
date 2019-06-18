@@ -44,7 +44,7 @@ void init_glog(string log_folder,string log_subFolder,string glogLevel) {
     google::SetDeleteLogBeyondHowLongTimeBySeconds(3600 * 24 * 15); //log最长保留15天
 		
 
-    LOG(ERROR) << "XTP JAVA API Log start in folder: " << str_smart_log_folder << ",this is not a error";
+    LOG(ERROR) << "XTP JAVA API Log start in folder: " << str_smart_log_folder << ", this is not a error";
 
 }
 

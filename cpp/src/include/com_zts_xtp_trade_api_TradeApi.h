@@ -26,10 +26,18 @@ JNIEXPORT jstring JNICALL Java_com_zts_xtp_trade_api_TradeApi_getApiLastError
 /*
  * Class:     com_zts_xtp_trade_api_TradeApi
  * Method:    tradeInit
- * Signature: (SLjava/lang/String;Ljava/lang/String;Lcom/zts/xtp/common/enums/XtpLogLevel;)V
+ * Signature: (Ljava/lang/String;Ljava/lang/String;Lcom/zts/xtp/common/enums/XtpLogLevel;)V
  */
 JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_tradeInit
-  (JNIEnv *, jobject, jshort, jstring, jstring, jobject);
+  (JNIEnv *, jobject, jshort, jstring, jstring, jobject, jobject);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    subscribePublicTopic
+ * Signature: (Lcom/zts/xtp/common/enums/XtpTeResumeType;)V
+ */
+JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_subscribePublicTopic (JNIEnv *, jobject, jobject);
+
 
 /*
  * Class:     com_zts_xtp_trade_api_TradeApi

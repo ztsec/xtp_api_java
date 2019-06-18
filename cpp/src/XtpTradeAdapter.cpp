@@ -28,7 +28,7 @@ JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_initGlog
 }
 
 JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_tradeInit
-  (JNIEnv *env, jobject obj, jshort clientId, jstring key, jstring logFolder, jobject jLogLevel)
+  (JNIEnv *env, jobject obj, jshort clientId, jstring key, jstring logFolder, jobject jLogLevel, jobject resumeTypeObj)
 {
     Trade *ptrade;
     if(NULL == ptrade_)
@@ -89,7 +89,12 @@ JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_tradeInit
         jclass logLevelClass = env->FindClass("com/zts/xtp/common/enums/XtpLogLevel");
         jmethodID getLogLevelValue = env->GetMethodID(logLevelClass, "getValue", "()I");
         XTP_LOG_LEVEL logLevel = (XTP_LOG_LEVEL)env->CallIntMethod(jLogLevel, getLogLevelValue);
-        ptrade->Init(logLevel);
+
+        jclass resumeTypeClass = env->FindClass("com/zts/xtp/common/enums/XtpTeResumeType");
+        jmethodID resumeTypeMethod = env->GetMethodID(resumeTypeClass, "getType", "()I");
+        XTP_TE_RESUME_TYPE resumeType = (XTP_TE_RESUME_TYPE)env->CallIntMethod(resumeTypeObj, resumeTypeMethod);
+
+        ptrade->Init(logLevel,resumeType);
 
         ptrade_=ptrade;
 
@@ -100,6 +105,19 @@ JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_tradeInit
 
     setHandle(env, obj, ptrade);
 }
+
+JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_subscribePublicTopic (JNIEnv *env, jobject obj, jobject resumeTypeObj)
+{
+    Trade *ptrade = getHandle<Trade>(env, obj);
+
+    jclass resumeTypeClass = env->FindClass("com/zts/xtp/common/enums/XtpTeResumeType");
+    jmethodID resumeTypeMethod = env->GetMethodID(resumeTypeClass, "getType", "()I");
+    XTP_TE_RESUME_TYPE resumeType = (XTP_TE_RESUME_TYPE)env->CallIntMethod(resumeTypeObj, resumeTypeMethod);
+
+    ptrade->SubscribePublicTopic(resumeType);
+    return;
+}
+
 
 JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_disconnect (JNIEnv *env, jobject obj)
 {

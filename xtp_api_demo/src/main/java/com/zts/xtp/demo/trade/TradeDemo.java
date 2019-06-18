@@ -13,7 +13,7 @@ public class TradeDemo {
     public TradeDemo(String ip, int port, String user, String password, short clientId, String key, String dataFolder){
         TradeSpi tradeSpi = new TradeSpiImpl();
         tradeApi = new TradeApi(tradeSpi);
-        tradeApi.init(clientId, key, dataFolder, XtpLogLevel.XTP_LOG_LEVEL_INFO, JniLogLevel.JNI_LOG_LEVEL_INFO);
+        tradeApi.init(clientId, key, dataFolder, XtpLogLevel.XTP_LOG_LEVEL_INFO, JniLogLevel.JNI_LOG_LEVEL_INFO, XtpTeResumeType.XTP_TERT_RESTART);
         sessionId = tradeApi.login(ip, port, user, password, TransferProtocol.XTP_PROTOCOL_TCP);
         System.out.println("login OMS result: " + sessionId);
     }

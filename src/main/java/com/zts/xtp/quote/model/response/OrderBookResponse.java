@@ -1,6 +1,7 @@
 package com.zts.xtp.quote.model.response;
 
 import com.zts.xtp.common.enums.ExchangeType;
+import com.zts.xtp.common.enums.MarketDataType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -53,7 +54,12 @@ public class OrderBookResponse {
     private long[] askQty;
 
     public void setExchangeType(int exchangeType) {
-        this.exchangeType = ExchangeType.values()[exchangeType - 1];
+        if(ExchangeType.values().length<exchangeType){
+            this.exchangeType = ExchangeType.UNKNOWN;
+            System.err.println("Error: OrderBookResponse received ExchangeType value exceed ExchangeType enum size, receive="+exchangeType);
+        }else{
+            this.exchangeType = ExchangeType.values()[exchangeType - 1];
+        }
     }
 
     public void setExchangeType(ExchangeType exchangeType) {

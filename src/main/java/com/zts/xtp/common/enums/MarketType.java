@@ -27,7 +27,7 @@ public enum MarketType {
             case 1:
                 return XTP_MKT_SZ_A;
             case 2:
-                return XTP_MKT_SZ_A;
+                return XTP_MKT_SH_A;
             default:
                 return XTP_MKT_UNKNOWN;
         }

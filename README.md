@@ -51,13 +51,14 @@
             src/test/java/com.zts.xtp/trade/TradeApiTest.java是交易的单元测试：
             修改TradeApiTest.java：
             tradeApi.init((short)18, "23a71733bba3sd78722319b212e",
-                       "/var/log/zts/xtp", XtpLogLevel.XTP_LOG_LEVEL_INFO, JniLogLevel.JNI_LOG_LEVEL_INFO);
+                       "/var/log/zts/xtp", XtpLogLevel.XTP_LOG_LEVEL_INFO, JniLogLevel.JNI_LOG_LEVEL_INFO, XtpTeResumeType.XTP_TERT_RESTART);
             sessionId = tradeApi.login("xx.xx.xx.xx", 1234,
                        "15001030", "xxxxxx", TransferProtocol.XTP_PROTOCOL_TCP);
             init方法的第1个参数是xtp client id（不超过255），实盘环境配置请联系官方人员获取，
                      第2个参数为测试环境的serverkey，实盘环境请联系官方人员获取，
                      第3个参数为java api产生的日志路径，
                      第4个参数为java api交易日志级别，
+                     第5个参数为推送的续传方式,
             login方法的参数分别是测试xtp交易ip、xtp交易端口、资金账号、密码、传输方式(测试只支持TCP，实盘可配置TCP或UDP），
                      请分别填入测试环境的参数及申请到的测试账号口令，实盘环境配置请联系官方人员获取。
                                           
@@ -151,13 +152,14 @@
           src/test/java/com.zts.xtp/trade/TradeApiTest.java是交易的单元测试：
           修改TradeApiTest.java：
           tradeApi.init((short)18, "23a71733bba3sd78722319b212e",
-                                  "/var/log/zts/xtp", XtpLogLevel.XTP_LOG_LEVEL_INFO, JniLogLevel.JNI_LOG_LEVEL_INFO);
+                                  "/var/log/zts/xtp", XtpLogLevel.XTP_LOG_LEVEL_INFO, JniLogLevel.JNI_LOG_LEVEL_INFO, XtpTeResumeType.XTP_TERT_RESTART);
           sessionId = tradeApi.login("xx.xx.xx.xx", 1234,
                                             "xxxxxx", "xxxxxx", TransferProtocol.XTP_PROTOCOL_TCP);
           init方法的第1个参数是xtp client id（不超过255），实盘环境配置请联系官方人员获取，
                    第2个参数为测试环境的serverkey，实盘环境请联系官方人员获取，
                    第3个参数为java api产生的日志路径，
                    第4个参数为java api交易日志级别，
+                   第5个参数为推送的续传方式，
           login方法的参数分别是测试xtp交易ip、xtp交易端口、资金账号、密码、传输方式(测试只支持TCP，实盘可配置TCP或UDP），请分别
                    填入测试环境的参数及申请到的测试账号口令，实盘环境配置请联系官方人员获取。
                                   

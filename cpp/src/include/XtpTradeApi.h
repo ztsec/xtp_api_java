@@ -38,7 +38,6 @@ private:
     jclass query_option_auctionInfo_rsp_class_;
     jclass order_cancel_info_class_;
 
-
 public:
 
     void OnDisconnected(uint64_t session_id, int reason);
@@ -104,10 +103,10 @@ public:
 
     ~Trade();
 
-    void Init(XTP_LOG_LEVEL logLevel)
+    void Init(XTP_LOG_LEVEL logLevel,XTP_TE_RESUME_TYPE resumeType)
     {
         api_ = XTP::API::TraderApi::CreateTraderApi(client_id_, file_path_.c_str(), logLevel);
-        api_->SubscribePublicTopic(XTP_TERT_RESTART);
+        api_->SubscribePublicTopic(resumeType);
         api_->SetSoftwareKey(key_.c_str());
         api_->SetSoftwareVersion("1.1.0");
         api_->RegisterSpi(this);
@@ -117,6 +116,16 @@ public:
     {
         if(api_)
             api_->Release();
+    }
+
+    void SubscribePublicTopic(XTP_TE_RESUME_TYPE resumeType)
+    {
+        if(api_!=NULL){
+            api_->SubscribePublicTopic(resumeType);
+        }
+        else{
+            LOG(ERROR) << __PRETTY_FUNCTION__<<"subscribePublicTopic mast call after init" ;
+        }
     }
 
     uint64_t Login(std::string server_ip, uint16_t server_port, std::string username, std::string password, XTP_PROTOCOL_TYPE protocol)

@@ -66,7 +66,12 @@ public class TradeResponse {
     }
 
     public void setPositionEffectType(int type) {
-        positionEffectType = PositionEffectType.values()[type];
+        if(PositionEffectType.values().length-1<type){
+            positionEffectType = PositionEffectType.XTP_POSITION_EFFECT_UNKNOWN;
+            System.err.println("Error: received PositionEffectType value exceed positionEffectType enum size, receive="+type);
+        }else{
+            positionEffectType = PositionEffectType.values()[type];
+        }
     }
 
     public void setBusinessType(int type) {

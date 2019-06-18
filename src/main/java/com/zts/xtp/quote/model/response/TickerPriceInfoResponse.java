@@ -1,6 +1,7 @@
 package com.zts.xtp.quote.model.response;
 
 import com.zts.xtp.common.enums.ExchangeType;
+import com.zts.xtp.common.enums.TickerType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,6 +24,11 @@ public class TickerPriceInfoResponse {
     private boolean lastResp;
 
     public void setExchangeType(int exchangeType) {
-        this.exchangeType = ExchangeType.values()[exchangeType - 1];
+        if(ExchangeType.values().length<exchangeType){
+            this.exchangeType = ExchangeType.UNKNOWN;
+            System.err.println("Error: TickerPriceInfoResponse received ExchangeType value exceed ExchangeType enum size, receive="+exchangeType);
+        }else{
+            this.exchangeType = ExchangeType.values()[exchangeType - 1];
+        }
     }
 }

@@ -2,6 +2,7 @@ package com.zts.xtp.quote.model.response;
 
 import com.zts.xtp.common.enums.ExchangeType;
 import com.zts.xtp.common.enums.MarketDataType;
+import com.zts.xtp.common.enums.PositionEffectType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -74,7 +75,12 @@ public class DepthMarketDataResponse {
     private MarketDataType dataType;
 
     public void setDataType(int type){
-        this.dataType = MarketDataType.values()[type];
+        if(MarketDataType.values().length-1<type){
+            this.dataType = MarketDataType.XTP_MARKETDATA_ACTUAL;//如果类型未找到，默认现货
+            System.err.println("Error: received MarketDataType value exceed MarketDataType enum size, receive="+type);
+        }else{
+            this.dataType = MarketDataType.values()[type];
+        }
     }
 
     public void setExchangeType(int type) {

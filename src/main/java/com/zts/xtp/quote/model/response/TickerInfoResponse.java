@@ -46,10 +46,20 @@ public class TickerInfoResponse {
     private boolean lastResp;
 
     public void setExchangeType(int exchangeType) {
-        this.exchangeType = ExchangeType.values()[exchangeType - 1];
+        if(ExchangeType.values().length<exchangeType){
+            this.exchangeType = ExchangeType.UNKNOWN;
+            System.err.println("Error: TickerInfoResponse received ExchangeType value exceed ExchangeType enum size, receive="+exchangeType);
+        }else{
+            this.exchangeType = ExchangeType.values()[exchangeType - 1];
+        }
     }
 
     public void setTickerType(int tickerType) {
-        this.tickerType = TickerType.values()[tickerType];
+        if(TickerType.values().length<tickerType){
+            this.tickerType = TickerType.XTP_TICKER_TYPE_UNKNOWN;
+            System.err.println("Error: TickerInfoResponse received TickerType value exceed TickerType enum size, receive="+tickerType);
+        }else{
+            this.tickerType = TickerType.values()[tickerType - 1];
+        }
     }
 }
