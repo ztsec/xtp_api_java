@@ -10,8 +10,20 @@
     如果您的linux是glibc2.12版本，请先手工将cpp/lib/linux_glibc2.12下的两个dll覆盖到cpp/lib/linux下，默认cpp/lib/linux下是同cpp/lib/linux_glibc2.14一样的glibc2.14版本编译的
    
 #Version history
-    v1.1.18.19-1.0.1 优化逐笔行情推送性能，废除原逐笔行情推送java接口onTickByTick，改为逐笔委托onTickByTickEntrust和逐笔成交行情推送onTickByTickTrade两个java api实现，对应的quoteplugin动态库也进行了修改。
-    v1.1.18.19-1.0.0 支持xtp 1.1.18.19
+    v1.1.18.19-1.0.2 
+                     1.增加trade的SetHeartBeatInterval、GetTradingDay、GetApiVersion、GetClientIDByXTPID、GetAccountByXTPID接口
+
+    v1.1.18.19-1.0.1 
+                     1.添加subscribePublicTopic api 支持
+                     2.trade接口的init方法增加publicTopic续传类型参数
+                     3.扩充PositionEffectType、SideType枚举值，升级到xtp1.1.18.19
+                     4.修复DepthMarketDataResponse中MarketDataType的转换可能存在的越界错误
+                     5.修复OrderBookResponse、TickerPriceInfoResponse中ExchangeType的转换可能存在的越界错误
+                     6.修复OTickerInfoResponse中ExchangeType、TickerType的转换可能存在的越界错误
+                     7.修复TradeResponse中PositionEffectType的转换可能存在的越界错误
+                     8.修改测试用例、demo程序、readme中trade的init方法的调用及参数说明
+    v1.1.18.19-1.0.0 
+                     1.支持xtp 1.1.18.19
 
 ##如何使用：
 * **方式一：直接使用成品**
