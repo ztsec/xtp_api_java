@@ -234,6 +234,26 @@ public:
         }
         return api_->QueryOptionAuctionInfo(&query_param, session_id, request_id);
     }
+
+	const char* GetTradingDay()
+	{
+		return api_->GetTradingDay();
+	}
+
+	const char* GetApiVersion()
+	{
+		return api_->GetApiVersion();
+	}
+
+	uint8_t GetClientIDByXTPID(uint64_t order_xtp_id)
+	{
+		return api_->GetClientIDByXTPID(order_xtp_id);
+	}
+
+	const char* GetAccountByXTPID(uint64_t order_xtp_id)
+	{
+		return api_->GetAccountByXTPID(order_xtp_id);
+	}
 private:
 
     JNIEnv* preInvoke();

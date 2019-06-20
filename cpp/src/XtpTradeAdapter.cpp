@@ -727,3 +727,43 @@ JNIEXPORT jint JNICALL Java_com_zts_xtp_trade_api_TradeApi_queryOptionAuctionInf
 
       return ptrade->QueryOptionAuctionInfo(req, sessionId, requestId, false);
 }
+
+JNIEXPORT jstring JNICALL Java_com_zts_xtp_trade_api_TradeApi_getTradingDay(JNIEnv *env, jobject clazz) {
+	// get the trader pointer
+	Trade *ptrade = getHandle<Trade>(env, clazz);
+
+	const char *tradingDay = ptrade->GetTradingDay();
+	return env->NewStringUTF(tradingDay);
+}
+
+JNIEXPORT jstring JNICALL Java_com_zts_xtp_trade_api_TradeApi_getApiVersion(JNIEnv *env, jobject clazz) {
+	// get the trader pointer
+	Trade *ptrade = getHandle<Trade>(env, clazz);
+
+	const char* version = ptrade->GetApiVersion();
+	return env->NewStringUTF(version);
+}
+
+JNIEXPORT jshort JNICALL Java_com_zts_xtp_trade_api_TradeApi_getClientIDByXTPID(JNIEnv *env, jobject clazz, jstring orderXTPId) {
+	// get the trader pointer
+	Trade *ptrade = getHandle<Trade>(env, clazz);
+
+	uint64_t xtpId;
+	const char *char_xtpOrderId = env->GetStringUTFChars(orderXTPId, 0);
+	std::stringstream(char_xtpOrderId) >> xtpId;
+
+	env->ReleaseStringUTFChars(orderXTPId, char_xtpOrderId);
+	return ptrade->GetClientIDByXTPID(xtpId);
+}
+
+JNIEXPORT jstring JNICALL Java_com_zts_xtp_trade_api_TradeApi_getAccountByXTPID(JNIEnv *env, jobject clazz, jstring orderXTPId) {
+	// get the trader pointer
+	Trade *ptrade = getHandle<Trade>(env, clazz);
+
+	uint64_t xtpId;
+	const char *char_xtpOrderId = env->GetStringUTFChars(orderXTPId, 0);
+	std::stringstream(char_xtpOrderId) >> xtpId;
+
+	const char* account = ptrade->GetAccountByXTPID(xtpId);
+	return env->NewStringUTF(account);
+}
