@@ -41,6 +41,13 @@ JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_subscribePublicTopic 
 
 /*
  * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    setHeartBeatInterval
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_setHeartBeatInterval (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
  * Method:    disconnect
  * Signature: ()V
  */

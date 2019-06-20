@@ -119,6 +119,13 @@ JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_subscribePublicTopic 
 }
 
 
+JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_setHeartBeatInterval (JNIEnv *env, jobject obj, jint interval)
+{
+    Trade *ptrade = getHandle<Trade>(env, obj);
+    ptrade->SetHeartBeatInterval(interval);
+}
+
+
 JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_disconnect (JNIEnv *env, jobject obj)
 {
     Trade *ptrade = getHandle<Trade>(env, obj);

@@ -45,6 +45,7 @@ public class TradeApiTest {
         tradeApi.init(CLIENT_ID, TRADE_KEY,
                 DATA_FOLDER, XtpLogLevel.XTP_LOG_LEVEL_INFO, JniLogLevel.JNI_LOG_LEVEL_INFO, XtpTeResumeType.XTP_TERT_RESTART);
 //        tradeApi.subscribePublicTopic(XtpTeResumeType.XTP_TERT_RESTART);
+//        tradeApi.setHeartBeatInterval(30);
         sessionId = tradeApi.login(XTP_TRADE_SERVER_IP, XTP_TRADE_SERVER_PORT,
                 ACCOUNT, PASSWORD, TransferProtocol.XTP_PROTOCOL_TCP);
 

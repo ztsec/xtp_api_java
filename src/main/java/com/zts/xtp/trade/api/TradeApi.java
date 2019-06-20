@@ -42,6 +42,7 @@ public class TradeApi {
      * @param key 用户开发软件Key，用户申请开户时给予
      * @param xtpAPIlogLevel xtp api 日志输出级别
      * @param jniLogLevel  jni c++部分的日志级别
+     * @param resumeType 设置公共流（订单响应、成交回报）重传方式
      */
     public void init(short clientId, String key, String logFolder, XtpLogLevel  xtpAPIlogLevel, JniLogLevel jniLogLevel,XtpTeResumeType resumeType){
         if(!JNILoadLibrary.glogHasInited){
@@ -89,13 +90,20 @@ public class TradeApi {
     private native void tradeInit(short clientId, String key, String logFolder, XtpLogLevel logLevel,XtpTeResumeType resumeType);
 
 
-
     /**
      * 设置公共流（订单响应、成交回报）重传方式
      * 该方法要在Login方法前调用，或通过tradeInit传入resumeType调用。注意在用户断线后，如果不登出就login()，公共流订阅方式不会起作用。用户只会收到断线后的所有消息。如果先logout()再login()，那么公共流订阅方式会起作用，用户收到的数据会根据用户的选择方式而定。jvm中所有用户公用同一个重传方式，以最后一次设置为准。
      * @param resumeType XTP_TERT_RESTART:从本交易日开始重传 XTP_TERT_RESUME:(保留字段，此方式暂未支持)从上次收到的续传 XTP_TERT_QUICK:只传送登录后公共流的内容
      */
     public native void subscribePublicTopic(XtpTeResumeType resumeType);
+
+
+    /**
+     *  此函数必须在Login之前、init之后调用
+     *  用于设置检测心跳超时的时间，并非设置发心跳包的频率，默认15秒检测一次，建议设置30秒以上，设置过小会引发断线，该方法一般用于debug加断点时防止断开连接，一般正常业务时无需设置
+     * @param interval interval 心跳检测时间间隔，单位为秒
+     */
+    public native void setHeartBeatInterval(int interval);
 
     /**
      * 断开连接并清除交易模块

@@ -128,6 +128,13 @@ public:
         }
     }
 
+    void SetHeartBeatInterval(uint32_t interval){
+        if(api_==NULL){
+            LOG(ERROR) << __PRETTY_FUNCTION__<<"setHeartBeatInterval mast call after init" ;
+        }
+        api_->SetHeartBeatInterval(interval);
+    }
+
     uint64_t Login(std::string server_ip, uint16_t server_port, std::string username, std::string password, XTP_PROTOCOL_TYPE protocol)
     {
         return api_->Login(server_ip.c_str(), server_port, username.c_str(), password.c_str(), protocol);

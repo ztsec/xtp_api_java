@@ -98,7 +98,8 @@ public class QuoteApi {
     public native int logout();
 
     /**
-     *  此函数必须在Login之前调用
+     *  此函数必须在Login之前、init之后调用
+     *  用于设置检测心跳超时的时间，并非设置发心跳包的频率，默认15秒检测一次，建议设置30秒以上，设置过小会引发断线，该方法一般用于debug加断点时防止断开连接，一般正常业务时无需设置
      * @param interval interval 心跳检测时间间隔，单位为秒
      */
     public native void setHeartBeatInterval(int interval);

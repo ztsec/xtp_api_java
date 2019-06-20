@@ -25,7 +25,7 @@
             
         > mac：
         
-            cp cpp/mac/* /usr/local/lib/
+            cp cpp/lib/mac/* /usr/local/lib/
             cp cpp/buildcpp/macosx/libtradeplugin.dylib /usr/local/lib/
             cp cpp/buildcpp/macosx/libquoteplugin.dylib /usr/local/lib/
             
@@ -189,7 +189,35 @@
                    private static final String PASSWORD = "xxxxxx";//xtp密码
                    private static final String DATA_FOLDER = "/var/log/zts/xtp";//java api输出日志的本地目录
           运行Application.java即可，上述参数也可以通过根目录下user.config.properites中配置。公网测试环境请使用TCP连接，UPD会收不到数据。
-          
+
+#修改JNI代码调用流程
+
+   > API调用，即JAVA -> C++：以下单为例
+   
+        1.业务代码调用tradeApi.insertOrder
+        2.TradeApi.java的 public native String insertOrder(OrderInsertRequest order, String sessionId); 注意同步修改注释
+        3.com_zts_xtp_trade_api_TradeApi.h的JNIEXPORT jstring JNICALL Java_com_zts_xtp_trade_api_TradeApi_insertOrder(JNIEnv *, jobject, jobject, jstring);注意同步修改注释
+        4.XtpTradeApi.h中实现api：（对java->c++的api调用需要实现，对c++->java的spi无需实现）
+            uint64_t InsertOrder(XTPOrderInsertInfo order, uint64_t session_id)
+            {
+                ...
+               return api_->InsertOrder(&order, session_id);
+            }
+        5.XtpTradeApi.cpp中实现：
+            jstring JNICALL Java_com_zts_xtp_trade_api_TradeApi_insertOrder(JNIEnv *env, jobject obj, jobject tradeOrder, jstring strSessionId)
+            中调用上一步实现的函数uint64_t orderId = ptrade->InsertOrder(orderInfo, sessionId);
+       
+   > SPI调用，即C++ -> JAVA：以收成交回报为例
+        
+        1.XtpTradeApi.h中定义    void OnTradeEvent(XTPTradeReport *trade_info, uint64_t session_id);
+        2.XtpTradeApi.cpp中实现 void Trade::OnTradeEvent(XTPTradeReport *trade_info, uint64_t session_id) 
+            {
+                ... 将c++数据通过jni调用在java层构造出来
+                env->CallVoidMethod(trade_plugin_obj_, jm_tradeEventResult, tradeReportObj, strSessionId); 调用java层TradeSpi.java的onTradeEvent接口
+
+            }
+        3.TradeSpi.java定义spi接口 void onTradeEvent(TradeResponse tradeInfo, String sessionId) ;
+        4.业务代码实现onTradeEvent接口
         
  #License 
     Licensed under the MIT License.  
