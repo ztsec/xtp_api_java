@@ -265,6 +265,34 @@ public class TradeApi {
      */
     public native int queryOptionAuctionInfo(OptionAuctionInfoRequest optionAuctionInfoRequest, String sessionId, int requestId);
 
+    /**
+     * 获取当前交易日
+     * 只有登录成功后,才能得到正确的交易日
+     * @return 获取到的交易日
+     */
+    public native String getTradingDay();
+
+    /**
+     * 获取API的发行版本号
+     * @return 返回api发行版本号
+     */
+    public native String getApiVersion();
+
+    /**
+     * 通过报单在xtp系统中的ID获取下单的客户端id
+     * @remark 由于系统允许同一用户在不同客户端上登录操作，每个客户端通过不同的client_id进行区分
+     * @param orderXtpId 报单在xtp系统中的ID
+     * @return 返回客户端id，可以用此方法过滤自己下的订单
+     */
+    public native short getClientIDByXTPID(String orderXtpId);
+
+    /**
+     * 通过报单在xtp系统中的ID获取相关资金账户名
+     * @remark 只有资金账户登录成功后,才能得到正确的信息
+     * @param orderXtpId 报单在xtp系统中的ID
+     * @return 返回资金账户名
+     */
+    public native String getAccountByXTPID(String orderXtpId);
 
     //====================================Callback Functions==========================================
     private void onDisconnect(String sessionId, int reason) {

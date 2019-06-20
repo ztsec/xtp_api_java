@@ -7,14 +7,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/*
-* Class:     com_zts_xtp_trade_api_TradeApi
-* Method:    initGlog
-* Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
-*/
-JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_initGlog
-        (JNIEnv *, jobject, jstring,jstring,jstring);
 /*
  * Class:     com_zts_xtp_trade_api_TradeApi
  * Method:    getApiLastError
@@ -22,6 +14,14 @@ JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_initGlog
  */
 JNIEXPORT jstring JNICALL Java_com_zts_xtp_trade_api_TradeApi_getApiLastError
   (JNIEnv *, jobject);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    initGlog
+ * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_initGlog
+  (JNIEnv *, jobject, jstring, jstring, jstring);
 
 /*
  * Class:     com_zts_xtp_trade_api_TradeApi
@@ -190,6 +190,38 @@ JNIEXPORT jint JNICALL Java_com_zts_xtp_trade_api_TradeApi_queryIPOQuotaInfo
  */
 JNIEXPORT jint JNICALL Java_com_zts_xtp_trade_api_TradeApi_queryOptionAuctionInfo
   (JNIEnv *, jobject, jobject, jstring, jint);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    getTradingDay
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_zts_xtp_trade_api_TradeApi_getTradingDay
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    getApiVersion
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_zts_xtp_trade_api_TradeApi_getApiVersion
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    getClientIDByXTPID
+ * Signature: (Ljava/lang/String;)S
+ */
+JNIEXPORT jshort JNICALL Java_com_zts_xtp_trade_api_TradeApi_getClientIDByXTPID
+  (JNIEnv *, jobject, jstring);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    getAccountByXTPID
+ * Signature: (Ljava/lang/String;)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_zts_xtp_trade_api_TradeApi_getAccountByXTPID
+  (JNIEnv *, jobject, jstring);
 
 #ifdef __cplusplus
 }

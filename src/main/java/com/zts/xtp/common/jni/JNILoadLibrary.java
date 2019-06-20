@@ -25,7 +25,7 @@ public class JNILoadLibrary {
             osIsWindows = (os.indexOf("windows") != -1);
             if(osIsWindows){
                 String arch = System.getProperty("os.arch");
-                if(arch=="x86")
+                if("x86".equals(arch))
                     libraryPath = "cpp/lib/win32/dll:cpp/buildcpp/win32:"+libraryPath; //加载工程目录下lib/win32下的xtp的dll
                 else
                     libraryPath = "cpp/lib/win64/dll:cpp/buildcpp/win64:"+libraryPath; //加载工程目录下lib/win64下的xtp的dll

@@ -264,9 +264,39 @@ public class TradeApiTest {
         System.out.println("testQueryOptionAuctionInfo");
         int result = tradeApi.queryOptionAuctionInfo(null, sessionId, 13);
         Assert.assertEquals(result, 0);
-
     }
 
+	@Test
+	public void testGetTradingDay() {
+		System.out.println("testGetTradingDay");
+		String tradingDay = tradeApi.getTradingDay();
+		System.out.println("testGetTradingDay tradingDay: " + tradingDay);
+		Assert.assertNotNull(tradingDay);
+	}
+
+    @Test
+    public void testGetApiVersion() {
+        System.out.println("testGetApiVersion");
+        String version = tradeApi.getApiVersion();
+        System.out.println("testGetApiVersion version: " + version);
+        Assert.assertEquals("1.1.18.19", version);
+    }
+
+    @Test
+    public void testGetClientIDByXTPID() {
+        System.out.println("testGetClientIDByXTPID");
+        short clientId = tradeApi.getClientIDByXTPID("1009073519666951445");
+        System.out.println("testGetClientIDByXTPID clientId: " + clientId);
+        Assert.assertNotNull(clientId);
+    }
+
+	@Test
+	public void testGetAccountByXTPID() {
+		System.out.println("testGetAccountByXTPID");
+		String account = tradeApi.getAccountByXTPID("396628509490944857");
+		System.out.println("testGetAccountByXTPID account: " + account);
+		Assert.assertNotNull(account);
+	}
 
     //==============Common Functions=========
     private String insertOrder() {
