@@ -35,12 +35,17 @@ public class QuoteApiTest {
         JNILoadLibrary.loadLibrary();
         TestQuoteSpi testspi = new TestQuoteSpi();
         quoteApi = new QuoteApi(testspi);
-        quoteApi.setUDPBufferSize(UDPBUFFERSIZE);
-
         quoteApi.init(CLIENT_ID,DATA_FOLDER,XtpLogLevel.XTP_LOG_LEVEL_INFO, JniLogLevel.JNI_LOG_LEVEL_INFO);
-
-        int login_result = quoteApi.login(XTP_QUOTE_SERVER_IP,XTP_QUOTE_SERVER_PORT,ACCOUNT,PASSWORD,TransferProtocol.XTP_PROTOCOL_TCP);
+        quoteApi.setUDPBufferSize(UDPBUFFERSIZE);
+//        quoteApi.setHeartBeatInterval(60*10);
+        int login_result = quoteApi.login(XTP_QUOTE_SERVER_IP,XTP_QUOTE_SERVER_PORT,ACCOUNT,PASSWORD,TransferProtocol.XTP_PROTOCOL_TCP);//XTP_PROTOCOL_TCP
         Assert.assertEquals(login_result, 0);
+
+        System.out.println("subscribeAllTickByTick");
+        quoteApi.subscribeAllTickByTick(2);
+
+//        System.out.println("subscribeAllOrderBook");
+//        quoteApi.subscribeAllOrderBook(2);
     }
 
     @AfterClass
@@ -52,7 +57,7 @@ public class QuoteApiTest {
 
     @After
     public void waitSomeTime() throws InterruptedException {
-        Thread.sleep(5000);
+        Thread.sleep(500000);
     }
 
 

@@ -576,15 +576,18 @@ void XtpQuote::OnTickByTick(XTPTBT *tbt_data) {
         return;
     }
 
-    if (!bAttachedTickByTick || env==NULL)
-    {
-        // attach the current thread to the JVM
-        jint res = jvm_->AttachCurrentThread((void**)&env, &att_args_);
-        if (res != 0) {
-            LOG(ERROR) << "XtpQuoteApi OnTickByTick AttachCurrentThread failed." ;
-        }
-        bAttachedTickByTick = true;
-    }
+    //恢复每次attach  最后detach  解决同时订阅marketdata时  会造成NewStringUTF 崩溃
+    JNIEnv* env;
+    jint res = jvm_->AttachCurrentThread((void**)&env, &att_args_);
+//    if (!bAttachedTickByTick || env==NULL)
+//    {
+//        // attach the current thread to the JVM
+//        jint res = jvm_->AttachCurrentThread((void**)&env, &att_args_);
+//        if (res != 0) {
+//            LOG(ERROR) << "XtpQuoteApi OnTickByTick AttachCurrentThread failed." ;
+//        }
+//        bAttachedTickByTick = true;
+//    }
 
     if (pluginClass == NULL) {
         pluginClass = env->GetObjectClass(quote_plugin_obj_);
@@ -639,7 +642,8 @@ void XtpQuote::OnTickByTick(XTPTBT *tbt_data) {
     }
 
 
-
+    //如果不释放  同时订阅marketdata时  会造成NewStringUTF 崩溃
+    jvm_->DetachCurrentThread();
 
 
 
@@ -654,7 +658,7 @@ void XtpQuote::OnTickByTick(XTPTBT *tbt_data) {
 
     //==================  原组装对象的方式  效率低  ===================================
 //    JNIEnv* env;
-//     prepare the invocation
+//     //prepare the invocation
 //    env = preInvoke();
 //
 //    jclass pluginClass = env->GetObjectClass(quote_plugin_obj_);
@@ -689,7 +693,7 @@ void XtpQuote::OnTickByTick(XTPTBT *tbt_data) {
 //    jmethodID jm_setDataTime = env->GetMethodID(xtp_tick_by_tick_class_, "setDataTime", "(J)V");
 //    env->CallVoidMethod(rspObj, jm_setDataTime, tbt_data->data_time);
 //
-//    jmethodID jm_setType = env->GetMethodID(xtp_tick_by_tick_class_, "setType", "(I)V");
+//    jmethodID jm_setType = env->GetMethodID(xtp_tick_by_tick_class_, "setTickByTickType", "(I)V");
 //    assert(jm_setType != NULL);
 //    env->CallVoidMethod(rspObj, jm_setType, tbt_data->type);
 //
