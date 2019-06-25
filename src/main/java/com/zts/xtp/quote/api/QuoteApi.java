@@ -105,7 +105,7 @@ public class QuoteApi {
     public native void setHeartBeatInterval(int interval);
     
     /**
-     *  此函数必须在Login之前调用
+     *  此函数必须在Login之前、init之后调用调用
      * @param buff_size buff_size 接口接受行情的缓存，单位为M
      */
     public native void setUDPBufferSize(int buff_size);
@@ -359,7 +359,7 @@ public class QuoteApi {
      * @param side 方向  '1':买; '2':卖; 'G':借入; 'F':出借
      * @param ord_type 订单类别  '1': 市价; '2': 限价; 'U': 本方最优
      */
-    void onTickByTickEntrust(int exchange_id,String ticker,long seq,long data_time,int type,int channel_no,int order_seq,double price,long qty, char side,char ord_type){
+    void onTickByTickEntrust(int exchange_id,String ticker,long seq,long data_time,int type,int channel_no,long order_seq,double price,long qty, char side,char ord_type){
         quoteSpi.onTickByTickEntrust(exchange_id, ticker, seq, data_time, type, channel_no, order_seq, price, qty,  side, ord_type);
     }
 
@@ -379,7 +379,7 @@ public class QuoteApi {
      * @param ask_no 卖方订单号
      * @param trade_flag 上海: 内外盘标识('B':主动买; 'S':主动卖; 'N':未知)   深圳: 成交标识('4':撤; 'F':成交)
      */
-    void onTickByTickTrade(int exchange_id,String ticker,long seq,long data_time,int type,int channel_no,int order_seq,double price,long qty, double money,long bid_no,long ask_no,char trade_flag){
+    void onTickByTickTrade(int exchange_id,String ticker,long seq,long data_time,int type,int channel_no,long order_seq,double price,long qty, double money,long bid_no,long ask_no,char trade_flag){
         quoteSpi.onTickByTickTrade(exchange_id,ticker, seq, data_time, type, channel_no, order_seq, price, qty,  money, bid_no, ask_no, trade_flag);
     }
 

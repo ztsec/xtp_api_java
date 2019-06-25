@@ -103,6 +103,7 @@ public interface QuoteSpi {
      */
     void onTickByTickEntrust(int exchange_id,String ticker,long seq,long data_time,int type,int channel_no,long order_seq,double price,long qty, char side,char ord_type);
 
+
     /**
      * 逐笔成交行情通知  需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线
      * @param exchange_id 交易所代码   1:深圳   2:上海   3:未知

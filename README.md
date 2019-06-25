@@ -1,4 +1,5 @@
 # 中泰证券量化交易平台XTP JAVA API接口
+
     本项目是中泰证券XTP极速交易JAVA接口的开源实现，供客户在量化交易中使用JAVA接口快速接入XTP系统。中泰证券XTP是为股票交易而生的极速交易系统，为投资者提供极速交易、极速行情、Level2行情。
 
     目前支持xtp版本为1.1.18.19，支持win、linux、mac平台运行
@@ -10,6 +11,7 @@
     如果您的linux是glibc2.12版本，请先手工将cpp/lib/linux_glibc2.12下的两个dll覆盖到cpp/lib/linux下，默认cpp/lib/linux下是同cpp/lib/linux_glibc2.14一样的glibc2.14版本编译的
    
 #Version history
+
     v1.1.18.19-1.0.2 
                      1.增加trade的SetHeartBeatInterval、GetTradingDay、GetApiVersion、GetClientIDByXTPID、GetAccountByXTPID接口
 
@@ -26,6 +28,7 @@
                      1.支持xtp 1.1.18.19
 
 ##如何使用：
+
 * **方式一：直接使用成品**
     * 1）在项目根目录下手工拷贝动态库到系统目录 
     
@@ -204,6 +207,7 @@
 
 #修改JNI代码调用流程
 
+
    > API调用，即JAVA -> C++：以下单为例
    
         1.业务代码调用tradeApi.insertOrder
@@ -229,7 +233,12 @@
 
             }
         3.TradeSpi.java定义spi接口 void onTradeEvent(TradeResponse tradeInfo, String sessionId) ;
-        4.业务代码实现onTradeEvent接口
+        4.TradeApi.java定义供C++调用的接口，内部再转调spi的方法
+            private void onTradeEvent(TradeResponse tradeInfo, String sessionId) {
+                tradeSpi.onTradeEvent(tradeInfo, sessionId);
+            }
+        5.业务代码实现onTradeEvent接口
         
  #License 
+ 
     Licensed under the MIT License.  

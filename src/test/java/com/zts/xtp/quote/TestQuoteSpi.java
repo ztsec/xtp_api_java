@@ -3,6 +3,7 @@ package com.zts.xtp.quote;
 import com.zts.xtp.common.model.ErrorMessage;
 import com.zts.xtp.quote.model.response.*;
 import com.zts.xtp.quote.spi.QuoteSpi;
+import org.junit.Assert;
 
 /**
  * Created by Guan Jian on 2018/8/15.
@@ -13,6 +14,7 @@ public class TestQuoteSpi implements QuoteSpi {
     public void onDisconnected(int reason) {
         System.out.println("onDisconnected");
         System.out.println(reason);
+        Assert.assertEquals(0, 0);
     }
 
     @Override
@@ -68,6 +70,7 @@ public class TestQuoteSpi implements QuoteSpi {
         System.out.println("onTickByTickEntrust");
         System.out.println("exchange_id:"+exchange_id+" ticker:"+ticker+" seq:"+seq+" data_time:"+data_time+" type:"+type+" channel_no:"+channel_no+" order_seq:"+order_seq+" price:"+price+" qty:"+qty+" side:"+side+" ord_type:"+ord_type);
     }
+
 
     @Override
     public void onTickByTickTrade(int exchange_id, String ticker, long seq, long data_time, int type, int channel_no, long order_seq, double price, long qty, double money, long bid_no, long ask_no, char trade_flag) {

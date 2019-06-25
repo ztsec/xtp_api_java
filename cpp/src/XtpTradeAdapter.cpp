@@ -109,12 +109,16 @@ JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_tradeInit
 JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_subscribePublicTopic (JNIEnv *env, jobject obj, jobject resumeTypeObj)
 {
     Trade *ptrade = getHandle<Trade>(env, obj);
+    if (ptrade) {
+        jclass resumeTypeClass = env->FindClass("com/zts/xtp/common/enums/XtpTeResumeType");
+        jmethodID resumeTypeMethod = env->GetMethodID(resumeTypeClass, "getType", "()I");
+        XTP_TE_RESUME_TYPE resumeType = (XTP_TE_RESUME_TYPE)env->CallIntMethod(resumeTypeObj, resumeTypeMethod);
 
-    jclass resumeTypeClass = env->FindClass("com/zts/xtp/common/enums/XtpTeResumeType");
-    jmethodID resumeTypeMethod = env->GetMethodID(resumeTypeClass, "getType", "()I");
-    XTP_TE_RESUME_TYPE resumeType = (XTP_TE_RESUME_TYPE)env->CallIntMethod(resumeTypeObj, resumeTypeMethod);
+        ptrade->SubscribePublicTopic(resumeType);
+    }else{
+        LOG(ERROR) << "trade subscribePublicTopic failed! It mast be call before trade login and after trade init!";
+    }
 
-    ptrade->SubscribePublicTopic(resumeType);
     return;
 }
 
@@ -122,7 +126,11 @@ JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_subscribePublicTopic 
 JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_setHeartBeatInterval (JNIEnv *env, jobject obj, jint interval)
 {
     Trade *ptrade = getHandle<Trade>(env, obj);
-    ptrade->SetHeartBeatInterval(interval);
+    if (ptrade) {
+        ptrade->SetHeartBeatInterval(interval);
+    }else{
+        LOG(ERROR) << "trade setHeartBeatInterval failed! It mast be call before trade login and after trade init!";
+    }
 }
 
 

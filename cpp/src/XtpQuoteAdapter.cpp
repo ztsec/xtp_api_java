@@ -151,7 +151,11 @@ JNIEXPORT jint JNICALL Java_com_zts_xtp_quote_api_QuoteApi_logout (JNIEnv *env, 
 JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_setHeartBeatInterval (JNIEnv *env, jobject obj, jint interval)
 {
     XtpQuote *pquote = getHandle<XtpQuote>(env, obj);
-    pquote->SetHeartBeatInterval(interval);
+    if (pquote) {
+        pquote->SetHeartBeatInterval(interval);
+    }else{
+        LOG(ERROR) << "quote setHeartBeatInterval failed! It mast be call before quote login and after quote init!";
+    }
 }
 
 JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_setUDPBufferSize(JNIEnv *env, jobject obj, jint size)
@@ -160,7 +164,9 @@ JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_setUDPBufferSize(JNIE
 	if (pquote)
 	{
 		pquote->SetUDPBufferSize(size);
-	}
+	}else{
+        LOG(ERROR) << "quote SetUDPBufferSize failed! It mast be call before quote login and after quote init!";
+    }
 }
 
 JNIEXPORT jint JNICALL Java_com_zts_xtp_quote_api_QuoteApi_subscribeMarketData (JNIEnv *env, jobject obj,
