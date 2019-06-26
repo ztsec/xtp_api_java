@@ -12,20 +12,20 @@
    
 #Version history
 
-    v1.1.18.19-1.0.2 
-                     1.增加trade的SetHeartBeatInterval、GetTradingDay、GetApiVersion、GetClientIDByXTPID、GetAccountByXTPID接口
+    v1.1.18.19-1.0.3    1.解决逐笔崩溃问题、解决逐笔与其他行情同时订阅崩溃问题     
+                                      
+    v1.1.18.19-1.0.2    1.增加trade的SetHeartBeatInterval、GetTradingDay、GetApiVersion、GetClientIDByXTPID、GetAccountByXTPID接口
 
-    v1.1.18.19-1.0.1 
-                     1.添加subscribePublicTopic api 支持
-                     2.trade接口的init方法增加publicTopic续传类型参数
-                     3.扩充PositionEffectType、SideType枚举值，升级到xtp1.1.18.19
-                     4.修复DepthMarketDataResponse中MarketDataType的转换可能存在的越界错误
-                     5.修复OrderBookResponse、TickerPriceInfoResponse中ExchangeType的转换可能存在的越界错误
-                     6.修复OTickerInfoResponse中ExchangeType、TickerType的转换可能存在的越界错误
-                     7.修复TradeResponse中PositionEffectType的转换可能存在的越界错误
-                     8.修改测试用例、demo程序、readme中trade的init方法的调用及参数说明
-    v1.1.18.19-1.0.0 
-                     1.支持xtp 1.1.18.19
+    v1.1.18.19-1.0.1    1.添加subscribePublicTopic api 支持
+                        2.trade接口的init方法增加publicTopic续传类型参数
+                        3.扩充PositionEffectType、SideType枚举值，升级到xtp1.1.18.19
+                        4.修复DepthMarketDataResponse中MarketDataType的转换可能存在的越界错误
+                        5.修复OrderBookResponse、TickerPriceInfoResponse中ExchangeType的转换可能存在的越界错误
+                        6.修复OTickerInfoResponse中ExchangeType、TickerType的转换可能存在的越界错误
+                        7.修复TradeResponse中PositionEffectType的转换可能存在的越界错误
+                        8.修改测试用例、demo程序、readme中trade的init方法的调用及参数说明
+                     
+    v1.1.18.19-1.0.0    1.支持xtp 1.1.18.19
 
 ##如何使用：
 
