@@ -68,14 +68,14 @@ public class TestQuoteSpi implements QuoteSpi {
     @Override
     public void onTickByTickEntrust(int exchange_id, String ticker, long seq, long data_time, int type, int channel_no, long order_seq, double price, long qty, char side, char ord_type) {
         System.out.println("onTickByTickEntrust");
-        System.out.println("exchange_id:"+exchange_id+" ticker:"+ticker+" seq:"+seq+" data_time:"+data_time+" type:"+type+" channel_no:"+channel_no+" order_seq:"+order_seq+" price:"+price+" qty:"+qty+" side:"+side+" ord_type:"+ord_type);
+//        System.out.println("exchange_id:"+exchange_id+" ticker:"+ticker+" seq:"+seq+" data_time:"+data_time+" type:"+type+" channel_no:"+channel_no+" order_seq:"+order_seq+" price:"+price+" qty:"+qty+" side:"+side+" ord_type:"+ord_type);
     }
 
 
     @Override
     public void onTickByTickTrade(int exchange_id, String ticker, long seq, long data_time, int type, int channel_no, long order_seq, double price, long qty, double money, long bid_no, long ask_no, char trade_flag) {
         System.out.println("onTickByTickTrade");
-        System.out.println("exchange_id:"+exchange_id+" ticker:"+ticker+" seq:"+seq+" data_time:"+data_time+" type:"+type+" channel_no:"+channel_no+" order_seq:"+order_seq+" price:"+price+" qty:"+qty+" money:"+money+" bid_no:"+bid_no+" ask_no:"+ask_no+" trade_flag:"+trade_flag);
+//        System.out.println("exchange_id:"+exchange_id+" ticker:"+ticker+" seq:"+seq+" data_time:"+data_time+" type:"+type+" channel_no:"+channel_no+" order_seq:"+order_seq+" price:"+price+" qty:"+qty+" money:"+money+" bid_no:"+bid_no+" ask_no:"+ask_no+" trade_flag:"+trade_flag);
     }
 
 //    @Override
@@ -143,8 +143,8 @@ public class TestQuoteSpi implements QuoteSpi {
     @Override
     public void onDepthMarketData(DepthMarketDataResponse depthMarketData, DepthMarketDataExResponse depthQuote) {
         System.out.println("onDepthMarketData");
-        System.out.println(depthMarketData);
-        System.out.println(depthQuote);
+//        System.out.println(depthMarketData);
+//        System.out.println(depthQuote);
     }
 
     @Override

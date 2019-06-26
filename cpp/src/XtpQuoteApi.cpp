@@ -578,7 +578,9 @@ void XtpQuote::OnTickByTick(XTPTBT *tbt_data) {
 
     //恢复每次attach  最后detach  解决同时订阅marketdata时  会造成NewStringUTF 崩溃
     JNIEnv* env;
-    jint res = jvm_->AttachCurrentThread((void**)&env, &att_args_);
+    env = preInvoke();
+    pluginClass = env->GetObjectClass(quote_plugin_obj_);
+
 //    if (!bAttachedTickByTick || env==NULL)
 //    {
 //        // attach the current thread to the JVM
@@ -588,11 +590,11 @@ void XtpQuote::OnTickByTick(XTPTBT *tbt_data) {
 //        }
 //        bAttachedTickByTick = true;
 //    }
+//    if (pluginClass == NULL) {
+//        pluginClass = env->GetObjectClass(quote_plugin_obj_);
+//        LOG(INFO)  << "OnTickByTick pluginClass is "<< pluginClass ;
+//    }
 
-    if (pluginClass == NULL) {
-        pluginClass = env->GetObjectClass(quote_plugin_obj_);
-        LOG(INFO)  << "OnTickByTick pluginClass is "<< pluginClass ;
-    }
     jstring jstr_ticker = env->NewStringUTF(tbt_data->ticker);
 
     switch(tbt_data->type)
@@ -607,12 +609,15 @@ void XtpQuote::OnTickByTick(XTPTBT *tbt_data) {
                 LOG(ERROR) << "OnTickByTick xtp_tbt_entrust is NULL," << tbt_data->seq ;
                 return;
             }
-            if (jm_onTickByTickEntrust == NULL) {
-                jm_onTickByTickEntrust = env->GetMethodID(pluginClass, "onTickByTickEntrust", "(ILjava/lang/String;JJIIJDJCC)V");
-                LOG(INFO) << "OnTickByTick jm_onTickByTickEntrust is " << jm_onTickByTickEntrust ;
-            }
-            //cout << "OnTickByTick Entrust:" <<tbt_data->exchange_id<<","<<jstr_ticker<<","<<tbt_data->seq<<","<<tbt_data->data_time<<","<<tbt_data->type<<","<<", subPart="<<
-            //	xtp_tbt_entrust->channel_no<<","<<xtp_tbt_entrust->seq<<","<<xtp_tbt_entrust->price<<","<<xtp_tbt_entrust->qty<<","<<xtp_tbt_entrust->side<<","<<xtp_tbt_entrust->ord_type << endl;
+            //暂时每次都获取
+            jm_onTickByTickEntrust = env->GetMethodID(pluginClass, "onTickByTickEntrust", "(ILjava/lang/String;JJIIJDJCC)V");
+
+//            if (jm_onTickByTickEntrust == NULL) {
+//                jm_onTickByTickEntrust = env->GetMethodID(pluginClass, "onTickByTickEntrust", "(ILjava/lang/String;JJIIJDJCC)V");
+//                LOG(INFO) << "OnTickByTick jm_onTickByTickEntrust is " << jm_onTickByTickEntrust ;
+//            }
+//            std::cout << "OnTickByTick Entrust:" <<tbt_data->exchange_id<<","<<jstr_ticker<<","<<tbt_data->seq<<","<<tbt_data->data_time<<","<<tbt_data->type<<","<<", subPart="<<
+//            	xtp_tbt_entrust->channel_no<<","<<xtp_tbt_entrust->seq<<","<<xtp_tbt_entrust->price<<","<<xtp_tbt_entrust->qty<<","<<xtp_tbt_entrust->side<<","<<xtp_tbt_entrust->ord_type << std::endl;
             env->CallVoidMethod(quote_plugin_obj_, jm_onTickByTickEntrust,
                                 tbt_data->exchange_id, jstr_ticker, tbt_data->seq, tbt_data->data_time, tbt_data->type,
                                 xtp_tbt_entrust->channel_no, xtp_tbt_entrust->seq, xtp_tbt_entrust->price, xtp_tbt_entrust->qty, xtp_tbt_entrust->side, xtp_tbt_entrust->ord_type);
@@ -628,12 +633,15 @@ void XtpQuote::OnTickByTick(XTPTBT *tbt_data) {
                 LOG(ERROR) << "OnTickByTick xtp_tbt_trade is NULL," << tbt_data->seq ;
                 return;
             }
-            if (jm_onTickByTickTrade == NULL) {
-                jm_onTickByTickTrade = env->GetMethodID(pluginClass, "onTickByTickTrade", "(ILjava/lang/String;JJIIJDJDJJC)V");
-                LOG(INFO) << "OnTickByTick jm_onTickByTickTrade is " << jm_onTickByTickTrade ;
-            }
-            //cout << "OnTickByTick Entrust:" << tbt_data->exchange_id <<","<< jstr_ticker <<","<< tbt_data->seq <<","<< tbt_data->data_time <<","<< tbt_data->type <<","<< ", subPart=" <<
-            //	xtp_tbt_trade->channel_no << "," << xtp_tbt_trade->seq<<","<< xtp_tbt_trade->price<<","<< xtp_tbt_trade->qty<<","<< xtp_tbt_trade->money<<","<< xtp_tbt_trade->bid_no<<","<< xtp_tbt_trade->ask_no<<","<< xtp_tbt_trade->trade_flag << endl;
+            //暂时每次都获取
+            jm_onTickByTickTrade = env->GetMethodID(pluginClass, "onTickByTickTrade", "(ILjava/lang/String;JJIIJDJDJJC)V");
+
+//            if (jm_onTickByTickTrade == NULL) {
+//                jm_onTickByTickTrade = env->GetMethodID(pluginClass, "onTickByTickTrade", "(ILjava/lang/String;JJIIJDJDJJC)V");
+//                LOG(INFO) << "OnTickByTick jm_onTickByTickTrade is " << jm_onTickByTickTrade ;
+//            }
+//            std::cout << "OnTickByTick Trade:" << tbt_data->exchange_id <<","<< jstr_ticker <<","<< tbt_data->seq <<","<< tbt_data->data_time <<","<< tbt_data->type <<","<< ", subPart=" <<
+//            	xtp_tbt_trade->channel_no << "," << xtp_tbt_trade->seq<<","<< xtp_tbt_trade->price<<","<< xtp_tbt_trade->qty<<","<< xtp_tbt_trade->money<<","<< xtp_tbt_trade->bid_no<<","<< xtp_tbt_trade->ask_no<<","<< xtp_tbt_trade->trade_flag << std::endl;
             env->CallVoidMethod(quote_plugin_obj_, jm_onTickByTickTrade,
                                 tbt_data->exchange_id, jstr_ticker, tbt_data->seq, tbt_data->data_time, tbt_data->type,
                                 xtp_tbt_trade->channel_no, xtp_tbt_trade->seq, xtp_tbt_trade->price, xtp_tbt_trade->qty, xtp_tbt_trade->money, xtp_tbt_trade->bid_no, xtp_tbt_trade->ask_no, xtp_tbt_trade->trade_flag);
