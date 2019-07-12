@@ -4,7 +4,7 @@ apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 group = 'com.zts.xtp'
-version = '1.1.18.19'
+version = '1.1.19.2'
 
 
 

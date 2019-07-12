@@ -166,6 +166,16 @@ public class TradeApi {
     public native int queryOrders(OrderQueryRequest queryOrderReq, String sessionId, int requestId);
 
     /**
+     * 分页请求查询报单
+     * 该方法支持分页查询，注意用户需要记录下最后一笔查询结果的reference以便用户下次查询使用
+     * @param queryOrderByPageReq 需要分页查询订单的条件，如果第一次查询，那么queryOrderByPageReq.reference填0
+     * @param sessionId 资金账户对应的sessionId,登录时得到
+     * @param requestId 用于用户定位查询响应的ID，由用户自定义
+     * @return 查询是否成功，“0”表示成功，非“0”表示出错，此时用户可以调用GetApiLastError()来获取错误代码
+     */
+    public native void queryOrdersByPage(OrderQueryByPageReq queryOrderByPageReq, String sessionId, int requestId);
+
+    /**
      * 根据委托编号请求查询相关成交
      * 此函数查询出的结果可能对应多个查询结果响应
      * @param orderXtpId 需要查询的报单在xtp系统中的ID，即InsertOrder()orderXtpId
@@ -184,6 +194,17 @@ public class TradeApi {
      * @return 查询是否成功，“0”表示成功，非“0”表示出错，此时用户可以调用GetApiLastError()来获取错误代码
      */
     public native int queryTrades(TraderQueryRequest queryTraderReq, String sessionId, int requestId);
+
+
+    /**
+     * 分页请求查询成交回报
+     * 该方法支持分页查询，注意用户需要记录下最后一笔查询结果的reference以便用户下次查询使用
+     * @param queryTradeByPageReq 需要分页查询成交回报的条件，如果第一次查询，那么queryTradeByPageReq.reference填0
+     * @param sessionId 资金账户对应的sessionId,登录时得到
+     * @param requestId 用于用户定位查询响应的ID，由用户自定义
+     * @return 查询是否成功，“0”表示成功，非“0”表示出错，此时用户可以调用GetApiLastError()来获取错误代码
+     */
+    public native void queryTradesByPage(TradeQueryByPageReq queryTradeByPageReq, String sessionId, int requestId);
 
     /**
      * 请求查询投资者持仓
@@ -302,6 +323,15 @@ public class TradeApi {
      */
     public native String getAccountByXTPID(String orderXtpId);
 
+
+    /**
+     * 服务器是否重启过
+     * 此函数必须在Login之后调用
+     * @param session_id 资金账户对应的session_id,登录时得到
+     * @return true表示重启过，false表示没有重启过
+     */
+    public native  boolean isServerRestart(String session_id);
+
     //====================================Callback Functions==========================================
     private void onDisconnect(String sessionId, int reason) {
         tradeSpi.onDisconnect(sessionId, reason);
@@ -323,12 +353,20 @@ public class TradeApi {
         tradeSpi.onCancelOrderError(cancelInfo, errorMessage, sessionId);
     }
 
-    private void onQueryOrder (OrderResponse orderInfo, ErrorMessage errorMessage, String sessionId) {
+    private void onQueryOrder(OrderResponse orderInfo, ErrorMessage errorMessage, String sessionId) {
         tradeSpi.onQueryOrder(orderInfo, errorMessage, sessionId);
+    }
+
+    private void onQueryOrderByPage(OrderResponse orderInfo, long reqCount, long orderSequence, long queryReference, String sessionId) {
+        tradeSpi.onQueryOrderByPage(orderInfo, reqCount, orderSequence, queryReference, sessionId);
     }
 
     private void onQueryTrade(TradeResponse tradeInfo, ErrorMessage errorMessage, String sessionId) {
         tradeSpi.onQueryTrade(tradeInfo, errorMessage, sessionId);
+    }
+
+    private void onQueryTradeByPage(TradeResponse tradeInfo, long reqCount, long tradeSequence, long queryReference, String sessionId) {
+        tradeSpi.onQueryTradeByPage(tradeInfo, reqCount, tradeSequence, queryReference, sessionId);
     }
 
     private void onQueryPosition(StockPositionResponse stockPositionInfo, ErrorMessage errorMessage, String sessionId) {

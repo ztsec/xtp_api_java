@@ -15,6 +15,8 @@ public enum TickerType {
     XTP_TICKER_TYPE_BOND,
     /** 期权 */
     XTP_TICKER_TYPE_OPTION,
+    /** 科创板股票（上海） */
+    XTP_TICKER_TYPE_TECH_STOCK,
     /** 未知类型 */
     XTP_TICKER_TYPE_UNKNOWN
 }

@@ -2,15 +2,18 @@
 
     本项目是中泰证券XTP极速交易JAVA接口的开源实现，供客户在量化交易中使用JAVA接口快速接入XTP系统。中泰证券XTP是为股票交易而生的极速交易系统，为投资者提供极速交易、极速行情、Level2行情。
 
-    目前支持xtp版本为1.1.18.19，支持win、linux、mac平台运行
+    目前支持xtp api版本为1.1.19.2，支持win、linux平台运行，注意mac平台1.1.19.2版本存在bug无法登陆，如需使用mac版本请使用v1.1.18.19分支或v1.1.18.19-1.0.3release
     
     请先到中泰证券xtp官方网站申请测试账号 https://xtp.zts.com.cn/register 及测试环境的连接ip、端口等信息
                                                                                         
     API参考官方C++版本的接口文档https://xtp.zts.com.cn/home
     
-    如果您的linux是glibc2.12版本，请先手工将cpp/lib/linux_glibc2.12下的两个dll覆盖到cpp/lib/linux下，默认cpp/lib/linux下是同cpp/lib/linux_glibc2.14一样的glibc2.14版本编译的
+    如果您的linux是centos6版本，请先手工将cpp/lib/linux_centos6下的两个dll覆盖到cpp/lib/linux下，默认cpp/lib/linux下是同cpp/lib/linux_centos7一样的版本编译的
    
 #Version history
+
+    v1.1.19.2-1.1.0     1.支持xtp api 1.1.19.2、支持科创板业务：TickerType新增XTP_TICKER_TYPE_TECH_STOCK枚举、IPOTickerResponse新增tickerType属性、IPOQuotaResponse新增tech_quantity、uused属性
+                        2.新增分页请求查询报单queryOrdersByPage、分页请求查询成交回报queryTradesByPage、判断服务器是否重启过isServerRestart三个api及对应spi实现
 
     v1.1.18.19-1.0.3    1.解决逐笔崩溃问题、解决逐笔与其他行情同时订阅崩溃问题     
                                       
@@ -25,7 +28,7 @@
                         7.修复TradeResponse中PositionEffectType的转换可能存在的越界错误
                         8.修改测试用例、demo程序、readme中trade的init方法的调用及参数说明
                      
-    v1.1.18.19-1.0.0    1.支持xtp 1.1.18.19
+    v1.1.18.19-1.0.0    1.支持xtp api 1.1.18.19
 
 ##如何使用：
 
@@ -59,7 +62,7 @@
     * 2）确保有JRE8及以上被安装在目标主机，如果是windows还需要安装Visual C++ Redistributable for Visual Studio 2015，下载地址：                 
          https://www.microsoft.com/zh-CN/download/details.aspx?id=48145
          
-    * 3）在量化交易java代码中引入build/libs/xtpapi-1.1.18.19.jar并使用
+    * 3）在量化交易java代码中引入build/libs/xtpapi-1.1.19.2.jar并使用
     
          > 如需进行单元测试：
                            
@@ -86,7 +89,7 @@
                     
             上述参数也可以通过根目录下user.config.properites中配置。公网测试环境请使用TCP连接，UPD会收不到数据。
                     
-            执行./gradlew build -x test进行重新编译java生成build/libs/xtpapi-1.1.18.19.jar
+            执行./gradlew build -x test进行重新编译java生成build/libs/xtpapi-1.1.19.2.jar
             分别执行TradeApiTest、QuoteApiTest中的junit单元测试。
                   
          > 如需进行demo测试：
@@ -157,9 +160,9 @@
     
     * 5）安装并配置gradle
     
-    * 6）在工程根目录下执行./gradlew build -x test 执行成功后在项目根目录生成build/libs/xtpapi-1.1.18.19.jar
+    * 6）在工程根目录下执行./gradlew build -x test 执行成功后在项目根目录生成build/libs/xtpapi-1.1.19.2.jar
     
-    * 7）在量化交易java代码中引入build/libs/xtpapi-1.1.18.19.jar并使用（注意如果在IDE中打开java代码及java测试用例，需要
+    * 7）在量化交易java代码中引入build/libs/xtpapi-1.1.19.2.jar并使用（注意如果在IDE中打开java代码及java测试用例，需要
          在IDE中安装lombok插件才能看源码不报错，如果不看源码与测试用例，无需安装）
            
          > 如需进行单元测试：
@@ -187,7 +190,7 @@
                    
           上述参数也可以通过根目录下user.config.properites中配置。公网测试环境请使用TCP连接，UPD会收不到数据。
                    
-          执行./gradlew build -x test进行重新编译java生成build/libs/xtpapi-1.1.18.19.jar
+          执行./gradlew build -x test进行重新编译java生成build/libs/xtpapi-1.1.19.2.jar
           分别执行TradeApiTest、QuoteApiTest中的junit单元测试。
           
          > 如需进行demo测试：

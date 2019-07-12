@@ -43,7 +43,7 @@ public class TradeApiTest {
         tradeApi = new TradeApi(tradeSpi);
 
         tradeApi.init(CLIENT_ID, TRADE_KEY,
-                DATA_FOLDER, XtpLogLevel.XTP_LOG_LEVEL_INFO, JniLogLevel.JNI_LOG_LEVEL_INFO, XtpTeResumeType.XTP_TERT_RESTART);
+                DATA_FOLDER, XtpLogLevel.XTP_LOG_LEVEL_TRACE, JniLogLevel.JNI_LOG_LEVEL_INFO, XtpTeResumeType.XTP_TERT_RESTART);
 //        tradeApi.subscribePublicTopic(XtpTeResumeType.XTP_TERT_RESTART);
 //        tradeApi.setHeartBeatInterval(30);
         sessionId = tradeApi.login(XTP_TRADE_SERVER_IP, XTP_TRADE_SERVER_PORT,
@@ -298,6 +298,27 @@ public class TradeApiTest {
 		System.out.println("testGetAccountByXTPID account: " + account);
 		Assert.assertNotNull(account);
 	}
+
+    @Test
+    public void testIsServerRestart() {
+        System.out.println("testIsServerRestart");
+        boolean result = tradeApi.isServerRestart(sessionId);
+        System.out.println("testIsServerRestart: " + result);
+    }
+
+    @Test
+    public void testQueryOrdersByPage() {
+        System.out.println("testQueryOrdersByPage");
+        OrderQueryByPageReq req = OrderQueryByPageReq.builder().reqCount(10).reserved(0).build();
+        tradeApi.queryOrdersByPage(req, sessionId,13);
+    }
+
+    @Test
+    public void testQueryTradesByPage() {
+        System.out.println("testQueryTradesByPage");
+        TradeQueryByPageReq req = TradeQueryByPageReq.builder().reqCount(10).reserved(0).build();
+        tradeApi.queryTradesByPage(req, sessionId,13);
+    }
 
     //==============Common Functions=========
     private String insertOrder() {

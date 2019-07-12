@@ -104,6 +104,13 @@ JNIEXPORT jint JNICALL Java_com_zts_xtp_trade_api_TradeApi_queryOrders
 
 /*
  * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    queryOrdersByPage
+ * Signature: (Lcom/zts/xtp/trade/model/request/OrderQueryByPageReq;Ljava/lang/String;I)V
+ */
+JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_queryOrdersByPage(JNIEnv *, jobject, jobject, jstring, jint);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
  * Method:    queryTradesByXtpId
  * Signature: (Ljava/lang/String;Ljava/lang/String;I)I
  */
@@ -117,6 +124,13 @@ JNIEXPORT jint JNICALL Java_com_zts_xtp_trade_api_TradeApi_queryTradesByXtpId
  */
 JNIEXPORT jint JNICALL Java_com_zts_xtp_trade_api_TradeApi_queryTrades
   (JNIEnv *, jobject, jobject, jstring, jint);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    queryTradesByPage
+ * Signature: (Lcom/zts/xtp/trade/model/request/TradeQueryByPageReq;Ljava/lang/String;I)V
+ */
+JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_queryTradesByPage(JNIEnv *, jobject, jobject, jstring, jint);
 
 /*
  * Class:     com_zts_xtp_trade_api_TradeApi
@@ -229,6 +243,14 @@ JNIEXPORT jshort JNICALL Java_com_zts_xtp_trade_api_TradeApi_getClientIDByXTPID
  */
 JNIEXPORT jstring JNICALL Java_com_zts_xtp_trade_api_TradeApi_getAccountByXTPID
   (JNIEnv *, jobject, jstring);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    isServerRestart
+ * Signature: (Ljava/lang/String;)Z;
+ */
+JNIEXPORT jboolean JNICALL Java_com_zts_xtp_trade_api_TradeApi_isServerRestart(JNIEnv *, jobject, jstring);
+
 
 #ifdef __cplusplus
 }

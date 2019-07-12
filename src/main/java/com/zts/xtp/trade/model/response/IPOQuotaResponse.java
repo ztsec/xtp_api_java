@@ -16,6 +16,10 @@ public class IPOQuotaResponse {
     private MarketType marketType;
     /**可申购额度*/
     private int quantity;
+    /**上海科创板额度*/
+    private int tech_quantity;
+    /**保留*/
+    private int unused;
     /**此消息响应函数对应的请求ID*/
     private int requestId;
     /**此消息响应函数是否为request_id这条请求所对应的最后一个响应，当为最后一个的时候为true，如果为false，表示还有其他后续消息响应*/

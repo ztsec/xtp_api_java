@@ -108,6 +108,17 @@ public interface TradeSpi {
         String sessionId) ;
 
     /**
+     * 分页请求查询报单响应
+     * 当orderSequence为0，表明当次查询没有查到任何记录，如果orderSequence等于reqCount，那么表示还有报单，可以进行下一次分页查询，如果不等，表示所有报单已经查询完毕。需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线。
+     * @param orderInfo 查询到的一个报单
+     * @param reqCount 分页请求的最大数量
+     * @param orderSequence 当前报单信息所对应的查询索引，需要记录下来，在进行下一次分页查询的时候需要用到
+     * @param queryReference 查询到的一个报单
+     * @param sessionId 资金账户对应的sessionId，登录时得到
+     */
+    void onQueryOrderByPage(OrderResponse orderInfo, long reqCount, long orderSequence, long queryReference, String sessionId);
+
+    /**
      * 请求查询投资者持仓响应
      * 由于用户可能持有多个股票，一个查询请求可能对应多个响应，需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线
      * @param stockPositionInfo 查询到的一只股票的持仓情况
@@ -134,6 +145,17 @@ public interface TradeSpi {
      * @param sessionId 资金账户对应的sessionId，登录时得到
      */
     void onQueryTrade(TradeResponse tradeInfo, ErrorMessage errorMessage, String sessionId) ;
+
+    /**
+     * 分页请求查询成交响应
+     * 当tradeSequence为0，表明当次查询没有查到任何记录，如果tradeSequence等于reqCount，那么表示还有回报，可以进行下一次分页查询，如果不等，表示所有回报已经查询完毕。需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线。
+     * @param tradeInfo 查询到的一个成交信息
+     * @param reqCount 分页请求的最大数量
+     * @param tradeSequence 当前回报信息所对应的查询索引，需要记录下来，在进行下一次分页查询的时候需要用到
+     * @param queryReference 查询到的一个
+     * @param sessionId 资金账户对应的sessionId，登录时得到
+     */
+    void onQueryTradeByPage(TradeResponse tradeInfo, long reqCount, long tradeSequence, long queryReference, String sessionId);
 
     /**
      * 成交通知

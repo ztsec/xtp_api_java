@@ -54,6 +54,10 @@ public:
 
     void OnQueryTrade(XTPQueryTradeRsp *trade_info, XTPRI *error_info, int request_id, bool is_last, uint64_t session_id) ;
 
+    void OnQueryOrderByPage(XTPQueryOrderRsp *order_info, int64_t req_count, int64_t order_sequence, int64_t query_reference, int request_id, bool is_last, uint64_t session_id);
+
+    void OnQueryTradeByPage(XTPQueryTradeRsp *trade_info, int64_t req_count, int64_t trade_sequence, int64_t query_reference, int request_id, bool is_last, uint64_t session_id);
+
     void OnQueryPosition(XTPQueryStkPositionRsp *position, XTPRI *error_info, int request_id, bool is_last, uint64_t session_id);
 
     void OnQueryAsset(XTPQueryAssetRsp *asset, XTPRI *error_info, int request_id, bool is_last, uint64_t session_id) ;
@@ -181,6 +185,16 @@ public:
 
     }
 
+    void QueryOrdersByPage(const XTPQueryOrderByPageReq query_param, uint64_t session_id, int request_id)
+    {
+        api_->QueryOrdersByPage(&query_param, session_id, request_id);
+    }
+
+    void QueryTradesByPage(const XTPQueryTraderByPageReq query_param, uint64_t session_id, int request_id)
+    {
+        api_->QueryTradesByPage(&query_param, session_id, request_id);
+    }
+
     int QueryPosition(const char *ticker, uint64_t session_id, int request_id)
     {
        return api_->QueryPosition(ticker, session_id, request_id);
@@ -254,6 +268,11 @@ public:
 	{
 		return api_->GetAccountByXTPID(order_xtp_id);
 	}
+
+	bool IsServerRestart(uint64_t session_id)
+    {
+        return api_->IsServerRestart(session_id);
+    }
 private:
 
     JNIEnv* preInvoke();

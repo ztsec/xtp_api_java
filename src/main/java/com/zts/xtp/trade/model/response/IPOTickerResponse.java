@@ -2,6 +2,7 @@ package com.zts.xtp.trade.model.response;
 
 
 import com.zts.xtp.common.enums.MarketType;
+import com.zts.xtp.common.enums.TickerType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,6 +22,8 @@ public class IPOTickerResponse {
     private String ticker;
     /**申购股票名称*/
     private String tickerName;
+    /**证券类别*/
+    private TickerType tickerType;
     /**申购价格*/
     private double price;
     /**申购单元*/
@@ -35,5 +38,7 @@ public class IPOTickerResponse {
     public void setMarketType(int type) {
         marketType = MarketType.values()[type];
     }
-
+    public void setTickerType(int tickerType){
+        this.tickerType = TickerType.values()[tickerType];
+    }
 }

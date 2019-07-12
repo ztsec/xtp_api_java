@@ -89,6 +89,24 @@ public class TradeSpiImpl implements TradeSpi {
     }
 
     @Override
+    public void onQueryOrderByPage(OrderResponse orderInfo, long reqCount, long orderSequence, long queryReference, String sessionId) {
+        if (orderInfo != null) {
+            System.out.println("onQueryOrderByPage: " + orderInfo.toString() + "  reqCount="+reqCount+"  orderSequence="+orderSequence+"  queryReference="+queryReference+"  sessionId="+sessionId);
+        } else {
+            System.err.println("onQueryOrderByPage error");
+        }
+    }
+
+    @Override
+    public void onQueryTradeByPage(TradeResponse tradeInfo, long reqCount, long tradeSequence, long queryReference, String sessionId) {
+        if (tradeInfo != null) {
+            System.out.println("onQueryTradeByPage: " + tradeInfo.toString() + "  reqCount="+reqCount+"  tradeSequence="+tradeSequence+"  queryReference="+queryReference+"  sessionId="+sessionId);
+        } else {
+            System.err.println("onQueryTradeByPage error");
+        }
+    }
+
+    @Override
     public void onQueryPosition(StockPositionResponse stockPositionInfo, ErrorMessage errorMessage,
         String sessionId) {
         System.out.println("onQueryPosition: " + stockPositionInfo.toString());
