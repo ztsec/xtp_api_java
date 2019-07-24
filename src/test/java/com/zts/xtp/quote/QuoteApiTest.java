@@ -41,8 +41,8 @@ public class QuoteApiTest {
         int login_result = quoteApi.login(XTP_QUOTE_SERVER_IP,XTP_QUOTE_SERVER_PORT,ACCOUNT,PASSWORD,TransferProtocol.XTP_PROTOCOL_TCP);//XTP_PROTOCOL_TCP
         Assert.assertEquals(login_result, 0);
 
-        System.out.println("subscribeAllTickByTick");
-        quoteApi.subscribeAllTickByTick(2);
+//        System.out.println("subscribeAllTickByTick");
+//        quoteApi.subscribeAllTickByTick(2);
 
 //        System.out.println("subscribeAllOrderBook");
 //        quoteApi.subscribeAllOrderBook(2);

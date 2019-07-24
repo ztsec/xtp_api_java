@@ -59,7 +59,7 @@ public class TickerInfoResponse {
             this.tickerType = TickerType.XTP_TICKER_TYPE_UNKNOWN;
             System.err.println("Error: TickerInfoResponse received TickerType value exceed TickerType enum size, receive="+tickerType);
         }else{
-            this.tickerType = TickerType.values()[tickerType - 1];
+            this.tickerType = TickerType.values()[tickerType];
         }
     }
 }
