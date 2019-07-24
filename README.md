@@ -12,6 +12,8 @@
    
 #Version history
 
+    v1.1.18.19-1.0.4    1.解决queryAllTicker响应异常问题  
+
     v1.1.18.19-1.0.3    1.解决逐笔崩溃问题、解决逐笔与其他行情同时订阅崩溃问题     
                                       
     v1.1.18.19-1.0.2    1.增加trade的SetHeartBeatInterval、GetTradingDay、GetApiVersion、GetClientIDByXTPID、GetAccountByXTPID接口
