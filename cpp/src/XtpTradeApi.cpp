@@ -1121,8 +1121,9 @@ void Trade::generateOrderInfoObj(JNIEnv* env, jobject& tradeOrderInfoObj,XTPOrde
     env->CallVoidMethod(tradeOrderInfoObj, jm_setOrderCancelClientId, order_info->order_cancel_client_id);
 
     //call setOrderCancelXtpId
-    jmethodID jm_setOrderCancelXtpId = env->GetMethodID(trade_order_info_class_, "setOrderCancelXtpId", "(I)V");
-    env->CallVoidMethod(tradeOrderInfoObj, jm_setOrderCancelXtpId, order_info->order_cancel_xtp_id);
+    jmethodID jm_setOrderCancelXtpId = env->GetMethodID(trade_order_info_class_, "setOrderCancelXtpId", "(Ljava/lang/String;)V");
+    jstring orderCancelXtpIdStr = env->NewStringUTF((std::to_string(order_info->order_cancel_xtp_id)).c_str());
+    env->CallVoidMethod(tradeOrderInfoObj, jm_setOrderCancelXtpId, orderCancelXtpIdStr);
 
     //call setTicker
     jmethodID jm_setTicker = env->GetMethodID(trade_order_info_class_, "setTicker", "(Ljava/lang/String;)V");
@@ -1229,8 +1230,9 @@ void Trade::generateCancelInfoObj(JNIEnv* env, jobject& tradeCancelOrderInfoObj,
     jstring orderXtpIdStr = env->NewStringUTF((std::to_string(cancel_info->order_xtp_id)).c_str());
     env->CallVoidMethod(tradeCancelOrderInfoObj, jm_setOrderXtpId, orderXtpIdStr);
 
-    jmethodID jm_setOrderCancelXtpId = env->GetMethodID(order_cancel_info_class_, "setOrderCancelXtpId", "(I)V");
-    env->CallVoidMethod(tradeCancelOrderInfoObj, jm_setOrderCancelXtpId, cancel_info->order_cancel_xtp_id);
+    jmethodID jm_setOrderCancelXtpId = env->GetMethodID(order_cancel_info_class_, "setOrderCancelXtpId", "(Ljava/lang/String;)V");
+    jstring orderCancelXtpIdStr = env->NewStringUTF((std::to_string(cancel_info->order_cancel_xtp_id)).c_str());
+    env->CallVoidMethod(tradeCancelOrderInfoObj, jm_setOrderCancelXtpId, orderCancelXtpIdStr);
 
     //call setRequestId
      jmethodID jm_setRequestId = env->GetMethodID(order_cancel_info_class_, "setRequestId", "(I)V");
