@@ -12,6 +12,9 @@
    
 #Version history
 
+    v1.1.19.2-1.1.2     1.将java api中OrderResponse和OrderCancelResponse中的撤单id
+                        2.orderCancelXtpId由int改为String；扩充EtfReplaceType的枚举类型
+                        
     v1.1.19.2-1.1.1     1.解决queryAllTicker响应异常问题  
 
     v1.1.19.2-1.1.0     1.支持xtp api 1.1.19.2、支持科创板业务：TickerType新增XTP_TICKER_TYPE_TECH_STOCK枚举、IPOTickerResponse新增tickerType属性、IPOQuotaResponse新增tech_quantity、uused属性

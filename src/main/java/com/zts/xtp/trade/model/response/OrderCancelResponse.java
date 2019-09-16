@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class OrderCancelResponse {
 
     /**撤单XTPID*/
-    private int orderCancelXtpId;
+    private String orderCancelXtpId;
     /**原始订单XTPID*/
     private String orderXtpId;
     /**此消息响应函数对应的请求ID*/
@@ -26,8 +26,8 @@ public class OrderCancelResponse {
     public String toString(){
         return "OrderCancelResponse [ "+
                 "orderXtpId:"+orderXtpId+
-                "orderCancelXtpId"+orderCancelXtpId+
-                "requestId"+requestId+
-                "lastResp"+lastResp;
+                "  orderCancelXtpId:"+orderCancelXtpId+
+                "  requestId:"+requestId+
+                "  lastResp:"+lastResp+" ]";
     }
 }

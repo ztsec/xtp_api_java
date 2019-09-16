@@ -11,6 +11,14 @@ public enum EtfReplaceType {
     ERT_CASH_OPTIONAL,
     /**必须现金替代*/
     ERT_CASH_MUST,
+    /**深市退补现金替代*/
+    ERT_CASH_RECOMPUTE_INTER_SZ,
+    /**深市必须现金替代*/
+    ERT_CASH_MUST_INTER_SZ,
+    /**非沪深市场成分证券退补现金替代*/
+    ERT_CASH_RECOMPUTE_INTER_OTHER,
+    /**表示非沪深市场成份证券必须现金替代*/
+    ERT_CASH_MUST_INTER_OTHER,
     /**无效值*/
     EPT_INVALID;
 
