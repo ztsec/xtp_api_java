@@ -20,6 +20,9 @@
     v1.1.19.2-1.1.0     1.支持xtp api 1.1.19.2、支持科创板业务：TickerType新增XTP_TICKER_TYPE_TECH_STOCK枚举、IPOTickerResponse新增tickerType属性、IPOQuotaResponse新增tech_quantity、uused属性
                         2.新增分页请求查询报单queryOrdersByPage、分页请求查询成交回报queryTradesByPage、判断服务器是否重启过isServerRestart三个api及对应spi实现
 
+    v1.1.18.19-1.0.5    1.将java api中OrderResponse和OrderCancelResponse中的撤单id
+                        2.orderCancelXtpId由int改为String；扩充EtfReplaceType的枚举类型
+                        
     v1.1.18.19-1.0.4    1.解决queryAllTicker响应异常问题  
 
     v1.1.18.19-1.0.3    1.解决逐笔崩溃问题、解决逐笔与其他行情同时订阅崩溃问题     
