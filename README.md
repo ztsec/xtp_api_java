@@ -12,6 +12,8 @@
    
 #Version history
 
+    v1.1.19.2-1.1.3     1.解决开平标志错误
+
     v1.1.19.2-1.1.2     1.将java api中OrderResponse和OrderCancelResponse中的撤单id
                         2.orderCancelXtpId由int改为String；扩充EtfReplaceType的枚举类型
                         
