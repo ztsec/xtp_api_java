@@ -1383,11 +1383,7 @@ void  Trade::generateTradeReportObj(JNIEnv* env, jobject& tradeReportObj,XTPTrad
     env->CallVoidMethod(tradeReportObj, jm_setSide, xtpSideType);
 
     //call setPositionEffectType
-    int positionEffect = XTP_POSITION_EFFECT_UNKNOWN;
-    if (trade_info->business_type == XTP_BUSINESS_TYPE::XTP_BUSINESS_TYPE_OPTION)
-    {
-        positionEffect = (int)trade_info->position_effect;
-    }
+    int positionEffect = (int)trade_info->position_effect;
     jmethodID jm_setPositionEffectType = env->GetMethodID(trade_report_class_, "setPositionEffectType", "(I)V");
     env->CallVoidMethod(tradeReportObj, jm_setPositionEffectType, positionEffect);
 
