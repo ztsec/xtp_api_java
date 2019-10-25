@@ -82,7 +82,6 @@ public class OrderResponse {
     }
 
     public void setPositionEffectType(int type) {
-        if(type>7) type = 7;
         positionEffectType = PositionEffectType.values()[type];
     }
 

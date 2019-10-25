@@ -1219,11 +1219,7 @@ void Trade::generateOrderInfoObj(JNIEnv* env, jobject& tradeOrderInfoObj,XTPOrde
     env->CallVoidMethod(tradeOrderInfoObj, jm_setSideType, xtpSideType);
 
     //call setPositionEffectType
-    int positionEffect = XTP_POSITION_EFFECT_UNKNOWN;
-    if (order_info->business_type == XTP_BUSINESS_TYPE::XTP_BUSINESS_TYPE_OPTION)
-    {
-        positionEffect = (int)order_info->position_effect;
-    }
+    int positionEffect = (int)order_info->position_effect;
     LOG(INFO)<< "generateOrderInfoObj: position_effect" << order_info->position_effect << "; positionEffect: " << positionEffect;
     jmethodID jm_setPositionEffectType = env->GetMethodID(trade_order_info_class_, "setPositionEffectType", "(I)V");
     env->CallVoidMethod(tradeOrderInfoObj, jm_setPositionEffectType, positionEffect);
