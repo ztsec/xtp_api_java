@@ -35,7 +35,7 @@ void Trade::OnError(XTPRI *error_info) {
 }
 
 void Trade::OnTradeEvent(XTPTradeReport *trade_info, uint64_t session_id) {
-    LOG(INFO) << __PRETTY_FUNCTION__ ;
+//    LOG(INFO) << __PRETTY_FUNCTION__ ;
 
     JNIEnv* env;
     // prepare the invocation
@@ -242,7 +242,7 @@ void Trade::OnQueryTradeByPage(XTPQueryTradeRsp *trade_info, int64_t req_count, 
 }
 
 void Trade::OnQueryPosition(XTPQueryStkPositionRsp *position, XTPRI *error_info, int request_id, bool is_last, uint64_t session_id) {
-    LOG(INFO) << __PRETTY_FUNCTION__ ;
+//    LOG(INFO) << __PRETTY_FUNCTION__ ;
 
     JNIEnv* env;
     // prepare the invocation
@@ -385,7 +385,7 @@ void Trade::OnQueryPosition(XTPQueryStkPositionRsp *position, XTPRI *error_info,
 }
 
 void Trade::OnQueryAsset(XTPQueryAssetRsp *asset, XTPRI *error_info, int request_id, bool is_last, uint64_t session_id) {
-    LOG(INFO) << __PRETTY_FUNCTION__ ;
+//    LOG(INFO) << __PRETTY_FUNCTION__ ;
 
     JNIEnv* env;
     // prepare the invocation
@@ -552,7 +552,7 @@ void Trade::OnQueryAsset(XTPQueryAssetRsp *asset, XTPRI *error_info, int request
 }
 
 void Trade::OnOrderEvent(XTPOrderInfo *order_info, XTPRI *error_info, uint64_t session_id) {
-    LOG(INFO) << __PRETTY_FUNCTION__ ;
+//    LOG(INFO) << __PRETTY_FUNCTION__ ;
 
     if(error_info->error_id!=0){
     	LOG(ERROR) << __PRETTY_FUNCTION__ << " error_info:" << error_info->error_msg;
@@ -1220,7 +1220,7 @@ void Trade::generateOrderInfoObj(JNIEnv* env, jobject& tradeOrderInfoObj,XTPOrde
 
     //call setPositionEffectType
     int positionEffect = (int)order_info->position_effect;
-    LOG(INFO)<< "generateOrderInfoObj: position_effect" << order_info->position_effect << "; positionEffect: " << positionEffect;
+//    LOG(INFO)<< "generateOrderInfoObj: position_effect" << order_info->position_effect << "; positionEffect: " << positionEffect;
     jmethodID jm_setPositionEffectType = env->GetMethodID(trade_order_info_class_, "setPositionEffectType", "(I)V");
     env->CallVoidMethod(tradeOrderInfoObj, jm_setPositionEffectType, positionEffect);
 

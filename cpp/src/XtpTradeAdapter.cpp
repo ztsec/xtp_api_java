@@ -279,9 +279,9 @@ jstring JNICALL Java_com_zts_xtp_trade_api_TradeApi_insertOrder(JNIEnv *env, job
      orderInfo.position_effect = (XTP_POSITION_EFFECT_TYPE)(positionEffect);
      string str_position_effect;
      str_position_effect = orderInfo.position_effect;
-     LOG(INFO)<< "insert order: sessionId: " << sessionId << "; ticker: " << orderInfo.ticker << "; market: " << orderInfo.market \
+//     LOG(INFO)<< "insert order: sessionId: " << sessionId << "; ticker: " << orderInfo.ticker << "; market: " << orderInfo.market \
       << "; price: " << orderInfo.price << "; stop_price: " << orderInfo.stop_price << "; quantity: " << orderInfo.quantity \
-       << "; price_type: " << orderInfo.price_type << "; side: " << sideType << "; business_type: " << orderInfo.business_type
+       << "; price_type: " << orderInfo.price_type << "; side: " << sideType << "; business_type: " << orderInfo.business_type \
         << "; position_effect: " + str_position_effect;
 
     uint64_t orderId = ptrade->InsertOrder(orderInfo, sessionId);
