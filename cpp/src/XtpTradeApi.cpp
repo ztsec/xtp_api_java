@@ -762,7 +762,7 @@ void Trade::OnQueryFundTransfer(XTPFundTransferNotice *fund_transfer_info, XTPRI
 
     jobject resultObj = NULL;
     int errorCode = error_info->error_id;
-    if (errorCode == 0) {
+//    if (errorCode == 0) {//必须注释这里
         //fetch the default construct
         jmethodID defaultConstr = env->GetMethodID(fund_transfer_notice_class_, "<init>","()V");
         if (defaultConstr == NULL) {
@@ -778,7 +778,7 @@ void Trade::OnQueryFundTransfer(XTPFundTransferNotice *fund_transfer_info, XTPRI
         }
 
         generateFundTransferNoticeObj(env, resultObj, fund_transfer_info, request_id, is_last);
-    }
+//    }
 
     jstring strSessionId = env->NewStringUTF((std::to_string(session_id)).c_str());
     env->CallVoidMethod(trade_plugin_obj_, jm_event, resultObj, errorMsgObj, strSessionId);
@@ -823,7 +823,7 @@ void Trade::OnFundTransfer(XTPFundTransferNotice *fund_transfer_info, XTPRI *err
 
     jobject resultObj = NULL;
     int errorCode = error_info->error_id;
-    if (errorCode == 0) {
+//    if (errorCode == 0) {//这里必须注释掉
         //fetch the default construct
         jmethodID defaultConstr = env->GetMethodID(fund_transfer_notice_class_, "<init>","()V");
         if (defaultConstr == NULL) {
@@ -839,7 +839,7 @@ void Trade::OnFundTransfer(XTPFundTransferNotice *fund_transfer_info, XTPRI *err
         }
 
         generateFundTransferNoticeObj(env, resultObj, fund_transfer_info, 0, true);
-    }
+//    }
 
     jstring strSessionId = env->NewStringUTF((std::to_string(session_id)).c_str());
     env->CallVoidMethod(trade_plugin_obj_, jm_event, resultObj, errorMsgObj, strSessionId);
