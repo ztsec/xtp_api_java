@@ -39,10 +39,34 @@ public interface QuoteSpi {
 
     /**
      * 深度行情通知，包含买一卖一队列 <p> 需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线
-     * @param depthMarketData 行情数据
-     * @param depthQuote 买一卖一报价
+     * @param exchangeType 交易所代码
+     * @param ticker 合约代码（不包含交易所信息）
+     * @param lastPrice 最新价
+     * @param preClosePrice 昨收盘
+     * @param openPrice 今开盘
+     * @param highPrice 最高价
+     * @param lowPrice 最低价
+     * @param closePrice 今收盘
+     * @param upperLimitPrice 涨停价
+     * @param lowerLimitPrice 跌停价
+     * @param dataTime 时间类，格式为YYYYMMDDHHMMSSsss
+     * @param qty 数量，为总成交量（单位股，与交易所一致）
+     * @param turnover 成交金额，为总成交金额（单位元，与交易所一致）
+     * @param avgPrice 当日均价=(turnover/qty)
+     * @param bid 十档申买价
+     * @param ask 十档申卖价
+     * @param bidQty 十档申买量
+     * @param askQty 十档申卖量
+     * @param tradesCount 成交笔数
+     * @param tickerStatus 当前交易状态说明
+     * @param stkIopv 扩展数据，暂时没用
+     * @param dataType 决定了额外数据是哪种数据类型 stk or opt
      */
-    void onDepthMarketData(DepthMarketDataResponse depthMarketData, DepthMarketDataExResponse depthQuote);
+    void onDepthMarketData(int exchangeType,String ticker,double lastPrice,double preClosePrice,double openPrice,
+                           double highPrice,double lowPrice,double closePrice,double upperLimitPrice,
+                           double lowerLimitPrice,long dataTime,long qty,double turnover,double avgPrice,double[] bid,
+                           double[] ask,long[] bidQty,long[] askQty,long tradesCount,String tickerStatus,double stkIopv,
+                           int dataType);
 
     /**
      * 订阅行情订单簿应答 <p> 每条订阅的合约均对应一条订阅应答，需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线
@@ -60,9 +84,20 @@ public interface QuoteSpi {
 
     /**
      * 行情订单簿通知
-     * @param orderBook 行情订单簿数据，需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线
+     * @param exchangeId 交易所代码
+     * @param ticker 合约代码
+     * @param lastPrice 最新价
+     * @param qty 数量，为总成交量（单位股，与交易所一致）
+     * @param turnOver 成交金额，为总成交金额（单位元，与交易所一致）
+     * @param tradesCount 成交笔数
+     * @param bid 十档申买价
+     * @param ask 十档申卖价
+     * @param bidQty 十档申买量
+     * @param askQty 十档申卖量
+     * @param dataTime 时间类，格式为 yyyyMMddHHmmssSSS
      */
-    void onOrderBook(OrderBookResponse orderBook);
+    void onOrderBook(int exchangeId, String ticker, double lastPrice, long qty, double turnOver, long tradesCount,
+                     double[] bid, double[] ask, long[] bidQty, long[] askQty, long dataTime);
 
     /**
      * 订阅逐笔行情应答 <p> 每条订阅的合约均对应一条订阅应答，需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线
@@ -79,15 +114,6 @@ public interface QuoteSpi {
     void onUnSubTickByTick(SpecificTickerResponse ticker, ErrorMessage errorMessage);
 
     /**
-     * 逐笔行情通知 改为onTickByTickEntrust（逐笔委托）、onTickByTickTrade（逐笔成交）代替
-     * @param tickData 逐笔行情数据，包括逐笔委托和逐笔成交，此为共用结构体， 需要根据type来区分是逐笔委托还是逐笔成交，需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线
-     */
-//    default void onTickByTick(TickByTickResponse tickData) {
-//        // please implement this interface method
-//        //为了提高性能，xtp java版 api不再使用 xtp c++版本的api提供的onTickByTick方法作为逐笔行情通知回调，改为onTickByTickEntrust（逐笔委托）、onTickByTickTrade（逐笔成交）两个通知回调，直接传基本类型，避免二次构造java对象
-//    }
-
-    /**
      * 逐笔委托行情通知  需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线
      * @param exchange_id 交易所代码   1:深圳   2:上海   3:未知
      * @param ticker 合约代码（不包含交易所信息）
@@ -102,7 +128,6 @@ public interface QuoteSpi {
      * @param ord_type 订单类别  '1': 市价; '2': 限价; 'U': 本方最优
      */
     void onTickByTickEntrust(int exchange_id,String ticker,long seq,long data_time,int type,int channel_no,long order_seq,double price,long qty, char side,char ord_type);
-
 
     /**
      * 逐笔成交行情通知  需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线
@@ -121,7 +146,6 @@ public interface QuoteSpi {
      * @param trade_flag 上海: 内外盘标识('B':主动买; 'S':主动卖; 'N':未知)   深圳: 成交标识('4':撤; 'F':成交)
      */
      void onTickByTickTrade(int exchange_id,String ticker,long seq,long data_time,int type,int channel_no,long order_seq,double price,long qty, double money,long bid_no,long ask_no,char trade_flag);
-
 
     /**
      * 订阅全市场的行情应答
@@ -221,6 +245,10 @@ public interface QuoteSpi {
      */
      void onUnSubscribeAllOptionTickByTick(int exchangeId, ErrorMessage errorMessage);
 
-
-
+    /**
+     *  查询合约完整静态信息的应答
+     * @param rsp 合约完整静态信息
+     * @param errorMessage 查询合约完整静态信息时发生错误时返回的错误信息，当errorMessage为空，或者errorMessage.errorId为0时，表明没有错误
+     */
+     void onQueryAllTickersFullInfo(TickerFullInfoResponse rsp, ErrorMessage errorMessage);
 }

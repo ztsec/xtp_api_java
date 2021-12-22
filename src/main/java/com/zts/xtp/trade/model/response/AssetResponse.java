@@ -55,6 +55,12 @@ public class AssetResponse {
     private double forceFreezeAmount;
     /**可取资金*/
     private double preferredAmount;
+    /**融券卖出所得资金余额（仅限信用账户，只能用于买券还券）*/
+    private double repayStockAvalBanlance;
+    /**累计订单流量费*/
+    private double fundOrderDataCharges;
+    /**累计撤单流量费*/
+    private double fundCancelDataCharges;
     /**保留字段*/
     private long unknown;
     /**此消息响应函数对应的请求ID*/

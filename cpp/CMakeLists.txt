@@ -62,6 +62,7 @@ add_library(tradeplugin SHARED
         src/include/com_zts_xtp_trade_api_TradeApi.h
         src/include/handle.h
         src/include/InitGlog.h
+        src/include/RingBuffer.hpp
         src/include/XtpTradeApi.h
         src/InitGlog.cpp
         src/XtpTradeAdapter.cpp
@@ -95,7 +96,8 @@ add_library(quoteplugin SHARED
         )
 IF (WIN32)
     #copy tradeplugin quoteplugin to os lib path
-    TARGET_LINK_LIBRARIES(tradeplugin xtptraderapi.dll glog.dll )
+#    TARGET_LINK_LIBRARIES(tradeplugin xtptraderapi.dll glog.dll )
+    TARGET_LINK_LIBRARIES(tradeplugin xtptraderapi_xalgo.dll glog.dll )
     TARGET_LINK_LIBRARIES(quoteplugin xtpquoteapi.dll glog.dll )
     install(TARGETS tradeplugin DESTINATION C:/Windows/System32)
     install(TARGETS quoteplugin DESTINATION C:/Windows/System32)
@@ -105,13 +107,15 @@ IF (WIN32)
 	#win64
 	install(FILES lib/win64/dll/glog.dll DESTINATION C:/Windows/System32)
     install(FILES lib/win64/dll/xtpquoteapi.dll DESTINATION C:/Windows/System32)
-    install(FILES lib/win64/dll/xtptraderapi.dll DESTINATION C:/Windows/System32)
+#    install(FILES lib/win64/dll/xtptraderapi.dll DESTINATION C:/Windows/System32)
+    install(FILES lib/win64/dll/xtptraderapi_xalgo.dll DESTINATION C:/Windows/System32)
 	 #copy xtp lib and glog lib to os lib path
     install(FILES C:/Windows/System32/tradeplugin.dll DESTINATION ${PROJECT_SOURCE_DIR}/buildcpp/win64)
     install(FILES C:/Windows/System32/quoteplugin.dll DESTINATION ${PROJECT_SOURCE_DIR}/buildcpp/win64)
     #copy all lib to os javaproject/build/
     install(FILES C:/Windows/System32/glog.dll DESTINATION ${PROJECT_SOURCE_DIR}/../build/libs/win64/Windows/System32)
-    install(FILES C:/Windows/System32/xtptraderapi.dll DESTINATION ${PROJECT_SOURCE_DIR}/../build/libs/win64/Windows/System32)
+#    install(FILES C:/Windows/System32/xtptraderapi.dll DESTINATION ${PROJECT_SOURCE_DIR}/../build/libs/win64/Windows/System32)
+    install(FILES C:/Windows/System32/xtptraderapi_xalgo.dll DESTINATION ${PROJECT_SOURCE_DIR}/../build/libs/win64/Windows/System32)
     install(FILES C:/Windows/System32/xtpquoteapi.dll DESTINATION ${PROJECT_SOURCE_DIR}/../build/libs/win64/Windows/System32)
     install(FILES C:/Windows/System32/tradeplugin.dll DESTINATION ${PROJECT_SOURCE_DIR}/../build/libs/win64/Windows/System32)
     install(FILES C:/Windows/System32/quoteplugin.dll DESTINATION ${PROJECT_SOURCE_DIR}/../build/libs/win64/Windows/System32)
@@ -119,12 +123,14 @@ IF (WIN32)
 	#win32
     install(FILES lib/win32/dll/glog.dll DESTINATION C:/Windows/System32)
     install(FILES lib/win32/dll/xtpquoteapi.dll DESTINATION C:/Windows/System32)
-    install(FILES lib/win32/dll/xtptraderapi.dll DESTINATION C:/Windows/System32)
+#    install(FILES lib/win32/dll/xtptraderapi.dll DESTINATION C:/Windows/System32)
+    install(FILES lib/win32/dll/xtptraderapi_xalgo.dll DESTINATION C:/Windows/System32)
 	install(FILES C:/Windows/System32/tradeplugin.dll DESTINATION ${PROJECT_SOURCE_DIR}/buildcpp/win32)
     install(FILES C:/Windows/System32/quoteplugin.dll DESTINATION ${PROJECT_SOURCE_DIR}/buildcpp/win32)
     #copy all lib to os javaproject/build/
     install(FILES C:/Windows/System32/glog.dll DESTINATION ${PROJECT_SOURCE_DIR}/../build/libs/win32/Windows/System32)
-    install(FILES C:/Windows/System32/xtptraderapi.dll DESTINATION ${PROJECT_SOURCE_DIR}/../build/libs/win32/Windows/System32)
+#    install(FILES C:/Windows/System32/xtptraderapi.dll DESTINATION ${PROJECT_SOURCE_DIR}/../build/libs/win32/Windows/System32)
+    install(FILES C:/Windows/System32/xtptraderapi_xalgo.dll DESTINATION ${PROJECT_SOURCE_DIR}/../build/libs/win32/Windows/System32)
     install(FILES C:/Windows/System32/xtpquoteapi.dll DESTINATION ${PROJECT_SOURCE_DIR}/../build/libs/win32/Windows/System32)
     install(FILES C:/Windows/System32/tradeplugin.dll DESTINATION ${PROJECT_SOURCE_DIR}/../build/libs/win32/Windows/System32)
     install(FILES C:/Windows/System32/quoteplugin.dll DESTINATION ${PROJECT_SOURCE_DIR}/../build/libs/win32/Windows/System32)

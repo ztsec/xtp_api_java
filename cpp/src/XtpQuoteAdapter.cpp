@@ -23,6 +23,10 @@ JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_initGlog
 	const char *char_jniLogLevel = env->GetStringUTFChars(jniLogLevel, 0);
 	string strJniLogLevel = string(char_jniLogLevel);
     init_glog(strLogFolder, strLogSubFolder, strJniLogLevel);
+    env->ReleaseStringUTFChars(logFolder, char_xtp_data_folder);
+    env->ReleaseStringUTFChars(logSubFolder, char_logSubFolder);
+    env->ReleaseStringUTFChars(jniLogLevel, char_jniLogLevel);
+
 }
 
 void copy_tickers(JNIEnv *env,jobjectArray tickers,char *pTickers[],int count)
@@ -38,12 +42,15 @@ void copy_tickers(JNIEnv *env,jobjectArray tickers,char *pTickers[],int count)
 }
 
 JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_quoteInit(JNIEnv *env,
-    jobject obj, jshort clientId, jstring logFolder, jobject jLogLevel)
+    jobject obj, jshort clientId, jstring logFolder, jobject jLogLevel, jint threadNum, jint ringBufferSize)
 {
-    XtpQuote *pquote = new XtpQuote();
+    XtpQuote *pquote = new XtpQuote(threadNum, ringBufferSize);
     pquote->setClientId(clientId);
     const char *char_xtp_data_folder = env->GetStringUTFChars(logFolder, 0);
     pquote->setFilePath(char_xtp_data_folder);
+
+    LOG(ERROR) << "threadNum: " << threadNum;
+    LOG(ERROR) << "ringBufferSize: " << ringBufferSize;
 
     JavaVM* jvm;
     env->GetJavaVM(&jvm);
@@ -70,6 +77,9 @@ JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_quoteInit(JNIEnv *env
     jclass xtpqsiClass =  env->FindClass("com/zts/xtp/quote/model/response/TickerInfoResponse");
     pquote->setXTPQSIClass((jclass)env->NewGlobalRef(xtpqsiClass));
 
+    jclass xtpqfiClass =  env->FindClass("com/zts/xtp/quote/model/response/TickerFullInfoResponse");
+    pquote->setXTPQFIClass((jclass)env->NewGlobalRef(xtpqfiClass));
+
     jclass xtpobClass =  env->FindClass("com/zts/xtp/quote/model/response/OrderBookResponse");
     pquote->setXTPOBClass((jclass)env->NewGlobalRef(xtpobClass));
 
@@ -93,6 +103,7 @@ JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_quoteInit(JNIEnv *env
     pquote->Init(logLevel);
 
     setHandle(env, obj, pquote);
+    env->ReleaseStringUTFChars(logFolder, char_xtp_data_folder);
 
 }
 
@@ -109,7 +120,7 @@ JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_disconnect (JNIEnv *e
 }
 
 JNIEXPORT jint JNICALL JNICALL Java_com_zts_xtp_quote_api_QuoteApi_login (JNIEnv *env, jobject obj, jstring ip,
-        jint port, jstring userName, jstring password, jobject jProtocol)
+        jint port, jstring userName, jstring password, jobject jProtocol, jstring localIp)
 {
     XtpQuote *pquote = getHandle<XtpQuote>(env, obj);
 
@@ -119,11 +130,14 @@ JNIEXPORT jint JNICALL JNICALL Java_com_zts_xtp_quote_api_QuoteApi_login (JNIEnv
     std::string strUsername(char_userName);
     const char *char_password = env->GetStringUTFChars(password, 0);
     std::string strPassword(char_password);
+    const char *local_ip = env->GetStringUTFChars(localIp, 0);
+    std::string strLocalIp(local_ip);
 
     pquote->setServerIp(strIp.c_str());
     pquote->setServerPort(port);
     pquote->setUsername(strUsername.c_str());
     pquote->setPassword(strPassword.c_str());
+    pquote->setServerLocalIp(strLocalIp.c_str());
 
 
     jclass protocolClass = env->FindClass("com/zts/xtp/common/enums/TransferProtocol");
@@ -137,6 +151,7 @@ JNIEXPORT jint JNICALL JNICALL Java_com_zts_xtp_quote_api_QuoteApi_login (JNIEnv
     env->ReleaseStringUTFChars(ip, char_ip);
     env->ReleaseStringUTFChars(userName, char_userName);
     env->ReleaseStringUTFChars(password, char_password);
+    env->ReleaseStringUTFChars(localIp, local_ip);
 
     return sessionId;
 }
@@ -169,6 +184,39 @@ JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_setUDPBufferSize(JNIE
     }
 }
 
+JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_setUDPRecvThreadAffinity(JNIEnv *env, jobject obj, jint cpuNo)
+{
+    XtpQuote *pquote = getHandle<XtpQuote>(env, obj);
+    if (pquote)
+    {
+        pquote->SetUDPRecvThreadAffinity(cpuNo);
+    }else{
+        LOG(ERROR) << "quote SetUDPRecvThreadAffinity failed! It mast be call before quote login!";
+    }
+}
+
+JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_setUDPParseThreadAffinity(JNIEnv *env, jobject obj, jint cpuNo)
+{
+    XtpQuote *pquote = getHandle<XtpQuote>(env, obj);
+    if (pquote)
+    {
+        pquote->SetUDPParseThreadAffinity(cpuNo);
+    }else{
+        LOG(ERROR) << "quote SetUDPParseThreadAffinity failed! It mast be call before quote login!";
+    }
+}
+
+JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_setUDPSeqLogOutPutFlag(JNIEnv *env, jobject obj, jboolean flag)
+{
+    XtpQuote *pquote = getHandle<XtpQuote>(env, obj);
+    if (pquote)
+    {
+        pquote->SetUDPSeqLogOutPutFlag(flag);
+    }else{
+        LOG(ERROR) << "quote SetUDPSeqLogOutPutFlag failed! It mast be call before quote login!";
+    }
+}
+
 JNIEXPORT jint JNICALL Java_com_zts_xtp_quote_api_QuoteApi_subscribeMarketData (JNIEnv *env, jobject obj,
         jobjectArray tickers, jint count, jint exchangeType)
 {
@@ -184,7 +232,7 @@ JNIEXPORT jint JNICALL Java_com_zts_xtp_quote_api_QuoteApi_subscribeMarketData (
     for(int i=0; i<count; i++)
     {
         pTickers[i] = new char[XTP_TICKER_LEN];
-        
+        memset(pTickers[i],0,XTP_TICKER_LEN);
     }
     copy_tickers(env,tickers,pTickers,count);
     int result = pquote->SubscribeMarketData(pTickers, count, (XTP_EXCHANGE_TYPE)exchangeType);
@@ -211,6 +259,7 @@ JNIEXPORT jint JNICALL Java_com_zts_xtp_quote_api_QuoteApi_unSubscribeMarketData
     for(int i=0; i<count; i++)
     {
         pTickers[i] = new char[XTP_TICKER_LEN];
+        memset(pTickers[i],0,XTP_TICKER_LEN);
     }
 
     copy_tickers(env,tickers,pTickers,count);
@@ -233,6 +282,7 @@ JNIEXPORT jint JNICALL Java_com_zts_xtp_quote_api_QuoteApi_subscribeOrderBook (J
     for(int i=0; i<count; i++)
     {
         pTickers[i] = new char[XTP_TICKER_LEN];
+        memset(pTickers[i],0,XTP_TICKER_LEN);
     }
 
     copy_tickers(env,tickers,pTickers,count);
@@ -260,6 +310,7 @@ JNIEXPORT jint JNICALL Java_com_zts_xtp_quote_api_QuoteApi_unSubscribeOrderBook 
     for(int i=0; i<count; i++)
     {
         pTickers[i] = new char[XTP_TICKER_LEN];
+        memset(pTickers[i],0,XTP_TICKER_LEN);
     }
 
     copy_tickers(env,tickers,pTickers,count);
@@ -282,6 +333,7 @@ JNIEXPORT jint JNICALL Java_com_zts_xtp_quote_api_QuoteApi_subscribeTickByTick (
     for(int i=0; i<count; i++)
     {
         pTickers[i] = new char[XTP_TICKER_LEN];
+        memset(pTickers[i],0,XTP_TICKER_LEN);
     }
 
     copy_tickers(env,tickers,pTickers,count);
@@ -308,6 +360,7 @@ JNIEXPORT jint JNICALL Java_com_zts_xtp_quote_api_QuoteApi_unSubscribeTickByTick
     for(int i=0; i<count; i++)
     {
         pTickers[i] = new char[XTP_TICKER_LEN];
+        memset(pTickers[i],0,XTP_TICKER_LEN);
     }
 
     copy_tickers(env,tickers,pTickers,count);
@@ -377,6 +430,7 @@ JNIEXPORT jint JNICALL Java_com_zts_xtp_quote_api_QuoteApi_queryTickersPriceInfo
     for(int i=0; i<count; i++)
     {
         pTickers[i] = new char[XTP_TICKER_LEN];
+        memset(pTickers[i],0,XTP_TICKER_LEN);
     }
 
     copy_tickers(env,tickers,pTickers,count);
@@ -418,4 +472,9 @@ JNIEXPORT jint JNICALL Java_com_zts_xtp_quote_api_QuoteApi_subscribeAllOptionTic
 JNIEXPORT jint JNICALL Java_com_zts_xtp_quote_api_QuoteApi_unSubscribeAllOptionTickByTick(JNIEnv *env, jobject obj, jint exchangeType){
   XtpQuote *pquote = getHandle<XtpQuote>(env, obj);
   return pquote->UnSubscribeAllOptionTickByTick((XTP_EXCHANGE_TYPE)exchangeType);
+}
+
+JNIEXPORT jint JNICALL Java_com_zts_xtp_quote_api_QuoteApi_queryAllTickersFullInfo(JNIEnv *env, jobject obj, jint exchangeType){
+    XtpQuote *pquote = getHandle<XtpQuote>(env, obj);
+    return pquote->QueryAllTickersFullInfo((XTP_EXCHANGE_TYPE)exchangeType);
 }

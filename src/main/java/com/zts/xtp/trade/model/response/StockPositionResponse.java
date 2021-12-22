@@ -3,6 +3,7 @@ package com.zts.xtp.trade.model.response;
 
 import com.zts.xtp.common.enums.MarketType;
 import com.zts.xtp.common.enums.PositionDirectionType;
+import com.zts.xtp.common.enums.PositionSecurityType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -37,7 +38,7 @@ public class StockPositionResponse {
     /**持仓方向*/
     private PositionDirectionType positionDirectionType;
     /**保留字段1*/
-    private int reserved1;
+    private PositionSecurityType positionSecurityType;
     /**可行权合约*/
     private long executableOption;
     /**可锁定标的*/
@@ -48,6 +49,8 @@ public class StockPositionResponse {
     private long lockedPosition;
     /**可用已锁定标的*/
     private long usableLockedPosition;
+    /**盈亏成本价*/
+    private double profitPrice;
     /**保留字段*/
     private long unknown;
     /**此消息响应函数对应的请求ID*/
@@ -61,5 +64,9 @@ public class StockPositionResponse {
 
     public void setPositionDirectionType(int type) {
         positionDirectionType = PositionDirectionType.values()[type];
+    }
+
+    public void setPositionSecurityType(int type) {
+        positionSecurityType = PositionSecurityType.values()[type];
     }
 }

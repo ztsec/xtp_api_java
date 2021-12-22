@@ -23,5 +23,8 @@ public class ErrorMessage {
 	public int getErrorId() {
 		return errorId;
 	}
-    
+
+	public String getErrorMsg() {
+	    return errorMsg;
+    }
 }

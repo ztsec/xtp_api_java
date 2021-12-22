@@ -8,6 +8,18 @@
 #include <iostream>
 #include "glog/logging.h"
 
+#include <queue>
+#include <mutex>
+#include <thread>
+
+#include <fstream>
+#include "RingBuffer.hpp"
+
+#include <time.h>
+
+//#define COUNT_QUOTE         //输出queue_deep_log，输出各个缓冲区内的行情数据个数，并计算均值和方差(间隔10s)
+
+
 
 class XtpQuote : public XTP::API::QuoteSpi {
 private:
@@ -21,6 +33,7 @@ private:
     std::string username_;
     std::string password_;
     XTP_PROTOCOL_TYPE socket_type_;
+    std::string server_local_ip_;
 
     uint8_t client_id_;
     std::string file_path_;
@@ -35,6 +48,34 @@ private:
     jclass pluginClass = NULL;
     jmethodID jm_onTickByTickEntrust = NULL;
     jmethodID jm_onTickByTickTrade = NULL;
+
+    std::mutex* queue_lock_;
+    std::mutex* queue_lock_order_book_;
+    std::mutex* queue_lock_ticker_;
+
+    RingBuffer<XTPMD>** queue_;
+    RingBuffer<XTPOB>** queue_order_book_;
+    RingBuffer<XTPTBT>** queue_ticker_;
+
+    bool live_;
+    int64_t count_;
+    std::thread* thread_;
+    std::thread* thread_order_book_;
+    std::thread* thread_ticker_;
+    XTPMD market_data_for_gene_1_;
+    bool marketdata_available_;
+    bool quote_thread_available_;
+
+
+#ifdef COUNT_QUOTE
+    std::ofstream queue_deep_file_;
+    std::thread count_quote_thread_;
+#endif
+
+    //OnDepthMarketData里的缓存
+    JNIEnv* envMarketData = NULL;
+//    jmethodID jm_eventMarket = NULL;
+
     //=================
 
     jclass xtp_error_msg_class_;
@@ -49,6 +90,19 @@ private:
     jclass xtp_tick_by_tick_entrust_class_;
     jclass xtp_tick_by_tick_trade_class_;
     jclass xtp_ticker_price_info_class_;
+    jclass xtp_quote_static_full_info_class_;
+
+//    uint64_t count_market;
+    std::ofstream delay_log_file_;
+    std::mutex file_lock_;
+    uint64_t thread_num_;
+    uint64_t ring_buffer_size_;
+    uint64_t thread_num_min_ = 1;
+    uint64_t thread_num_max_ = 16;
+    uint64_t ring_buffer_size_min_ = 1024;
+    uint64_t ring_buffer_size_max_ = 1024 * 256;
+
+//    struct timeval time_start_;
 
 public:
     void OnDisconnected(int reason);
@@ -62,17 +116,33 @@ public:
     void OnDepthMarketData(XTPMD *market_data, int64_t bid1_qty[], int32_t bid1_count, int32_t max_bid1_count,
                            int64_t ask1_qty[], int32_t ask1_count, int32_t max_ask1_count);
 
+    void OnDepthMarketData1(XTPMD *market_data);
+
+    void OnDepthMarketData2(XTPMD *market_data, int64_t bid1_qty[], int32_t bid1_count, int32_t max_bid1_count,
+                            int64_t ask1_qty[], int32_t ask1_count, int32_t max_ask1_count, JNIEnv* env2 = NULL,
+                            jmethodID jm_event = NULL);
+
+    void DealDepthMarketData(int64_t id);
+
+    void GenerateDepthMarketData();
+
+    void CountDepthMarketData();
+
     void OnSubOrderBook(XTPST *ticker, XTPRI *error_info, bool is_last);
 
     void OnUnSubOrderBook(XTPST *ticker, XTPRI *error_info, bool is_last);
 
     void OnOrderBook(XTPOB *order_book);
+    void DealOrderBook(int64_t id);
+    void DoOrderBook(XTPOB *order_book, JNIEnv* env, jmethodID jm_event);
 
     void OnSubTickByTick(XTPST *ticker, XTPRI *error_info, bool is_last);
 
     void OnUnSubTickByTick(XTPST *ticker, XTPRI *error_info, bool is_last);
 
     void OnTickByTick(XTPTBT *tbt_data);
+    void DealTickByTick(int64_t id);
+    void DoTickByTick(XTPTBT *tbt_data, JNIEnv* env, jmethodID jm_event);
 
     void OnSubscribeAllMarketData(XTP_EXCHANGE_TYPE exchange_id, XTPRI *error_info);
 
@@ -102,10 +172,16 @@ public:
 
     void OnUnSubscribeAllOptionTickByTick(XTP_EXCHANGE_TYPE exchange_id, XTPRI *error_info);
 
+    void OnQueryAllTickersFullInfo(XTPQFI *ticker_info, XTPRI *error_info, bool is_last);
+
     //=================================================
     void setServerIp(const char *server_ip) { server_ip_ = server_ip; }
 
     const char *getServerIp() { return (server_ip_.c_str()); }
+
+    void setServerLocalIp(const char *server_local_ip) { server_local_ip_ = server_local_ip; }
+
+    const char *getServerLocalIp() { return (server_local_ip_.c_str()); }
 
     void setServerPort(uint16_t server_port) { server_port_ = server_port; }
 
@@ -139,6 +215,8 @@ public:
 
     void setXTPQSIClass(jclass jc) { xtp_quote_static_info_class_ = jc; }
 
+    void setXTPQFIClass(jclass jc) { xtp_quote_static_full_info_class_ = jc; }
+
     void setXTPOBClass(jclass jc) { order_book_class_ = jc; }
 
     void setXTPTBTClass(jclass jc) { xtp_tick_by_tick_class_ = jc; }
@@ -151,13 +229,14 @@ public:
 
     void setClientId(uint16_t client_id) { client_id_ = client_id; }
 
+
     uint16_t getClientId() { return client_id_; }
 
     void setFilePath(const char *file_path) { file_path_ = file_path; }
 
     const char *getFilePath() { return (file_path_.c_str()); }
 
-    XtpQuote();
+    XtpQuote(uint64_t thread_num, uint64_t ring_buffer_size);
 
     ~XtpQuote();
 
@@ -272,6 +351,10 @@ public:
         return api_->UnSubscribeAllOptionTickByTick(exchange_id);
     }
 
+    int QueryAllTickersFullInfo(XTP_EXCHANGE_TYPE exchange_id){
+        return api_->QueryAllTickersFullInfo(exchange_id);
+    }
+
     const char * GetTradingDay(){
         return api_->GetTradingDay();
     }
@@ -291,11 +374,33 @@ public:
         api_->SetUDPBufferSize(buff_size);
     }
 
+    void SetUDPRecvThreadAffinity(uint32_t cpu_no){
+        if(api_==NULL){
+            LOG(ERROR) << __PRETTY_FUNCTION__<<"SetUDPRecvThreadAffinity mast call before login" ;
+        }
+        api_->SetUDPRecvThreadAffinity(cpu_no);
+    }
+
+    void SetUDPParseThreadAffinity(uint32_t cpu_no){
+        if(api_==NULL){
+            LOG(ERROR) << __PRETTY_FUNCTION__<<"SetUDPParseThreadAffinity mast call before login" ;
+        }
+        api_->SetUDPParseThreadAffinity(cpu_no);
+    }
+
+    void SetUDPSeqLogOutPutFlag(bool flag){
+        if(api_==NULL){
+            LOG(ERROR) << __PRETTY_FUNCTION__<<"SetUDPSeqLogOutPutFlag mast call before login" ;
+        }
+        api_->SetUDPSeqLogOutPutFlag(flag);
+    }
 
 
 private:
 
     JNIEnv *preInvoke();
+
+    JNIEnv* preInvokeMarketDataF();
 
     void generateErrorMsgObj(JNIEnv *env, jobject &errorMsgObj, XTPRI *error_info, int request_id);
 

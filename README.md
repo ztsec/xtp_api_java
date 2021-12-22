@@ -2,16 +2,29 @@
 
     本项目是中泰证券XTP极速交易JAVA接口的开源实现，供客户在量化交易中使用JAVA接口快速接入XTP系统。中泰证券XTP是为股票交易而生的极速交易系统，为投资者提供极速交易、极速行情、Level2行情。
 
-    目前支持xtp api版本为1.1.19.2，支持win、linux平台运行，注意mac平台1.1.19.2版本存在bug无法登陆，如需使用mac版本请使用v1.1.18.19分支或v1.1.18.19-1.0.3release 
+    目前支持xtp api版本为2.2.32.2，支持win64、linux平台运行，注意mac平台未进行编译测试，如需使用mac版本请自行编译调试
     
     请先到中泰证券xtp官方网站申请测试账号 https://xtp.zts.com.cn/register 及测试环境的连接ip、端口等信息
                                                                                         
     API参考官方C++版本的接口文档https://xtp.zts.com.cn/home
     
-    如果您的linux是centos6版本，请先手工将cpp/lib/linux_centos6下的两个dll覆盖到cpp/lib/linux下，默认cpp/lib/linux下是同cpp/lib/linux_centos7一样的版本编译的
+    如果您的linux是centos6版本，请先手工将cpp/lib/linux_centos6下的两个so覆盖到cpp/lib/linux下，默认cpp/lib/linux下是同cpp/lib/linux_centos7一样的版本编译的
    
 #Version history
 
+    v2.2.32.2-2.0.0     1.新增支持算法总线服务
+                        2.新增支持融资融券业务
+                        3.java api的下单接口insertOrder逻辑优化：java api的下单接口参数传递由原来的OrderInsertRequest对象，展开为具体的属性；通过jni传到c++，然后再组装成一个c++对象，最后再调用xtp api的下单接口
+                        4.java api的委托回报接口onOrderEvent逻辑优化：onOrderEvent的入参OrderResponse对象和ErrorMessage对象展开为具体的对象属性，java端收到这些属性值之后，可以根据实际需要再组装成对象，也可以只取需要的部分数据。
+                        5.java api的成交回报接口onTradeEvent逻辑优化：onTradeEvent的入参TradeResponse对象展开为具体的对象属性，java端收到这些属性值之后，可以根据实际需要再组装成对象，也可以只取需要的部分数据。
+                        6.java api的行情快照回调接口onDepthMarketData逻辑优化：onDepthMarketData的入参DepthMarketDataResponse对象展开为具体的对象属性，去掉了部分扩展数据，减少带宽占用，java端收到这些属性值之后，可以根据实际需要再组装成对象，也可以只取需要的部分数据。
+                        7.java api的行情丁单薄回调接口onOrderBook逻辑优化：onOrderBook的入参OrderBookResponse对象展开为具体的对象属性，java端收到这些属性值之后，可以根据实际需要再组装成对象，也可以只取需要的部分数据。
+                        8.java api的逐笔行情（委托）回调接口onTickByTickEntrust逻辑优化：onTickByTickEntrust的入参TickByTickEntrustResponse对象展开为具体的对象属性，java端收到这些属性值之后，可以根据实际需要再组装成对象，也可以只取需要的部分数据。
+                        9.java api的逐笔行情（成交）回调接口onTickByTickTrade逻辑优化：onTickByTickTrade的入参TickByTickTradeResponse对象展开为具体的对象属性，java端收到这些属性值之后，可以根据实际需要再组装成对象，也可以只取需要的部分数据。
+                        10.user.config.properites配置文件新增配置项：threadNum（行情接收线程数）和ringBufferSize（行情数据接收缓冲区）
+                        
+                        
+    
     v1.1.19.2-1.1.4     1.解决资金划拨出现异常时XTPFundTransferNotice对象返回空值问题
     
     v1.1.19.2-1.1.3     1.解决开平标志错误
@@ -19,7 +32,7 @@
     v1.1.19.2-1.1.2     1.将java api中OrderResponse和OrderCancelResponse中的撤单id
                         2.orderCancelXtpId由int改为String；扩充EtfReplaceType的枚举类型
                         
-    v1.1.19.2-1.1.1     1.解决queryAllTicker响应异常问题  
+    v1.1.19.2-1.1.1     1.解决queryAllTicker响应异常问题
 
     v1.1.19.2-1.1.0     1.支持xtp api 1.1.19.2、支持科创板业务：TickerType新增XTP_TICKER_TYPE_TECH_STOCK枚举、IPOTickerResponse新增tickerType属性、IPOQuotaResponse新增tech_quantity、uused属性
                         2.新增分页请求查询报单queryOrdersByPage、分页请求查询成交回报queryTradesByPage、判断服务器是否重启过isServerRestart三个api及对应spi实现
@@ -56,18 +69,6 @@
             cp cpp/buildcpp/linux/libtradeplugin.so /usr/local/lib/
             cp cpp/buildcpp/linux/libquoteplugin.so /usr/local/lib/
             
-        > mac：
-        
-            cp cpp/lib/mac/* /usr/local/lib/
-            cp cpp/buildcpp/macosx/libtradeplugin.dylib /usr/local/lib/
-            cp cpp/buildcpp/macosx/libquoteplugin.dylib /usr/local/lib/
-            
-        > win32：
-        
-            copy cpp\lib\win32\dll\*  c:\windows\system32\
-            copy cpp\buildcpp\win32\dll\tradeplugin.dll  c:\windows\system32\
-            copy cpp\buildcpp\win32\dll\quoteplugin.dll  c:\windows\system32\
-            
          > win64：
                  
             copy cpp\lib\win64\dll\*  c:\windows\system32\
@@ -97,7 +98,7 @@
                                           
             src/test/java/com.zts.xtp/quote/QuoteApiTest.java是行情的单元测试：
             修改QuoteApiTest.java：
-            quoteApi.init((short)18,"/var/log/zts/xtp",XtpLogLevel.XTP_LOG_LEVEL_INFO, JniLogLevel.JNI_LOG_LEVEL_INFO);
+            quoteApi.init((short)18,"/var/log/zts/xtp",XtpLogLevel.XTP_LOG_LEVEL_INFO, JniLogLevel.JNI_LOG_LEVEL_INFO, 6, 20480);
             int login_result = quoteApi.login("xx.xx.xx.xx",1234,"xxxxx","xxxxxx",1);
             login方法第1个参数为xtp行情ip、第2个参数为xtp行情端口、第3个参数为申请到的测试账号、第4个参数为账号密码，
                     实盘环境的环境信息及资金账号请联系官方人员获取。
@@ -120,6 +121,7 @@
                     private static final String ACCOUNT = "xxxxxx";//xtp资金账号
                     private static final String PASSWORD = "xxxxxx";//xtp密码
                     private static final String DATA_FOLDER = "/var/log/zts/xtp";//java api输出日志的本地目录
+                    .......
             运行Application.java即可，上述参数也可以通过根目录下user.config.properites中配置。公网测试环境请使用TCP连接，UPD会收不到数据。
 
  
@@ -198,7 +200,7 @@
                                   
           src/test/java/com.zts.xtp/quote/QuoteApiTest.java是行情的单元测试：
           修改QuoteApiTest.java：
-          quoteApi.init((short)18,"/var/log/zts/xtp",XtpLogLevel.XTP_LOG_LEVEL_INFO, JniLogLevel.JNI_LOG_LEVEL_INFO);
+          quoteApi.init((short)18,"/var/log/zts/xtp",XtpLogLevel.XTP_LOG_LEVEL_INFO, JniLogLevel.JNI_LOG_LEVEL_INFO, 6, 20480);
           int login_result = quoteApi.login("23a71733bba3sd78722319b212e",1234,"xxxxxx","xxxxxx",1);
           login方法第1个参数为xtp行情ip、第2个参数为xtp行情端口、第3个参数为申请到的测试账号、第4个参数为账号密码，
                    实盘环境的环境信息及资金账号请联系官方人员获取。
@@ -221,6 +223,7 @@
                    private static final String ACCOUNT = "xxxxxx";//xtp资金账号
                    private static final String PASSWORD = "xxxxxx";//xtp密码
                    private static final String DATA_FOLDER = "/var/log/zts/xtp";//java api输出日志的本地目录
+                   ......
           运行Application.java即可，上述参数也可以通过根目录下user.config.properites中配置。公网测试环境请使用TCP连接，UPD会收不到数据。
 
 #修改JNI代码调用流程
@@ -229,16 +232,16 @@
    > API调用，即JAVA -> C++：以下单为例
    
         1.业务代码调用tradeApi.insertOrder
-        2.TradeApi.java的 public native String insertOrder(OrderInsertRequest order, String sessionId); 注意同步修改注释
-        3.com_zts_xtp_trade_api_TradeApi.h的JNIEXPORT jstring JNICALL Java_com_zts_xtp_trade_api_TradeApi_insertOrder(JNIEnv *, jobject, jobject, jstring);注意同步修改注释
+        2.TradeApi.java的 public native String insertOrder(int orderXtpId, int orderClientId, int tickerL, int tickerN, int marketType, double price, double stopPrice, long quantity, int priceType, int sideType, int positionEffectType, int businessType, long sessionIdH, long sessionIdE, long tid); 注意同步修改注释
+        3.com_zts_xtp_trade_api_TradeApi.h的JNIEXPORT jstring JNICALL Java_com_zts_xtp_trade_api_TradeApi_insertOrder(JNIEnv *, jobject, jint, jint, jint, jint, jint, jdouble, jdouble, jlong, jint, jint, jint, jint, jlong, jlong, jlong); 注意同步修改注释
         4.XtpTradeApi.h中实现api：（对java->c++的api调用需要实现，对c++->java的spi无需实现）
             uint64_t InsertOrder(XTPOrderInsertInfo order, uint64_t session_id)
             {
                 ...
                return api_->InsertOrder(&order, session_id);
             }
-        5.XtpTradeApi.cpp中实现：
-            jstring JNICALL Java_com_zts_xtp_trade_api_TradeApi_insertOrder(JNIEnv *env, jobject obj, jobject tradeOrder, jstring strSessionId)
+        5.XtpTradeAdapter.cpp中实现：
+            jstring JNICALL Java_com_zts_xtp_trade_api_TradeApi_insertOrder(JNIEnv *env, jobject obj, jint orderXtpId, jint orderClientId, jint tickerL, jint tickerN, jint marketType, jdouble price, jdouble stopPrice, jlong quantity, jint priceType, jint sideType, jint positionEffectType, jint businessType, jlong strSessionIdH, jlong strSessionIdE, jlong tid)
             中调用上一步实现的函数uint64_t orderId = ptrade->InsertOrder(orderInfo, sessionId);
        
    > SPI调用，即C++ -> JAVA：以收成交回报为例
@@ -247,16 +250,38 @@
         2.XtpTradeApi.cpp中实现 void Trade::OnTradeEvent(XTPTradeReport *trade_info, uint64_t session_id) 
             {
                 ... 将c++数据通过jni调用在java层构造出来
-                env->CallVoidMethod(trade_plugin_obj_, jm_tradeEventResult, tradeReportObj, strSessionId); 调用java层TradeSpi.java的onTradeEvent接口
+                envTrade2->CallVoidMethod(trade_plugin_obj_, jm_eventTrade2, orderXtpIdH, orderXtpIdE, trade_info->order_client_id, nTicker, nTickerLength, trade_info->market,
+                                             localOrderIdH, localOrderIdE, execId, trade_info->price, trade_info->quantity, trade_info->trade_time, trade_info->trade_amount,
+                                             reportIndexH, reportIndexE, orderExchId, trade_info->trade_type, trade_info->side, trade_info->position_effect, trade_info->business_type,
+                                             branchPbu, 0, true, strSessionIdH, strSessionIdE); 调用java层TradeSpi.java的onTradeEvent接口
 
             }
-        3.TradeSpi.java定义spi接口 void onTradeEvent(TradeResponse tradeInfo, String sessionId) ;
+        3.TradeSpi.java定义spi接口 void onTradeEvent(String orderXtpId, int orderClientId, String ticker, int marketType, String localOrderId, String execId,
+                                                     double price, long quantity, long tradeTime, double tradeAmount, String reportIndex, String orderExchId,
+                                                     char tradeType, int sideType, int positionEffectType, int businessType, String branchPbu, int requestId,
+                                                     boolean lastResp, String sessionId);
         4.TradeApi.java定义供C++调用的接口，内部再转调spi的方法
-            private void onTradeEvent(TradeResponse tradeInfo, String sessionId) {
-                tradeSpi.onTradeEvent(tradeInfo, sessionId);
-            }
+            private void onTradeEvent(long orderXtpIdH, long orderXtpIdE, int orderClientId, int nTicker,int nTickerLength,
+                                          int marketType, long localOrderIdH, long localOrderIdE, String execId,
+                                  double price, long quantity, long tradeTime, double tradeAmount, long reportIndexH, long reportIndexE, String orderExchId,
+                                  char tradeType, int sideType, int positionEffectType, int businessType, String branchPbu, int requestId,
+                                  boolean lastResp, long sessionIdH, long sessionIdE) {
+                    String ticker = tickerStringMapCache.getTickerFromTickerStringMapCache(nTicker, nTickerLength);
+                    String orderXtpId = String.valueOf(orderXtpIdH).concat(String.valueOf(orderXtpIdE));
+                    String localOrderId = String.valueOf(localOrderIdH).concat(String.valueOf(localOrderIdE));
+                    String reportIndex = String.valueOf(reportIndexH).concat(String.valueOf(reportIndexE));
+                    String sessionId = String.valueOf(sessionIdH).concat(String.valueOf(sessionIdE));
+            
+                    tradeSpi.onTradeEvent(orderXtpId, orderClientId, ticker, marketType, localOrderId, execId, price, quantity,
+                            tradeTime, tradeAmount, reportIndex, orderExchId, tradeType, sideType, positionEffectType, businessType,
+                            branchPbu, requestId, lastResp, sessionId);
+                }
         5.业务代码实现onTradeEvent接口
         
  #License 
  
-    Licensed under the MIT License.  
+    Licensed under the MIT License.
+    
+ #Remark
+ 
+    develop_optimization分支目前对应smart生产

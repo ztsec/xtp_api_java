@@ -12,5 +12,4 @@ public enum PositionDirectionType {
     XTP_POSITION_DIRECTION_SHORT,
     /**备兑（期权则为备兑义务方）*/
     XTP_POSITION_DIRECTION_COVERED,
-
 }

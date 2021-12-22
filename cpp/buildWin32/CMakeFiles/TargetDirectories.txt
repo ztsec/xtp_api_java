@@ -1,5 +1,0 @@
-E:/xtp_api_java/cpp/buildWin32/CMakeFiles/tradeplugin.dir
-E:/xtp_api_java/cpp/buildWin32/CMakeFiles/quoteplugin.dir
-E:/xtp_api_java/cpp/buildWin32/CMakeFiles/INSTALL.dir
-E:/xtp_api_java/cpp/buildWin32/CMakeFiles/ALL_BUILD.dir
-E:/xtp_api_java/cpp/buildWin32/CMakeFiles/ZERO_CHECK.dir

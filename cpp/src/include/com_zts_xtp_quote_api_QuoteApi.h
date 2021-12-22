@@ -7,21 +7,21 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 /*
-* Class:     com_zts_xtp_quote_api_TradeApi
-* Method:    initGlog
-* Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
-*/
+ * Class:     com_zts_xtp_quote_api_QuoteApi
+ * Method:    initGlog
+ * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+ */
 JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_initGlog
-        (JNIEnv *, jobject, jstring,jstring,jstring);
+  (JNIEnv *, jobject, jstring, jstring, jstring);
+
 /*
  * Class:     com_zts_xtp_quote_api_QuoteApi
  * Method:    quoteInit
- * Signature: (SLjava/lang/String;Lcom/zts/xtp/common/enums/XtpLogLevel;)V
+ * Signature: (SLjava/lang/String;Lcom/zts/xtp/common/enums/XtpLogLevel;II)V
  */
 JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_quoteInit
-  (JNIEnv *, jobject, jshort, jstring, jobject);
+  (JNIEnv *, jobject, jshort, jstring, jobject, jint, jint);
 
 /*
  * Class:     com_zts_xtp_quote_api_QuoteApi
@@ -34,10 +34,10 @@ JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_disconnect
 /*
  * Class:     com_zts_xtp_quote_api_QuoteApi
  * Method:    login
- * Signature: (Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;I)I
+ * Signature: (Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;Lcom/zts/xtp/common/enums/TransferProtocol;Ljava/lang/String;)I
  */
 JNIEXPORT jint JNICALL Java_com_zts_xtp_quote_api_QuoteApi_login
-  (JNIEnv *, jobject, jstring, jint, jstring, jstring, jobject);
+  (JNIEnv *, jobject, jstring, jint, jstring, jstring, jobject, jstring);
 
 /*
  * Class:     com_zts_xtp_quote_api_QuoteApi
@@ -56,12 +56,12 @@ JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_setHeartBeatInterval
   (JNIEnv *, jobject, jint);
 
 /*
-* Class:     com_zts_xtp_quote_api_QuoteApi
-* Method:    setUDPBufferSize
-* Signature: (I)V
-*/
+ * Class:     com_zts_xtp_quote_api_QuoteApi
+ * Method:    setUDPBufferSize
+ * Signature: (I)V
+ */
 JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_setUDPBufferSize
-(JNIEnv *, jobject, jint);
+  (JNIEnv *, jobject, jint);
 
 /*
  * Class:     com_zts_xtp_quote_api_QuoteApi
@@ -222,6 +222,38 @@ JNIEXPORT jint JNICALL Java_com_zts_xtp_quote_api_QuoteApi_subscribeAllOptionTic
  */
 JNIEXPORT jint JNICALL Java_com_zts_xtp_quote_api_QuoteApi_unSubscribeAllOptionTickByTick
   (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     com_zts_xtp_quote_api_QuoteApi
+ * Method:    queryAllTickersFullInfo
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL Java_com_zts_xtp_quote_api_QuoteApi_queryAllTickersFullInfo
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     com_zts_xtp_quote_api_QuoteApi
+ * Method:    setUDPRecvThreadAffinity
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_setUDPRecvThreadAffinity
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     com_zts_xtp_quote_api_QuoteApi
+ * Method:    setUDPParseThreadAffinity
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_setUDPParseThreadAffinity
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     com_zts_xtp_quote_api_QuoteApi
+ * Method:    setUDPSeqLogOutPutFlag
+ * Signature: (Z)V
+ */
+JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_setUDPSeqLogOutPutFlag
+  (JNIEnv *, jobject, jboolean);
 
 #ifdef __cplusplus
 }

@@ -34,6 +34,14 @@ public class ETFComponentResponse {
     private double premiumRatio;
     /**成分股替代标识为必须现金替代时候的总金额*/
     private double amount;
+    /**申购溢价比例*/
+    private double creationPremiumRatio;
+    /**赎回溢价比例*/
+    private double redemptionDiscountRatio;
+    /**申购时，成分股替代标识为必须现金替代时候的总金额*/
+    private double creationAmount;
+    /**赎回时，成分股替代标识为必须现金替代时候的总金额*/
+    private double redemptionAmount;
     /**此消息响应函数对应的请求ID*/
     private int requestId;
     /**此消息响应函数是否为request_id这条请求所对应的最后一个响应，当为最后一个的时候为true，如果为false，表示还有其他后续消息响应*/

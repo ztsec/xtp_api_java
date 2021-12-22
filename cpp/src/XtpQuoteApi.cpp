@@ -1,7 +1,48 @@
 #include "include/XtpQuoteApi.h"
 #include "include/glog/logging.h"
+#include <chrono>
+#include <numeric>
+#include <algorithm>
+#include <math.h>
+#include <exception>
 
-XtpQuote::XtpQuote(){
+using namespace std;
+
+std::string get_now_date()
+{
+    char tmp[20];
+    memset(tmp,0x00,20);
+    time_t nowtime;
+    struct tm* p;
+    time(&nowtime);
+    p = localtime(&nowtime);
+    sprintf(tmp, "%04d%02d%02d",p->tm_year+1900,p->tm_mon+1,p->tm_mday);
+    return std::string(tmp);
+}
+
+
+double get_mean(std::vector<int64_t>& vec)
+{
+    double sum = std::accumulate(std::begin(vec), std::end(vec), 0.0);
+    double mean =  sum / vec.size();
+    return mean;
+}
+
+double get_stdev(std::vector<int64_t>& vec)
+{
+    double mean = get_mean(vec);
+    double accum  = 0.0;
+    std::for_each (std::begin(vec), std::end(vec), [&](const double d) {
+        accum  += (d-mean)*(d-mean);
+    });
+    double stdev = sqrt(accum/(vec.size()));
+    return stdev;
+}
+
+XtpQuote::XtpQuote(uint64_t thread_num, uint64_t ring_buffer_size)
+    :live_(true),count_(0),marketdata_available_(false),quote_thread_available_(false),
+     thread_num_(thread_num), ring_buffer_size_(ring_buffer_size)
+{
     server_ip_ = "";
     server_port_ = 0;
     username_ = "";
@@ -15,12 +56,102 @@ XtpQuote::XtpQuote(){
     att_args_.version = JNI_VERSION_1_8;
     att_args_.name = NULL;
     att_args_.group = NULL;
+
+    std::string delay_file_name = std::string("delay_log_") + get_now_date() + ".log";
+    std::string delay_log_file = std::string("/usr/local/project/log/") + delay_file_name;
+    delay_log_file_.open(delay_log_file.c_str() , std::ios::app);
+
+#ifdef COUNT_QUOTE
+    std::string count_file_name = std::string("queue_deep_log_") + get_now_date() + ".log";
+    std::string count_log_file = std::string("/usr/local/project/log/") + count_file_name;
+    queue_deep_file_.open(count_log_file.c_str() , std::ios::app);
+#endif
+
+    if (thread_num_ < thread_num_min_) {
+        thread_num_ = thread_num_min_;
+    }
+    if (thread_num_ > thread_num_max_) {
+        thread_num_ = thread_num_max_;
+    }
+    if (ring_buffer_size_ < ring_buffer_size_min_) {
+        ring_buffer_size_ = ring_buffer_size_min_;
+    }
+    if (ring_buffer_size_ > ring_buffer_size_max_) {
+        ring_buffer_size_ = ring_buffer_size_max_;
+    }
+
+    queue_lock_ = new std::mutex[thread_num_];
+    queue_lock_order_book_ = new std::mutex[thread_num_];
+    queue_ = new RingBuffer<XTPMD>*[thread_num_];
+    for(int i=0; i<thread_num_; i++)
+    {
+        queue_[i] = new RingBuffer<XTPMD>(ring_buffer_size_);
+    }
+
+    queue_order_book_ = new RingBuffer<XTPOB>*[thread_num_];
+    for (int i = 0; i < thread_num_; i++) {
+	    queue_order_book_[i] = new  RingBuffer<XTPOB>(ring_buffer_size_);
+    }
+
+    queue_ticker_ = new RingBuffer<XTPTBT>*[thread_num_];
+    for (int i = 0; i < thread_num_; i++) {
+	queue_ticker_[i] = new RingBuffer<XTPTBT>(ring_buffer_size_);
+    }
+
+    thread_ = new std::thread[thread_num_];
+    thread_order_book_ = new std::thread[thread_num_];
+    thread_ticker_ = new std::thread[thread_num_];
+    for(int i=0; i<thread_num_; i++)
+    {
+        thread_[i] = std::thread([=](){ DealDepthMarketData(i); });
+        thread_order_book_[i] = std::thread([=](){ DealOrderBook(i); });
+	thread_ticker_[i] = std::thread([=]() { DealTickByTick(i);});
+    }
+
+#ifdef COUNT_QUOTE
+    count_quote_thread_ = std::thread([=](){ CountDepthMarketData(); });
+#endif
+
 }
 
 XtpQuote:: ~XtpQuote(){
     if (api_){
         api_->Release();
     }
+    live_ = false;
+
+#ifdef COUNT_QUOTE
+    count_quote_thread_.join();
+    queue_deep_file_.close();
+#endif
+
+    for(int i=0; i<thread_num_; i++) {
+        thread_[i].join();
+	thread_order_book_[i].join();
+	thread_ticker_[i].join();
+    }
+    for(int i=0; i<thread_num_; i++)
+    {
+        XTPMD xtpmd;
+        while (!queue_[i]->isEmpty())
+            queue_[i]->pop(xtpmd);
+        delete queue_[i];
+    }
+
+    delete [] queue_;
+    delete [] thread_;
+    delete [] queue_lock_;
+
+    delete [] queue_order_book_;
+    delete [] thread_order_book_;
+    delete [] queue_lock_order_book_;
+
+    delete [] queue_ticker_;
+    delete [] thread_ticker_;
+    delete [] queue_lock_ticker_;
+
+    delay_log_file_.close();
+
 }
 
 JNIEnv* XtpQuote::preInvoke() {
@@ -37,6 +168,32 @@ JNIEnv* XtpQuote::preInvoke() {
        }
        return env;
 }
+
+JNIEnv* XtpQuote::preInvokeMarketDataF() {
+    if (jvm_ == NULL) {
+        LOG(ERROR) << "XtpQuoteApi jvm_ is null." ;
+        return NULL;
+    }
+
+    try {
+        int status = jvm_->GetEnv((void **)&envMarketData, JNI_VERSION_1_8);
+        if ( envMarketData == NULL || status != JNI_OK )
+        {
+            LOG(ERROR) << " preInvokeMarketDataF status is  " << status;
+            jint resMarketData = jvm_->AttachCurrentThread((void**) &envMarketData, &att_args_);
+            if (resMarketData != 0) {
+                LOG(ERROR) << "XtpQuoteApi OnDepthMarketData AttachCurrentThread failed." ;
+                return NULL;
+            }
+
+        }
+    } catch (exception& e) {
+        LOG(ERROR) << "have exception  " ;
+    }
+
+    return envMarketData;
+}
+
 
 void XtpQuote::OnDisconnected(int reason) {
     //LOG(INFO) << __PRETTY_FUNCTION__ ;
@@ -127,7 +284,7 @@ void XtpQuote::OnUnSubMarketData(XTPST *ticker, XTPRI *error_info, bool is_last)
     if (error_info != NULL) {
         if(error_info->error_id!=0){
         	LOG(ERROR) << __PRETTY_FUNCTION__ << " error_info:" << error_info->error_msg;
-				}
+        }
     }
 
     JNIEnv* env;
@@ -187,45 +344,233 @@ void XtpQuote::OnUnSubMarketData(XTPST *ticker, XTPRI *error_info, bool is_last)
     jvm_->DetachCurrentThread();
 }
 
+
+void XtpQuote::CountDepthMarketData()
+{
+    std::vector<int64_t> queue_deep;
+    int64_t num = 0;
+    while(live_)
+    {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        for(int i=0; i<thread_num_; i++)
+        {
+
+            num = queue_[i]->amount();
+            queue_deep.push_back(num);
+        }
+
+        for(int i=0; i<thread_num_; i++)
+        {
+#ifdef COUNT_QUOTE
+            queue_deep_file_  << queue_deep[i] << ",";
+#endif
+        }
+
+        auto mean = get_mean(queue_deep);
+        auto stdev= get_stdev(queue_deep);
+#ifdef COUNT_QUOTE
+        queue_deep_file_ << mean << "," << stdev << ",";
+        if(mean == 0)
+        {
+            queue_deep_file_ << 0 << std::endl;
+        } else{
+            queue_deep_file_ << stdev/mean << std::endl;
+        }
+#endif
+        queue_deep.clear();
+    }
+
+}
+
 void XtpQuote::OnDepthMarketData(XTPMD *market_data, int64_t bid1_qty[], int32_t bid1_count, int32_t max_bid1_count, int64_t ask1_qty[], int32_t ask1_count, int32_t max_ask1_count) {
-    //LOG(INFO) << __PRETTY_FUNCTION__;
+    {
+        int64_t id = int64_t(market_data->ticker[5]-'0');
+        //int64_t id = count_;
+        count_++;
+        id = id%thread_num_;
+        {
+            auto ret = true;
+            ret = queue_[id]->push(market_data);
+            if(!ret)
+                LOG(ERROR) << "queue_[" << id << "] push failed for RingBuffer isFull";
+            if(queue_[id]->isEmpty())
+                LOG(ERROR) << "queue_[" << id << "] push success; and RingBuffer`s rear[" << queue_[id]->rear() << "] pass its front["<< queue_[id]->front() <<"]";
+        }
+    }
+
+    if(!marketdata_available_)
+    {
+        memcpy(&market_data_for_gene_1_, market_data, sizeof(XTPMD));
+        marketdata_available_ = true;
+    }
+
+}
+
+void XtpQuote::DealDepthMarketData(int64_t id)
+{
+    JNIEnv* env = NULL;
+    jclass pluginClass = NULL;
+    jmethodID jm_event = NULL;
+    int count = 0;
+    int mask = 10000;
+    int64_t id_ = id;
+
+    XTPMD market_data;
+    while(live_)
+    {
+        while (!queue_[id_]->isEmpty())
+        {
+            {
+                auto ret = queue_[id_]->pop(market_data);
+
+                if(!ret)
+                {
+                    LOG(ERROR) << "queue_[" << id << "] pop failed for RingBuffer`s rear[" << queue_[id_]->rear() << "] pass its front["<< queue_[id_]->front() <<"]";
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                    continue;
+                }
+            }
+
+            if(count%mask == 0)
+            {
+                env = preInvoke();
+                pluginClass = env->GetObjectClass(quote_plugin_obj_);
+                assert(pluginClass != NULL);
+                jm_event = env->GetMethodID(pluginClass, "onDepthMarketData","(IIIDDDDDDDDJJDDDDDDDDDDDDDDDDDDDDDDJJJJJJJJJJJJJJJJJJJJJLjava/lang/String;DI)V");
+
+            }
+            OnDepthMarketData2(&market_data, 0, 0, 0, 0, 0, 0, env, jm_event);
+            if(count%mask == mask-1)
+            {
+                jvm_->DetachCurrentThread();
+                env = NULL;
+            }
+            count++;
+        }
+        std::this_thread::sleep_for(std::chrono::microseconds(10));
+    }
+    if(env != NULL)
+    {
+        jvm_->DetachCurrentThread();
+    }
+}
+
+void XtpQuote::OnDepthMarketData2(XTPMD *market_data, int64_t bid1_qty[], int32_t bid1_count, int32_t max_bid1_count, int64_t ask1_qty[], int32_t ask1_count, int32_t max_ask1_count, JNIEnv* env2, jmethodID jm_event2) {
+
     JNIEnv* env;
-    // prepare the invocation
-    env = preInvoke();
-    jclass pluginClass = env->GetObjectClass(quote_plugin_obj_);
-    assert(pluginClass != NULL);
-    jmethodID jm_event = env->GetMethodID(pluginClass, "onDepthMarketData",
-    "(Lcom/zts/xtp/quote/model/response/DepthMarketDataResponse;Lcom/zts/xtp/quote/model/response/DepthMarketDataExResponse;)V");
+    jmethodID jm_event;
+    if(env2==NULL || (jvm_->GetEnv((void **)&env2, JNI_VERSION_1_8) != JNI_OK))
+    {
+        env = preInvoke();
+        jclass pluginClass = env->GetObjectClass(quote_plugin_obj_);
+        assert(pluginClass != NULL);
+        jm_event = env->GetMethodID(pluginClass, "onDepthMarketData","(IIIDDDDDDDDJJDDDDDDDDDDDDDDDDDDDDDDJJJJJJJJJJJJJJJJJJJJJLjava/lang/String;DI)V");
 
+    } else {
+        env = env2;
+        jm_event = jm_event2;
+    }
 
-    jobject mdObj = NULL;
-    jmethodID mdConstr = env->GetMethodID(xtp_market_data_class_, "<init>","()V");
-    if (mdConstr == NULL) {
-       jvm_->DetachCurrentThread();
-       return;
-    }
-    mdObj = env->NewObject(xtp_market_data_class_, mdConstr);
-    if (mdObj == NULL) {
-       jvm_->DetachCurrentThread();
-       return;
-    }
-    generateMarketDataObj(env, mdObj, market_data);
+    uint32_t nTicker = atol(market_data->ticker);
+    uint32_t nTickerLength = strlen(market_data->ticker);
 
-    jobject extObj = NULL;
-    jmethodID extConstr = env->GetMethodID(depth_market_data_ext_class_, "<init>","()V");
-    if (extConstr == NULL) {
-       jvm_->DetachCurrentThread();
-       return;
-    }
-    extObj = env->NewObject(depth_market_data_ext_class_, extConstr);
-    if (extObj == NULL) {
-       jvm_->DetachCurrentThread();
-       return;
-    }
-    generateDepthMarketDataExtObj(env, extObj, bid1_qty, bid1_count, max_bid1_count, ask1_qty, ask1_count, max_ask1_count);
+    jstring jstr_ticker_status = env->NewStringUTF(market_data->ticker_status);
 
-    env->CallVoidMethod(quote_plugin_obj_, jm_event, mdObj, extObj);
-    jvm_->DetachCurrentThread();
+    double bid[10];
+    double ask[10];
+    long bidQty[10];
+    long askQty[10];
+    for (int i=0; i<10; i++) {
+        bid[i] = market_data->bid[i];
+        ask[i] = market_data->ask[i];
+        bidQty[i] = market_data->bid_qty[i];
+        askQty[i] = market_data->ask_qty[i];
+    }
+
+    if (market_data->data_type_v2 == XTP_MARKETDATA_V2_ACTUAL) {
+        env->CallVoidMethod(quote_plugin_obj_, jm_event, market_data->exchange_id, nTicker, nTickerLength, market_data->last_price, market_data->pre_close_price,
+                            market_data->open_price, market_data->high_price, market_data->low_price, market_data->close_price, market_data->upper_limit_price,
+                            market_data->lower_limit_price, market_data->data_time, market_data->qty,
+                            market_data->turnover, market_data->avg_price,
+                            bid[0], bid[1], bid[2], bid[3], bid[4], bid[5], bid[6],bid[7], bid[8], bid[9],
+                            ask[0], ask[1], ask[2], ask[3], ask[4], ask[5], ask[6],ask[7], ask[8], ask[9],
+                            bidQty[0], bidQty[1], bidQty[2], bidQty[3], bidQty[4], bidQty[5], bidQty[6],bidQty[7], bidQty[8], bidQty[9],
+                            askQty[0], askQty[1], askQty[2], askQty[3], askQty[4], askQty[5], askQty[6],askQty[7], askQty[8], askQty[9],
+                            market_data->trades_count, jstr_ticker_status, market_data->stk.iopv, market_data->data_type_v2);
+    }
+    if (market_data->data_type_v2 == XTP_MARKETDATA_V2_OPTION) {
+        env->CallVoidMethod(quote_plugin_obj_, jm_event, market_data->exchange_id, nTicker, nTickerLength, market_data->last_price, market_data->pre_close_price,
+                            market_data->open_price, market_data->high_price, market_data->low_price, market_data->close_price, market_data->upper_limit_price,
+                            market_data->lower_limit_price, market_data->data_time, market_data->qty,
+                            market_data->turnover, market_data->avg_price,
+                            bid[0], bid[1], bid[2], bid[3], bid[4], bid[5], bid[6],bid[7], bid[8], bid[9],
+                            ask[0], ask[1], ask[2], ask[3], ask[4], ask[5], ask[6],ask[7], ask[8], ask[9],
+                            bidQty[0], bidQty[1], bidQty[2], bidQty[3], bidQty[4], bidQty[5], bidQty[6],bidQty[7], bidQty[8], bidQty[9],
+                            askQty[0], askQty[1], askQty[2], askQty[3], askQty[4], askQty[5], askQty[6],askQty[7], askQty[8], askQty[9],
+                            market_data->trades_count, jstr_ticker_status, 0.0, market_data->data_type_v2);
+    }
+    if (market_data->data_type_v2 == XTP_MARKETDATA_V2_BOND && market_data->exchange_id == XTP_EXCHANGE_SH) {
+        //L2
+        if (market_data->bond.instrument_status != NULL) {
+            if (0 == strcmp(market_data->bond.instrument_status, "ADD")) {
+                jstr_ticker_status = env->NewStringUTF("  0");
+            }
+            if (0 == strcmp(market_data->bond.instrument_status, "START")) {
+                jstr_ticker_status = env->NewStringUTF("S 1");
+            }
+            if (0 == strcmp(market_data->bond.instrument_status, "OCALL")) {
+                jstr_ticker_status = env->NewStringUTF("C11");
+            }
+            if (0 == strcmp(market_data->bond.instrument_status, "TRADE")) {
+                jstr_ticker_status = env->NewStringUTF("T11");
+            }
+            if (0 == strcmp(market_data->bond.instrument_status, "SUSP")) {
+                jstr_ticker_status = env->NewStringUTF("P01");
+            }
+            if (0 == strcmp(market_data->bond.instrument_status, "CLOSE")) {
+                jstr_ticker_status = env->NewStringUTF("E01");
+            }
+            if (0 == strcmp(market_data->bond.instrument_status, "ENDTR")) {
+                jstr_ticker_status = env->NewStringUTF("E01");
+            }
+
+            env->CallVoidMethod(quote_plugin_obj_, jm_event, market_data->exchange_id, nTicker, nTickerLength, market_data->last_price, market_data->pre_close_price,
+                                market_data->open_price, market_data->high_price, market_data->low_price, market_data->close_price, market_data->upper_limit_price,
+                                market_data->lower_limit_price, market_data->data_time, market_data->qty,
+                                market_data->turnover, market_data->avg_price,
+                                bid[0], bid[1], bid[2], bid[3], bid[4], bid[5], bid[6],bid[7], bid[8], bid[9],
+                                ask[0], ask[1], ask[2], ask[3], ask[4], ask[5], ask[6],ask[7], ask[8], ask[9],
+                                bidQty[0], bidQty[1], bidQty[2], bidQty[3], bidQty[4], bidQty[5], bidQty[6],bidQty[7], bidQty[8], bidQty[9],
+                                askQty[0], askQty[1], askQty[2], askQty[3], askQty[4], askQty[5], askQty[6],askQty[7], askQty[8], askQty[9],
+                                market_data->trades_count, jstr_ticker_status, 0.0, market_data->data_type_v2);
+
+        } else {  //L1
+            env->CallVoidMethod(quote_plugin_obj_, jm_event, market_data->exchange_id, nTicker, nTickerLength, market_data->last_price, market_data->pre_close_price,
+                                market_data->open_price, market_data->high_price, market_data->low_price, market_data->close_price, market_data->upper_limit_price,
+                                market_data->lower_limit_price, market_data->data_time, market_data->qty,
+                                market_data->turnover, market_data->avg_price,
+                                bid[0], bid[1], bid[2], bid[3], bid[4], bid[5], bid[6],bid[7], bid[8], bid[9],
+                                ask[0], ask[1], ask[2], ask[3], ask[4], ask[5], ask[6],ask[7], ask[8], ask[9],
+                                bidQty[0], bidQty[1], bidQty[2], bidQty[3], bidQty[4], bidQty[5], bidQty[6],bidQty[7], bidQty[8], bidQty[9],
+                                askQty[0], askQty[1], askQty[2], askQty[3], askQty[4], askQty[5], askQty[6],askQty[7], askQty[8], askQty[9],
+                                market_data->trades_count, jstr_ticker_status, 0.0, market_data->data_type_v2);
+        }
+    }
+    if (market_data->data_type_v2 == XTP_MARKETDATA_V2_INDEX) {
+        env->CallVoidMethod(quote_plugin_obj_, jm_event, market_data->exchange_id, nTicker, nTickerLength, market_data->last_price, market_data->pre_close_price,
+                            market_data->open_price, market_data->high_price, market_data->low_price, market_data->close_price, market_data->upper_limit_price,
+                            market_data->lower_limit_price, market_data->data_time, market_data->qty,
+                            market_data->turnover, market_data->avg_price,
+                            bid[0], bid[1], bid[2], bid[3], bid[4], bid[5], bid[6],bid[7], bid[8], bid[9],
+                            ask[0], ask[1], ask[2], ask[3], ask[4], ask[5], ask[6],ask[7], ask[8], ask[9],
+                            bidQty[0], bidQty[1], bidQty[2], bidQty[3], bidQty[4], bidQty[5], bidQty[6],bidQty[7], bidQty[8], bidQty[9],
+                            askQty[0], askQty[1], askQty[2], askQty[3], askQty[4], askQty[5], askQty[6],askQty[7], askQty[8], askQty[9],
+                            market_data->trades_count, jstr_ticker_status, 0.0, market_data->data_type_v2);
+    }
+
+    if (env2==NULL) {
+        jvm_->DetachCurrentThread();
+    }
 }
 
 void XtpQuote::OnSubOrderBook(XTPST *ticker, XTPRI *error_info, bool is_last) {
@@ -361,79 +706,93 @@ void XtpQuote::OnUnSubOrderBook(XTPST *ticker, XTPRI *error_info, bool is_last) 
 }
 
 void XtpQuote::OnOrderBook(XTPOB *order_book) {
+    int64_t id = int64_t(order_book->ticker[5] - '0');
+    id = id % thread_num_;
+
+    {
+	bool ret = true;
+	ret = queue_order_book_[id]->push(order_book);
+	if (!ret)
+	    LOG(ERROR) << "queue_order_book_" << id << "] push failed for RingBuffer is Full";
+	if (queue_order_book_[id]->isEmpty())
+	    LOG(ERROR) << "queue_order_book_[" << id << "] push success; and RingBuffer's rear[" << queue_order_book_[id] << "] pass its front[" << queue_order_book_[id]->front() << "]";
+    }
+}
+
+void XtpQuote::DoOrderBook(XTPOB *order_book, JNIEnv* env, jmethodID jm_event) {
     //LOG(INFO) << __PRETTY_FUNCTION__ ;
 
-    JNIEnv* env;
-    // prepare the invocation
-    env = preInvoke();
     jclass pluginClass = env->GetObjectClass(quote_plugin_obj_);
     assert(pluginClass != NULL);
-    jmethodID jm_event = env->GetMethodID(pluginClass, "onOrderBook", "(Lcom/zts/xtp/quote/model/response/OrderBookResponse;)V");
 
-    //fetch the default construct
-    jmethodID defaultConstr = env->GetMethodID(order_book_class_, "<init>","()V");
-    if (defaultConstr == NULL) {
-       jvm_->DetachCurrentThread();
-       return;
+    uint32_t nTicker = atol(order_book->ticker);
+    uint32_t nTickerLength = strlen(order_book->ticker);
+
+    double bid[10];
+    double ask[10];
+    long bidQty[10];
+    long askQty[10];
+    for (int i=0; i<10; i++) {
+        bid[i] = order_book->bid[i];
+        ask[i] = order_book->ask[i];
+        bidQty[i] = order_book->bid_qty[i];
+        askQty[i] = order_book->ask_qty[i];
     }
 
-    jobject rspObj=NULL;
-    //create the object
-    rspObj = env->NewObject(order_book_class_, defaultConstr);
-    if (rspObj == NULL) {
-       jvm_->DetachCurrentThread();
-       return;
+    env->CallVoidMethod(quote_plugin_obj_, jm_event, order_book->exchange_id, nTicker, nTickerLength, 
+	    order_book->last_price, order_book->qty, order_book->turnover, order_book->trades_count,
+	    bid[0], bid[1], bid[2], bid[3], bid[4], bid[5], bid[6], bid[7], bid[8], bid[9],
+	    ask[0], ask[1], ask[2], ask[3], ask[4], ask[5], ask[6], ask[7], ask[8], ask[9],
+	    bidQty[0], bidQty[1], bidQty[2], bidQty[3], bidQty[4], bidQty[5], bidQty[6], bidQty[7], bidQty[8], bidQty[9],
+	    askQty[0], askQty[1], askQty[2], askQty[3], askQty[4], askQty[5], askQty[6], askQty[7], askQty[8], askQty[9],
+	    order_book->data_time);
+}
+
+void XtpQuote::DealOrderBook(int64_t id) {
+    JNIEnv* env = NULL;
+//    env = preInvoke();
+    jclass pluginClass = NULL;
+    jmethodID jm_event = NULL;
+    int count = 0;
+    int mask = 10000;
+//    bool flag = true;
+    int64_t id_ = id;
+
+    XTPOB order_book;
+
+    while (live_) {
+
+        while (!queue_order_book_[id]->isEmpty()) {
+	    {
+
+		bool ret = queue_order_book_[id]->pop(order_book);
+		if (!ret) {
+		    LOG(ERROR) << "queue_order_book[" << id << "] pop failed for RingBuffer's rear[" << queue_order_book_[id]->rear() << "] pass its front[" << queue_order_book_[id]->front() << "]";
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                    continue;
+		}
+
+		if (count % mask == 0 || (jvm_->GetEnv((void **)&env, JNI_VERSION_1_8) != JNI_OK)) {
+		    env = preInvoke();
+		    pluginClass = env->GetObjectClass(quote_plugin_obj_);
+		    assert(pluginClass != NULL);
+		    jm_event = env->GetMethodID(pluginClass, "onOrderBook", "(IIIDJDJDDDDDDDDDDDDDDDDDDDDJJJJJJJJJJJJJJJJJJJJJ)V");
+		}
+
+		DoOrderBook(&order_book, env, jm_event);
+
+		if (count % mask == mask - 1) {
+		    jvm_->DetachCurrentThread();
+		    env = NULL;
+		}
+		count++;
+	    }
+	}
+        std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
-
-    jmethodID jm_setExchangeType= env->GetMethodID(order_book_class_, "setExchangeType", "(I)V");
-    assert(jm_setExchangeType != NULL);
-    env->CallVoidMethod(rspObj, jm_setExchangeType, order_book->exchange_id);
-
-    jstring jstr_ticker = env->NewStringUTF(order_book->ticker);
-    jmethodID jm_setTicker = env->GetMethodID(order_book_class_, "setTicker", "(Ljava/lang/String;)V");
-    env->CallVoidMethod(rspObj, jm_setTicker, jstr_ticker);
-
-    jmethodID jm_setLastPrice = env->GetMethodID(order_book_class_, "setLastPrice", "(D)V");
-    assert(jm_setLastPrice != NULL);
-    double new_last_price = order_book->last_price;
-    env->CallVoidMethod(rspObj, jm_setLastPrice, new_last_price);
-
-    jmethodID jm_setQty= env->GetMethodID(order_book_class_, "setQty", "(J)V");
-    env->CallVoidMethod(rspObj, jm_setQty, order_book->qty);
-
-    jmethodID jm_setTurnover = env->GetMethodID(order_book_class_, "setTurnover", "(D)V");
-    assert(jm_setTurnover != NULL);
-    env->CallVoidMethod(rspObj, jm_setTurnover, order_book->turnover);
-
-    jmethodID jm_setTradesCount= env->GetMethodID(order_book_class_, "setTradesCount", "(J)V");
-    env->CallVoidMethod(rspObj, jm_setTradesCount, order_book->trades_count);
-
-    jdoubleArray jarray_setBid = env->NewDoubleArray(10);
-    env->SetDoubleArrayRegion(jarray_setBid, 0, 10, order_book->bid);
-    jmethodID jm_setBid = env->GetMethodID(order_book_class_, "setBid", "([D)V");
-    env->CallVoidMethod(rspObj, jm_setBid, jarray_setBid);
-
-    jdoubleArray jarray_setAsk = env->NewDoubleArray(10);
-    env->SetDoubleArrayRegion(jarray_setAsk, 0, 10, order_book->ask);
-    jmethodID jm_setAsk = env->GetMethodID(order_book_class_, "setAsk", "([D)V");
-    env->CallVoidMethod(rspObj, jm_setAsk, jarray_setAsk);
-
-    jlongArray jarray_setBidQty = env->NewLongArray(10);
-    env->SetLongArrayRegion(jarray_setBidQty, 0, 10, (jlong *)order_book->bid_qty);
-    jmethodID jm_setBidQty = env->GetMethodID(order_book_class_, "setBidQty", "([J)V");
-    env->CallVoidMethod(rspObj, jm_setBidQty, jarray_setBidQty);
-
-    jlongArray jarray_setAskQty = env->NewLongArray(10);
-    env->SetLongArrayRegion(jarray_setAskQty, 0, 10, (jlong *)order_book->ask_qty);
-    jmethodID jm_setAskQty = env->GetMethodID(order_book_class_, "setAskQty", "([J)V");
-    env->CallVoidMethod(rspObj, jm_setAskQty, jarray_setAskQty);
-
-    jmethodID jm_setDataTime= env->GetMethodID(order_book_class_, "setDataTime", "(J)V");
-    env->CallVoidMethod(rspObj, jm_setDataTime, order_book->data_time);
-
-
-    env->CallVoidMethod(quote_plugin_obj_, jm_event, rspObj);
-    jvm_->DetachCurrentThread();
+    if (env != NULL) {
+	jvm_->DetachCurrentThread();
+    }
 }
 
 void XtpQuote::OnSubTickByTick(XTPST *ticker, XTPRI *error_info, bool is_last) {
@@ -568,8 +927,12 @@ void XtpQuote::OnUnSubTickByTick(XTPST *ticker, XTPRI *error_info, bool is_last)
     jvm_->DetachCurrentThread();
 }
 
-void XtpQuote::OnTickByTick(XTPTBT *tbt_data) {
+void XtpQuote::DoTickByTick(XTPTBT *tbt_data, JNIEnv* env, jmethodID jm_event) {
     //LOG(INFO) << __PRETTY_FUNCTION__ ;
+
+    if (jm_event == NULL) {
+	LOG(ERROR) << "DoTickByTick : jm_event is NULL, return";
+    }
 
     if(jvm_ == NULL){
         LOG(ERROR) << "XtpQuoteApi OnTickByTick very fatal error eccored: jvm_ == NULL , this tickByTick Msg dropped." ;
@@ -577,23 +940,7 @@ void XtpQuote::OnTickByTick(XTPTBT *tbt_data) {
     }
 
     //恢复每次attach  最后detach  解决同时订阅marketdata时  会造成NewStringUTF 崩溃
-    JNIEnv* env;
-    env = preInvoke();
     pluginClass = env->GetObjectClass(quote_plugin_obj_);
-
-//    if (!bAttachedTickByTick || env==NULL)
-//    {
-//        // attach the current thread to the JVM
-//        jint res = jvm_->AttachCurrentThread((void**)&env, &att_args_);
-//        if (res != 0) {
-//            LOG(ERROR) << "XtpQuoteApi OnTickByTick AttachCurrentThread failed." ;
-//        }
-//        bAttachedTickByTick = true;
-//    }
-//    if (pluginClass == NULL) {
-//        pluginClass = env->GetObjectClass(quote_plugin_obj_);
-//        LOG(INFO)  << "OnTickByTick pluginClass is "<< pluginClass ;
-//    }
 
     jstring jstr_ticker = env->NewStringUTF(tbt_data->ticker);
 
@@ -609,16 +956,8 @@ void XtpQuote::OnTickByTick(XTPTBT *tbt_data) {
                 LOG(ERROR) << "OnTickByTick xtp_tbt_entrust is NULL," << tbt_data->seq ;
                 return;
             }
-            //暂时每次都获取
-            jm_onTickByTickEntrust = env->GetMethodID(pluginClass, "onTickByTickEntrust", "(ILjava/lang/String;JJIIJDJCC)V");
 
-//            if (jm_onTickByTickEntrust == NULL) {
-//                jm_onTickByTickEntrust = env->GetMethodID(pluginClass, "onTickByTickEntrust", "(ILjava/lang/String;JJIIJDJCC)V");
-//                LOG(INFO) << "OnTickByTick jm_onTickByTickEntrust is " << jm_onTickByTickEntrust ;
-//            }
-//            std::cout << "OnTickByTick Entrust:" <<tbt_data->exchange_id<<","<<jstr_ticker<<","<<tbt_data->seq<<","<<tbt_data->data_time<<","<<tbt_data->type<<","<<", subPart="<<
-//            	xtp_tbt_entrust->channel_no<<","<<xtp_tbt_entrust->seq<<","<<xtp_tbt_entrust->price<<","<<xtp_tbt_entrust->qty<<","<<xtp_tbt_entrust->side<<","<<xtp_tbt_entrust->ord_type << std::endl;
-            env->CallVoidMethod(quote_plugin_obj_, jm_onTickByTickEntrust,
+            env->CallVoidMethod(quote_plugin_obj_, jm_event,
                                 tbt_data->exchange_id, jstr_ticker, tbt_data->seq, tbt_data->data_time, tbt_data->type,
                                 xtp_tbt_entrust->channel_no, xtp_tbt_entrust->seq, xtp_tbt_entrust->price, xtp_tbt_entrust->qty, xtp_tbt_entrust->side, xtp_tbt_entrust->ord_type);
             break;
@@ -633,200 +972,79 @@ void XtpQuote::OnTickByTick(XTPTBT *tbt_data) {
                 LOG(ERROR) << "OnTickByTick xtp_tbt_trade is NULL," << tbt_data->seq ;
                 return;
             }
-            //暂时每次都获取
-            jm_onTickByTickTrade = env->GetMethodID(pluginClass, "onTickByTickTrade", "(ILjava/lang/String;JJIIJDJDJJC)V");
 
-//            if (jm_onTickByTickTrade == NULL) {
-//                jm_onTickByTickTrade = env->GetMethodID(pluginClass, "onTickByTickTrade", "(ILjava/lang/String;JJIIJDJDJJC)V");
-//                LOG(INFO) << "OnTickByTick jm_onTickByTickTrade is " << jm_onTickByTickTrade ;
-//            }
-//            std::cout << "OnTickByTick Trade:" << tbt_data->exchange_id <<","<< jstr_ticker <<","<< tbt_data->seq <<","<< tbt_data->data_time <<","<< tbt_data->type <<","<< ", subPart=" <<
-//            	xtp_tbt_trade->channel_no << "," << xtp_tbt_trade->seq<<","<< xtp_tbt_trade->price<<","<< xtp_tbt_trade->qty<<","<< xtp_tbt_trade->money<<","<< xtp_tbt_trade->bid_no<<","<< xtp_tbt_trade->ask_no<<","<< xtp_tbt_trade->trade_flag << std::endl;
-            env->CallVoidMethod(quote_plugin_obj_, jm_onTickByTickTrade,
+            env->CallVoidMethod(quote_plugin_obj_, jm_event,
                                 tbt_data->exchange_id, jstr_ticker, tbt_data->seq, tbt_data->data_time, tbt_data->type,
                                 xtp_tbt_trade->channel_no, xtp_tbt_trade->seq, xtp_tbt_trade->price, xtp_tbt_trade->qty, xtp_tbt_trade->money, xtp_tbt_trade->bid_no, xtp_tbt_trade->ask_no, xtp_tbt_trade->trade_flag);
             break;
         }
     }
 
+}
 
-    //如果不释放  同时订阅marketdata时  会造成NewStringUTF 崩溃
-    jvm_->DetachCurrentThread();
+void XtpQuote::OnTickByTick(XTPTBT *tbt_data) {
+    int64_t id = int64_t(tbt_data->ticker[5] - '0');
+    id = id % thread_num_;
 
+    {
+	bool ret = true;
+	ret = queue_ticker_[id]->push(tbt_data);
+	if (!ret)
+	    LOG(ERROR) << "queue_ticker_" << id << "] push failed for RingBuffer is Full";
+	if (queue_ticker_[id]->isEmpty())
+	    LOG(ERROR) << "queue_ticker_[" << id << "] push success; and RingBuffer's rear[" << queue_ticker_[id] << "] pass its front[" << queue_ticker_[id]->front() << "]";
+    }
+}
 
-
-
-
-
-
-
-
-
-
-
-    //==================  原组装对象的方式  效率低  ===================================
-//    JNIEnv* env;
-//     //prepare the invocation
+void XtpQuote::DealTickByTick(int64_t id) {
+    JNIEnv* env = NULL;
 //    env = preInvoke();
-//
-//    jclass pluginClass = env->GetObjectClass(quote_plugin_obj_);
-//    assert(pluginClass != NULL);
-//    jmethodID jm_event = env->GetMethodID(pluginClass, "onTickByTick", "(Lcom/zts/xtp/quote/model/response/TickByTickResponse;)V");
-//
-//    jmethodID defaultConstr = env->GetMethodID(xtp_tick_by_tick_class_, "<init>","()V");
-//    if (defaultConstr == NULL) {
-//       jvm_->DetachCurrentThread();
-//       return;
-//    }
-//
-//    jobject rspObj=NULL;
-//    //create the object
-//    rspObj = env->NewObject(xtp_tick_by_tick_class_, defaultConstr);
-//    if (rspObj == NULL) {
-//       jvm_->DetachCurrentThread();
-//       return;
-//    }
-//
-//    jmethodID jm_setExchangeType = env->GetMethodID(xtp_tick_by_tick_class_, "setExchangeType", "(I)V");
-//    assert(jm_setExchangeType != NULL);
-//    env->CallVoidMethod(rspObj, jm_setExchangeType, tbt_data->exchange_id);
-//
-//    jstring jstr_ticker = env->NewStringUTF(tbt_data->ticker);
-//    jmethodID jm_setTicker = env->GetMethodID(xtp_tick_by_tick_class_, "setTicker", "(Ljava/lang/String;)V");
-//    env->CallVoidMethod(rspObj, jm_setTicker, jstr_ticker);
-//
-//    jmethodID jm_setSeq = env->GetMethodID(xtp_tick_by_tick_class_, "setSeq", "(J)V");
-//    env->CallVoidMethod(rspObj, jm_setSeq, tbt_data->seq);
-//
-//    jmethodID jm_setDataTime = env->GetMethodID(xtp_tick_by_tick_class_, "setDataTime", "(J)V");
-//    env->CallVoidMethod(rspObj, jm_setDataTime, tbt_data->data_time);
-//
-//    jmethodID jm_setType = env->GetMethodID(xtp_tick_by_tick_class_, "setTickByTickType", "(I)V");
-//    assert(jm_setType != NULL);
-//    env->CallVoidMethod(rspObj, jm_setType, tbt_data->type);
-//
-//    // set entrust or trade according to tbt type
-//    jmethodID jm_inner_setChannelNo;
-//    jmethodID jm_inner_setSeq;
-//    jmethodID jm_inner_setPrice;
-//    jmethodID jm_inner_setQty;
-//    jmethodID jm_inner_setSide;
-//    jmethodID jm_inner_setOrdType;
-//    jmethodID jm_inner_setMoney;
-//    jmethodID jm_inner_setBidNo;
-//    jmethodID jm_inner_setAskNo;
-//    jmethodID jm_inner_setTradeFlag;
-//
-//    switch(tbt_data->type)
-//    {
-//        // when type is entrust
-//        case XTP_TBT_ENTRUST:
-//        {
-//            // tbt entrust should not be null
-//            XTPTickByTickEntrust *xtp_tbt_entrust = &(tbt_data->entrust);
-//            if (xtp_tbt_entrust == NULL)
-//            {
-//                jvm_->DetachCurrentThread();
-//                return;
-//            }
-//
-//            jmethodID defaultConstrEntrust = env->GetMethodID(xtp_tick_by_tick_entrust_class_, "<init>", "()V");
-//            if (defaultConstr == NULL)
-//            {
-//                jvm_->DetachCurrentThread();
-//                return;
-//            }
-//
-//            jobject entrustObj = NULL;
-//            entrustObj = env->NewObject(xtp_tick_by_tick_entrust_class_, defaultConstrEntrust);
-//            if (entrustObj == NULL)
-//            {
-//                jvm_->DetachCurrentThread();
-//                return;
-//            }
-//
-//            jm_inner_setChannelNo = env->GetMethodID(xtp_tick_by_tick_entrust_class_, "setChannelNo", "(I)V");
-//            env->CallVoidMethod(entrustObj, jm_inner_setChannelNo, xtp_tbt_entrust->channel_no);
-//
-//            jm_inner_setSeq = env->GetMethodID(xtp_tick_by_tick_entrust_class_, "setSeq", "(J)V");
-//            env->CallVoidMethod(entrustObj, jm_inner_setSeq, xtp_tbt_entrust->seq);
-//
-//            jm_inner_setPrice = env->GetMethodID(xtp_tick_by_tick_entrust_class_, "setPrice", "(D)V");
-//            env->CallVoidMethod(entrustObj, jm_inner_setPrice, xtp_tbt_entrust->price);
-//
-//            jm_inner_setQty = env->GetMethodID(xtp_tick_by_tick_entrust_class_, "setQty", "(J)V");
-//            env->CallVoidMethod(entrustObj, jm_inner_setQty, xtp_tbt_entrust->qty);
-//
-//            jm_inner_setSide = env->GetMethodID(xtp_tick_by_tick_entrust_class_, "setSide", "(C)V");
-//            env->CallVoidMethod(entrustObj, jm_inner_setSide, xtp_tbt_entrust->side);
-//
-//            jm_inner_setOrdType = env->GetMethodID(xtp_tick_by_tick_entrust_class_, "setOrdType", "(C)V");
-//            env->CallVoidMethod(entrustObj, jm_inner_setOrdType, xtp_tbt_entrust->ord_type);
-//
-//            jmethodID jm_setEntrust = env->GetMethodID(xtp_tick_by_tick_class_, "setEntrust",
-//                "(Lcom/zts/xtp/quote/model/response/TickByTickEntrustResponse;)V");
-//            env->CallVoidMethod(rspObj, jm_setEntrust, entrustObj);
-//            break;
-//        }
-//        // when type is trade
-//        case XTP_TBT_TRADE:
-//        {
-//            // tbt trade should not be null
-//            XTPTickByTickTrade *xtp_tbt_trade = &(tbt_data->trade);
-//            if (xtp_tbt_trade == NULL)
-//            {
-//                jvm_->DetachCurrentThread();
-//                return;
-//            }
-//
-//            jmethodID defaultConstrTrade = env->GetMethodID(xtp_tick_by_tick_trade_class_, "<init>", "()V");
-//            if (defaultConstrTrade == NULL)
-//            {
-//                jvm_->DetachCurrentThread();
-//                return;
-//            }
-//
-//            jobject tradeObj = NULL;
-//            tradeObj = env->NewObject(xtp_tick_by_tick_trade_class_, defaultConstrTrade);
-//            if (tradeObj == NULL)
-//            {
-//                jvm_->DetachCurrentThread();
-//                return;
-//            }
-//
-//            jm_inner_setChannelNo = env->GetMethodID(xtp_tick_by_tick_trade_class_, "setChannelNo", "(I)V");
-//            env->CallVoidMethod(tradeObj, jm_inner_setChannelNo, xtp_tbt_trade->channel_no);
-//
-//            jm_inner_setSeq = env->GetMethodID(xtp_tick_by_tick_trade_class_, "setSeq", "(J)V");
-//            env->CallVoidMethod(tradeObj, jm_inner_setSeq, xtp_tbt_trade->seq);
-//
-//            jm_inner_setPrice = env->GetMethodID(xtp_tick_by_tick_trade_class_, "setPrice", "(D)V");
-//            env->CallVoidMethod(tradeObj, jm_inner_setPrice, xtp_tbt_trade->price);
-//
-//            jm_inner_setQty = env->GetMethodID(xtp_tick_by_tick_trade_class_, "setQty", "(J)V");
-//            env->CallVoidMethod(tradeObj, jm_inner_setQty, xtp_tbt_trade->qty);
-//
-//            jm_inner_setMoney = env->GetMethodID(xtp_tick_by_tick_trade_class_, "setMoney", "(D)V");
-//            env->CallVoidMethod(tradeObj, jm_inner_setMoney, jm_inner_setMoney, xtp_tbt_trade->money);
-//
-//            jm_inner_setBidNo = env->GetMethodID(xtp_tick_by_tick_trade_class_, "setBidNo", "(J)V");
-//            env->CallVoidMethod(tradeObj, jm_inner_setBidNo, jm_inner_setBidNo, xtp_tbt_trade->bid_no);
-//
-//            jm_inner_setAskNo = env->GetMethodID(xtp_tick_by_tick_trade_class_, "setAskNo", "(J)V");
-//            env->CallVoidMethod(tradeObj, jm_inner_setAskNo, xtp_tbt_trade->ask_no);
-//
-//            jm_inner_setTradeFlag = env->GetMethodID(xtp_tick_by_tick_trade_class_, "setTradeFlag", "(C)V");
-//            env->CallVoidMethod(tradeObj, jm_inner_setTradeFlag, xtp_tbt_trade->trade_flag);
-//
-//            jmethodID jm_setTrade = env->GetMethodID(xtp_tick_by_tick_class_, "setTrade",
-//                "(Lcom/zts/xtp/quote/model/response/TickByTickTradeResponse;)V");
-//            env->CallVoidMethod(rspObj, jm_setTrade, tradeObj);
-//            break;
-//        }
-//    }
-//
-//    env->CallVoidMethod(quote_plugin_obj_, jm_event, rspObj);
-//    jvm_->DetachCurrentThread();
+    jclass pluginClass = NULL;
+    jmethodID jm_event_entrust = NULL;
+    jmethodID jm_event_trade = NULL;
+    int count = 0;
+    int mask = 10000;
+//    bool flag = true;
+    int64_t id_ = id;
+
+    XTPTBT ticker;
+
+    while (live_) {
+        while (!queue_ticker_[id]->isEmpty()) {
+	    {
+		bool ret = queue_ticker_[id]->pop(ticker);
+		if (!ret) {
+		    LOG(ERROR) << "queue_ticker_[" << id << "] pop failed for RingBuffer's rear[" << queue_ticker_[id]->rear() << "] pass its front[" << queue_ticker_[id]->front() << "]";
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                    continue;
+		}
+
+		if (count % mask == 0 || (jvm_->GetEnv((void **)&env, JNI_VERSION_1_8) != JNI_OK)) {
+		    jm_event_entrust = jm_event_trade = NULL;
+		    env = preInvoke();
+		    pluginClass = env->GetObjectClass(quote_plugin_obj_);
+		    jm_event_entrust = env->GetMethodID(pluginClass, "onTickByTickEntrust", "(ILjava/lang/String;JJIIJDJCC)V");
+		    jm_event_trade = env->GetMethodID(pluginClass, "onTickByTickTrade", "(ILjava/lang/String;JJIIJDJDJJC)V");
+		}
+
+		if (ticker.type == XTP_TBT_ENTRUST) {
+		    DoTickByTick(&ticker, env, jm_event_entrust);
+		} else if (ticker.type == XTP_TBT_TRADE) {
+		    DoTickByTick(&ticker, env, jm_event_trade);
+		}
+
+		if (count % mask == mask - 1) {
+		    jvm_->DetachCurrentThread();
+		    env = NULL;
+		}
+		count++;
+	    }
+	}
+        std::this_thread::sleep_for(std::chrono::microseconds(10));
+    }
+    if (env != NULL) {
+	jvm_->DetachCurrentThread();
+    }
 }
 
 void XtpQuote::OnSubscribeAllMarketData(XTP_EXCHANGE_TYPE exchange_id, XTPRI *error_info) {
@@ -1443,6 +1661,182 @@ void XtpQuote::OnUnSubscribeAllOptionTickByTick(XTP_EXCHANGE_TYPE exchange_id, X
     generateErrorMsgObj(env, errorMsgObj, error_info, 0);
 
     env->CallVoidMethod(quote_plugin_obj_, jm_event, (int)exchange_id, errorMsgObj);
+    jvm_->DetachCurrentThread();
+}
+
+void XtpQuote::OnQueryAllTickersFullInfo(XTPQFI* ticker_info, XTPRI *error_info, bool is_last) {
+//    LOG(INFO) << __PRETTY_FUNCTION__;
+    if (error_info != NULL) {
+        if(error_info->error_id!=0){
+            LOG(ERROR) << __PRETTY_FUNCTION__ << " error_info:" << error_info->error_msg;
+        }
+    }
+
+    JNIEnv* env;
+    // prepare the invocation
+    env = preInvoke();
+    jclass pluginClass = env->GetObjectClass(quote_plugin_obj_);
+    assert(pluginClass != NULL);
+    jmethodID jm_event = env->GetMethodID(pluginClass, "onQueryAllTickersFullInfo",
+                                          "(Lcom/zts/xtp/quote/model/response/TickerFullInfoResponse;Lcom/zts/xtp/common/model/ErrorMessage;)V");
+
+    //generate the error msg object
+    //fetch the errormsg default construct
+    jmethodID defaultErrorConstr = env->GetMethodID(xtp_error_msg_class_, "<init>","()V");
+    if (defaultErrorConstr == NULL) {
+        jvm_->DetachCurrentThread();
+        return;
+    }
+
+    //create the errormsg object
+    jobject errorMsgObj = env->NewObject(xtp_error_msg_class_, defaultErrorConstr);
+    if (errorMsgObj == NULL) {
+        jvm_->DetachCurrentThread();
+        return;
+    }
+
+    generateErrorMsgObj(env, errorMsgObj, error_info, 0);
+
+    jobject rspObj=NULL;
+    //error_info = null or error_id =0 means successful
+    if (error_info == NULL || error_info->error_id == 0) {
+        //fetch the default construct
+        jmethodID defaultConstr = env->GetMethodID(xtp_quote_static_full_info_class_, "<init>","()V");
+        if (defaultConstr == NULL) {
+            jvm_->DetachCurrentThread();
+            return;
+        }
+
+        //create the object
+        rspObj = env->NewObject(xtp_quote_static_full_info_class_, defaultConstr);
+        if (rspObj == NULL) {
+            jvm_->DetachCurrentThread();
+            return;
+        }
+
+        jmethodID jm_setExchangeType = env->GetMethodID(xtp_quote_static_full_info_class_, "setExchangeType", "(I)V");
+        assert(jm_setExchangeType != NULL);
+        env->CallVoidMethod(rspObj, jm_setExchangeType, ticker_info->exchange_id);
+
+        jstring jstr_ticker = env->NewStringUTF(ticker_info->ticker);
+        jmethodID jm_setTicker = env->GetMethodID(xtp_quote_static_full_info_class_, "setTicker", "(Ljava/lang/String;)V");
+        env->CallVoidMethod(rspObj, jm_setTicker, jstr_ticker);
+
+        jstring jstr_tickerName = env->NewStringUTF(ticker_info->ticker_name);
+        jmethodID jm_setTickerName = env->GetMethodID(xtp_quote_static_full_info_class_, "setTickerName", "(Ljava/lang/String;)V");
+        env->CallVoidMethod(rspObj, jm_setTickerName, jstr_tickerName);
+
+        jmethodID jm_setSecurityType = env->GetMethodID(xtp_quote_static_full_info_class_, "setSecurityType", "(I)V");
+        assert(jm_setSecurityType != NULL);
+        env->CallVoidMethod(rspObj, jm_setSecurityType, ticker_info->security_type);
+
+        jmethodID jm_setQualificationType = env->GetMethodID(xtp_quote_static_full_info_class_, "setQualificationType", "(I)V");
+        assert(jm_setQualificationType != NULL);
+        env->CallVoidMethod(rspObj, jm_setQualificationType, ticker_info->ticker_qualification_class);
+
+        jmethodID jm_setIsRegistration = env->GetMethodID(xtp_quote_static_full_info_class_, "setIsRegistration", "(Z)V");
+        assert(jm_setIsRegistration != NULL);
+        env->CallVoidMethod(rspObj, jm_setIsRegistration, ticker_info->is_registration);
+
+        jmethodID jm_setIsVIE = env->GetMethodID(xtp_quote_static_full_info_class_, "setIsVIE", "(Z)V");
+        assert(jm_setIsVIE != NULL);
+        env->CallVoidMethod(rspObj, jm_setIsVIE, ticker_info->is_VIE);
+
+        jmethodID jm_setIsNoprofit = env->GetMethodID(xtp_quote_static_full_info_class_, "setIsNoprofit", "(Z)V");
+        assert(jm_setIsNoprofit != NULL);
+        env->CallVoidMethod(rspObj, jm_setIsNoprofit, ticker_info->is_noprofit);
+
+        jmethodID jm_setIsWeightedVotingRights = env->GetMethodID(xtp_quote_static_full_info_class_, "setIsWeightedVotingRights", "(Z)V");
+        assert(jm_setIsWeightedVotingRights != NULL);
+        env->CallVoidMethod(rspObj, jm_setIsWeightedVotingRights, ticker_info->is_weighted_voting_rights);
+
+        jmethodID jm_setIsHavePriceLimit = env->GetMethodID(xtp_quote_static_full_info_class_, "setIsHavePriceLimit", "(Z)V");
+        assert(jm_setIsHavePriceLimit != NULL);
+        env->CallVoidMethod(rspObj, jm_setIsHavePriceLimit, ticker_info->is_have_price_limit);
+
+        jmethodID jm_setPreClosePrice = env->GetMethodID(xtp_quote_static_full_info_class_, "setPreClosePrice", "(D)V");
+        assert(jm_setPreClosePrice != NULL);
+        double new_pre_close_price = ticker_info->pre_close_price;
+        env->CallVoidMethod(rspObj, jm_setPreClosePrice, new_pre_close_price);
+
+        jmethodID jm_setUpperLimitPrice = env->GetMethodID(xtp_quote_static_full_info_class_, "setUpperLimitPrice", "(D)V");
+        assert(jm_setUpperLimitPrice != NULL);
+        double new_upper_limit_price = ticker_info->upper_limit_price;
+        env->CallVoidMethod(rspObj, jm_setUpperLimitPrice, new_upper_limit_price);
+
+        jmethodID jm_setLowerLimitPrice = env->GetMethodID(xtp_quote_static_full_info_class_, "setLowerLimitPrice", "(D)V");
+        assert(jm_setLowerLimitPrice != NULL);
+        double new_lower_limit_price = ticker_info->lower_limit_price;
+        env->CallVoidMethod(rspObj, jm_setLowerLimitPrice, new_lower_limit_price);
+
+        jmethodID jm_setPriceTick = env->GetMethodID(xtp_quote_static_full_info_class_, "setPriceTick", "(D)V");
+        assert(jm_setPriceTick != NULL);
+        double new_price_tick = ticker_info->price_tick;
+        env->CallVoidMethod(rspObj, jm_setPriceTick, new_price_tick);
+
+        jmethodID jm_setBidQtyUpperLimit = env->GetMethodID(xtp_quote_static_full_info_class_, "setBidQtyUpperLimit", "(I)V");
+        assert(jm_setBidQtyUpperLimit != NULL);
+        env->CallVoidMethod(rspObj, jm_setBidQtyUpperLimit, ticker_info->bid_qty_upper_limit);
+
+        jmethodID jm_setBidQtyLowerLimit = env->GetMethodID(xtp_quote_static_full_info_class_, "setBidQtyLowerLimit", "(I)V");
+        assert(jm_setBidQtyLowerLimit != NULL);
+        env->CallVoidMethod(rspObj, jm_setBidQtyLowerLimit, ticker_info->bid_qty_lower_limit);
+
+        jmethodID jm_setBidQtyUnit = env->GetMethodID(xtp_quote_static_full_info_class_, "setBidQtyUnit", "(I)V");
+        assert(jm_setBidQtyUnit != NULL);
+        env->CallVoidMethod(rspObj, jm_setBidQtyUnit, ticker_info->bid_qty_unit);
+
+        jmethodID jm_setAskQtyUpperLimit = env->GetMethodID(xtp_quote_static_full_info_class_, "setAskQtyUpperLimit", "(I)V");
+        assert(jm_setAskQtyUpperLimit != NULL);
+        env->CallVoidMethod(rspObj, jm_setAskQtyUpperLimit, ticker_info->ask_qty_upper_limit);
+
+        jmethodID jm_setAskQtyLowerLimit = env->GetMethodID(xtp_quote_static_full_info_class_, "setAskQtyLowerLimit", "(I)V");
+        assert(jm_setAskQtyLowerLimit != NULL);
+        env->CallVoidMethod(rspObj, jm_setAskQtyLowerLimit, ticker_info->ask_qty_lower_limit);
+
+        jmethodID jm_setAskQtyUnit = env->GetMethodID(xtp_quote_static_full_info_class_, "setAskQtyUnit", "(I)V");
+        assert(jm_setAskQtyUnit != NULL);
+        env->CallVoidMethod(rspObj, jm_setAskQtyUnit, ticker_info->ask_qty_unit);
+
+        jmethodID jm_setMarketBidQtyUpperLimit = env->GetMethodID(xtp_quote_static_full_info_class_, "setMarketBidQtyUpperLimit", "(I)V");
+        assert(jm_setMarketBidQtyUpperLimit != NULL);
+        env->CallVoidMethod(rspObj, jm_setMarketBidQtyUpperLimit, ticker_info->market_bid_qty_upper_limit);
+
+        jmethodID jm_setMarketBidQtyLowerLimit = env->GetMethodID(xtp_quote_static_full_info_class_, "setMarketBidQtyLowerLimit", "(I)V");
+        assert(jm_setMarketBidQtyLowerLimit != NULL);
+        env->CallVoidMethod(rspObj, jm_setMarketBidQtyLowerLimit, ticker_info->market_bid_qty_lower_limit);
+
+        jmethodID jm_setMarketBidQtyUnit = env->GetMethodID(xtp_quote_static_full_info_class_, "setMarketBidQtyUnit", "(I)V");
+        assert(jm_setMarketBidQtyUnit != NULL);
+        env->CallVoidMethod(rspObj, jm_setMarketBidQtyUnit, ticker_info->market_bid_qty_unit);
+
+        jmethodID jm_setMarketAskQtyUpperLimit = env->GetMethodID(xtp_quote_static_full_info_class_, "setMarketAskQtyUpperLimit", "(I)V");
+        assert(jm_setMarketAskQtyUpperLimit != NULL);
+        env->CallVoidMethod(rspObj, jm_setMarketAskQtyUpperLimit, ticker_info->market_ask_qty_upper_limit);
+
+        jmethodID jm_setMarketAskQtyLowerLimit = env->GetMethodID(xtp_quote_static_full_info_class_, "setMarketAskQtyLowerLimit", "(I)V");
+        assert(jm_setMarketAskQtyLowerLimit != NULL);
+        env->CallVoidMethod(rspObj, jm_setMarketAskQtyLowerLimit, ticker_info->market_ask_qty_lower_limit);
+
+        jmethodID jm_setMarketAskQtyUnit = env->GetMethodID(xtp_quote_static_full_info_class_, "setMarketAskQtyUnit", "(I)V");
+        assert(jm_setMarketAskQtyUnit != NULL);
+        env->CallVoidMethod(rspObj, jm_setMarketAskQtyUnit, ticker_info->market_ask_qty_unit);
+
+        jmethodID jm_setSecurityStatus = env->GetMethodID(xtp_quote_static_full_info_class_, "setSecurityStatus", "(I)V");
+        assert(jm_setSecurityStatus != NULL);
+        env->CallVoidMethod(rspObj, jm_setSecurityStatus, ticker_info->security_status);
+
+        jmethodID jm_setUnknown1 = env->GetMethodID(xtp_quote_static_full_info_class_, "setUnknown1", "(I)V");
+        env->CallVoidMethod(rspObj, jm_setUnknown1, ticker_info->unknown1);
+
+        jmethodID jm_setUnknown = env->GetMethodID(xtp_quote_static_full_info_class_, "setUnknown", "(I)V");
+        env->CallVoidMethod(rspObj, jm_setUnknown, ticker_info->unknown);
+
+        jmethodID jm_setLastResp = env->GetMethodID(xtp_quote_static_full_info_class_, "setLastResp", "(Z)V");
+        assert(jm_setLastResp != NULL);
+        env->CallVoidMethod(rspObj, jm_setLastResp, is_last);
+    }
+    env->CallVoidMethod(quote_plugin_obj_, jm_event, rspObj, errorMsgObj);
     jvm_->DetachCurrentThread();
 }
 

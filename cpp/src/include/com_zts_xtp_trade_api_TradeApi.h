@@ -26,7 +26,7 @@ JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_initGlog
 /*
  * Class:     com_zts_xtp_trade_api_TradeApi
  * Method:    tradeInit
- * Signature: (Ljava/lang/String;Ljava/lang/String;Lcom/zts/xtp/common/enums/XtpLogLevel;)V
+ * Signature: (SLjava/lang/String;Ljava/lang/String;Lcom/zts/xtp/common/enums/XtpLogLevel;Lcom/zts/xtp/common/enums/XtpTeResumeType;)V
  */
 JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_tradeInit
   (JNIEnv *, jobject, jshort, jstring, jstring, jobject, jobject);
@@ -36,15 +36,16 @@ JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_tradeInit
  * Method:    subscribePublicTopic
  * Signature: (Lcom/zts/xtp/common/enums/XtpTeResumeType;)V
  */
-JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_subscribePublicTopic (JNIEnv *, jobject, jobject);
-
+JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_subscribePublicTopic
+  (JNIEnv *, jobject, jobject);
 
 /*
  * Class:     com_zts_xtp_trade_api_TradeApi
  * Method:    setHeartBeatInterval
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_setHeartBeatInterval (JNIEnv *, jobject, jint);
+JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_setHeartBeatInterval
+  (JNIEnv *, jobject, jint);
 
 /*
  * Class:     com_zts_xtp_trade_api_TradeApi
@@ -57,10 +58,10 @@ JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_disconnect
 /*
  * Class:     com_zts_xtp_trade_api_TradeApi
  * Method:    login
- * Signature: (Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;Lcom/zts/xtp/common/enums/TransferProtocol;)Ljava/lang/String;
+ * Signature: (Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;Lcom/zts/xtp/common/enums/TransferProtocol;Ljava/lang/String;)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_com_zts_xtp_trade_api_TradeApi_login
-  (JNIEnv *, jobject, jstring, jint, jstring, jstring, jobject);
+  (JNIEnv *, jobject, jstring, jint, jstring, jstring, jobject, jstring);
 
 /*
  * Class:     com_zts_xtp_trade_api_TradeApi
@@ -73,10 +74,10 @@ JNIEXPORT jint JNICALL Java_com_zts_xtp_trade_api_TradeApi_logout
 /*
  * Class:     com_zts_xtp_trade_api_TradeApi
  * Method:    insertOrder
- * Signature: (Lcom/zts/xtp/trade/model/request/OrderInsertRequest;Ljava/lang/String;)Ljava/lang/String;
+ * Signature: (IIIIIDDJIIIIJJJ)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_com_zts_xtp_trade_api_TradeApi_insertOrder
-  (JNIEnv *, jobject, jobject, jstring);
+  (JNIEnv *, jobject, jint, jint, jint, jint, jint, jdouble, jdouble, jlong, jint, jint, jint, jint, jlong, jlong, jlong);
 
 /*
  * Class:     com_zts_xtp_trade_api_TradeApi
@@ -107,7 +108,8 @@ JNIEXPORT jint JNICALL Java_com_zts_xtp_trade_api_TradeApi_queryOrders
  * Method:    queryOrdersByPage
  * Signature: (Lcom/zts/xtp/trade/model/request/OrderQueryByPageReq;Ljava/lang/String;I)V
  */
-JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_queryOrdersByPage(JNIEnv *, jobject, jobject, jstring, jint);
+JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_queryOrdersByPage
+  (JNIEnv *, jobject, jobject, jstring, jint);
 
 /*
  * Class:     com_zts_xtp_trade_api_TradeApi
@@ -130,7 +132,8 @@ JNIEXPORT jint JNICALL Java_com_zts_xtp_trade_api_TradeApi_queryTrades
  * Method:    queryTradesByPage
  * Signature: (Lcom/zts/xtp/trade/model/request/TradeQueryByPageReq;Ljava/lang/String;I)V
  */
-JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_queryTradesByPage(JNIEnv *, jobject, jobject, jstring, jint);
+JNIEXPORT void JNICALL Java_com_zts_xtp_trade_api_TradeApi_queryTradesByPage
+  (JNIEnv *, jobject, jobject, jstring, jint);
 
 /*
  * Class:     com_zts_xtp_trade_api_TradeApi
@@ -170,6 +173,14 @@ JNIEXPORT jstring JNICALL Java_com_zts_xtp_trade_api_TradeApi_fundTransfer
  * Signature: (Lcom/zts/xtp/trade/model/request/FundTransferLogQueryRequest;Ljava/lang/String;I)I
  */
 JNIEXPORT jint JNICALL Java_com_zts_xtp_trade_api_TradeApi_queryFundTransfer
+  (JNIEnv *, jobject, jobject, jstring, jint);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    queryOtherServerFund
+ * Signature: (Lcom/zts/xtp/trade/model/request/XTPFundQueryReq;Ljava/lang/String;I)I
+ */
+JNIEXPORT jint JNICALL Java_com_zts_xtp_trade_api_TradeApi_queryOtherServerFund
   (JNIEnv *, jobject, jobject, jstring, jint);
 
 /*
@@ -247,10 +258,186 @@ JNIEXPORT jstring JNICALL Java_com_zts_xtp_trade_api_TradeApi_getAccountByXTPID
 /*
  * Class:     com_zts_xtp_trade_api_TradeApi
  * Method:    isServerRestart
- * Signature: (Ljava/lang/String;)Z;
+ * Signature: (Ljava/lang/String;)Z
  */
-JNIEXPORT jboolean JNICALL Java_com_zts_xtp_trade_api_TradeApi_isServerRestart(JNIEnv *, jobject, jstring);
+JNIEXPORT jboolean JNICALL Java_com_zts_xtp_trade_api_TradeApi_isServerRestart
+  (JNIEnv *, jobject, jstring);
 
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    loginALGO
+ * Signature: (Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;Lcom/zts/xtp/common/enums/TransferProtocol;Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_com_zts_xtp_trade_api_TradeApi_loginALGO
+  (JNIEnv *, jobject, jstring, jint, jstring, jstring, jobject, jstring);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    queryStrategy
+ * Signature: (ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;I)I
+ */
+JNIEXPORT jint JNICALL Java_com_zts_xtp_trade_api_TradeApi_queryStrategy
+  (JNIEnv *, jobject, jint, jstring, jstring, jstring, jint);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    algoUserEstablishChannel
+ * Signature: (Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_com_zts_xtp_trade_api_TradeApi_algoUserEstablishChannel
+  (JNIEnv *, jobject, jstring, jint, jstring, jstring, jstring);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    insertAlgoOrder
+ * Signature: (ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_com_zts_xtp_trade_api_TradeApi_insertAlgoOrder
+  (JNIEnv *, jobject, jint, jstring, jstring, jstring);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    cancelAlgoOrder
+ * Signature: (ZLjava/lang/String;Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_com_zts_xtp_trade_api_TradeApi_cancelAlgoOrder
+  (JNIEnv *, jobject, jboolean, jstring, jstring);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    getAlgorithmIDByOrder
+ * Signature: (Ljava/lang/String;I)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_zts_xtp_trade_api_TradeApi_getAlgorithmIDByOrder
+  (JNIEnv *, jobject, jstring, jint);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    modifyUserTerminalInfo
+ * Signature: (Lcom/zts/xtp/trade/model/request/XTPUserTerminalInfoReq;Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_com_zts_xtp_trade_api_TradeApi_modifyUserTerminalInfo
+  (JNIEnv *, jobject, jobject, jstring);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    creditCashRepay
+ * Signature: (DLjava/lang/String;)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_zts_xtp_trade_api_TradeApi_creditCashRepay
+  (JNIEnv *, jobject, jdouble, jstring);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    creditCashRepayDebtInterestFee
+ * Signature: (Ljava/lang/String;DLjava/lang/String;)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_zts_xtp_trade_api_TradeApi_creditCashRepayDebtInterestFee
+  (JNIEnv *, jobject, jstring, jdouble, jstring);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    creditSellStockRepayDebtInterestFee
+ * Signature: (Lcom/zts/xtp/trade/model/request/OrderInsertRequest;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_zts_xtp_trade_api_TradeApi_creditSellStockRepayDebtInterestFee
+  (JNIEnv *, jobject, jobject, jstring, jstring);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    queryCreditCashRepayInfo
+ * Signature: (Ljava/lang/String;I)I
+ */
+JNIEXPORT jint JNICALL Java_com_zts_xtp_trade_api_TradeApi_queryCreditCashRepayInfo
+  (JNIEnv *, jobject, jstring, jint);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    queryCreditFundInfo
+ * Signature: (Ljava/lang/String;I)I
+ */
+JNIEXPORT jint JNICALL Java_com_zts_xtp_trade_api_TradeApi_queryCreditFundInfo
+  (JNIEnv *, jobject, jstring, jint);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    queryCreditDebtInfo
+ * Signature: (Ljava/lang/String;I)I
+ */
+JNIEXPORT jint JNICALL Java_com_zts_xtp_trade_api_TradeApi_queryCreditDebtInfo
+  (JNIEnv *, jobject, jstring, jint);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    queryCreditTickerDebtInfo
+ * Signature: (Lcom/zts/xtp/trade/model/request/XTPClientQueryCrdDebtStockReq;Ljava/lang/String;I)I
+ */
+JNIEXPORT jint JNICALL Java_com_zts_xtp_trade_api_TradeApi_queryCreditTickerDebtInfo
+  (JNIEnv *, jobject, jobject, jstring, jint);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    queryCreditAssetDebtInfo
+ * Signature: (Ljava/lang/String;I)I
+ */
+JNIEXPORT jint JNICALL Java_com_zts_xtp_trade_api_TradeApi_queryCreditAssetDebtInfo
+  (JNIEnv *, jobject, jstring, jint);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    queryCreditTickerAssignInfo
+ * Signature: (Lcom/zts/xtp/trade/model/request/XTPClientQueryCrdPositionStockReq;Ljava/lang/String;I)I
+ */
+JNIEXPORT jint JNICALL Java_com_zts_xtp_trade_api_TradeApi_queryCreditTickerAssignInfo
+  (JNIEnv *, jobject, jobject, jstring, jint);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    queryCreditExcessStock
+ * Signature: (Lcom/zts/xtp/trade/model/request/XTPClientQueryCrdSurplusStkReqInfo;Ljava/lang/String;I)I
+ */
+JNIEXPORT jint JNICALL Java_com_zts_xtp_trade_api_TradeApi_queryCreditExcessStock
+  (JNIEnv *, jobject, jobject, jstring, jint);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    queryMulCreditExcessStock
+ * Signature: (Lcom/zts/xtp/trade/model/request/XTPClientQueryCrdSurplusStkReqInfo;Ljava/lang/String;I)I
+ */
+JNIEXPORT jint JNICALL Java_com_zts_xtp_trade_api_TradeApi_queryMulCreditExcessStock
+  (JNIEnv *, jobject, jobject, jstring, jint);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    creditExtendDebtDate
+ * Signature: (Lcom/zts/xtp/trade/model/request/XTPCreditDebtExtendReq;Ljava/lang/String;)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_zts_xtp_trade_api_TradeApi_creditExtendDebtDate
+  (JNIEnv *, jobject, jobject, jstring);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    queryCreditExtendDebtDateOrders
+ * Signature: (Ljava/lang/String;Ljava/lang/String;I)I
+ */
+JNIEXPORT jint JNICALL Java_com_zts_xtp_trade_api_TradeApi_queryCreditExtendDebtDateOrders
+  (JNIEnv *, jobject, jstring, jstring, jint);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    queryCreditFundExtraInfo
+ * Signature: (Ljava/lang/String;I)I
+ */
+JNIEXPORT jint JNICALL Java_com_zts_xtp_trade_api_TradeApi_queryCreditFundExtraInfo
+  (JNIEnv *, jobject, jstring, jint);
+
+/*
+ * Class:     com_zts_xtp_trade_api_TradeApi
+ * Method:    queryCreditPositionExtraInfo
+ * Signature: (Lcom/zts/xtp/trade/model/request/XTPClientQueryCrdPositionStockReq;Ljava/lang/String;I)I
+ */
+JNIEXPORT jint JNICALL Java_com_zts_xtp_trade_api_TradeApi_queryCreditPositionExtraInfo
+  (JNIEnv *, jobject, jobject, jstring, jint);
 
 #ifdef __cplusplus
 }
