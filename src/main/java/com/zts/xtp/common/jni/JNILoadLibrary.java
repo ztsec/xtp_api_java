@@ -58,7 +58,7 @@ public class JNILoadLibrary {
                             && (name.endsWith(".dylib") || name.endsWith(".jnilib"));
                 if(osIsWindows_final)
 		  				isLib =  (name.startsWith("quoteplugin") || name.startsWith("tradeplugin") ||
-                            name.startsWith("xtptraderapi") || name.startsWith("xtpquoteapi")  || name.startsWith("glog") )
+                            name.startsWith("xtptraderapi_xalgo") || name.startsWith("xtpquoteapi")  || name.startsWith("glog") )
                             && name.endsWith(".dll");
                 return isLib;
             });
@@ -97,13 +97,13 @@ public class JNILoadLibrary {
             }catch (Exception e){
                 System.err.println("Fail to load native lib from Sys Path: "+"xtpquoteapi");
             }
-        if(!nativeLibHasLoaded.containsKey("xtptraderapi") && !nativeLibHasLoaded.containsKey("libxtptraderapi"))
+        if(!nativeLibHasLoaded.containsKey("xtptraderapi_xalgo") && !nativeLibHasLoaded.containsKey("libxtptraderapi_xalgo"))
             try{
-                System.loadLibrary("xtptraderapi");
-                System.out.println("load native lib from Sys Path: "+"xtptraderapi");
-                nativeLibHasLoaded.put("xtptraderapi", "1");
+                System.loadLibrary("xtptraderapi_xalgo");
+                System.out.println("load native lib from Sys Path: "+"xtptraderapi_xalgo");
+                nativeLibHasLoaded.put("xtptraderapi_xalgo", "1");
             }catch (Exception e){
-                System.err.println("Fail to load native lib from Sys Path: "+"xtptraderapi");
+                System.err.println("Fail to load native lib from Sys Path: "+"xtptraderapi_xalgo");
             }
         if(!nativeLibHasLoaded.containsKey("tradeplugin") && !nativeLibHasLoaded.containsKey("libtradeplugin"))
             try{
