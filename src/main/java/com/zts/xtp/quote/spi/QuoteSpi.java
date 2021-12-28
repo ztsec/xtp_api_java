@@ -37,8 +37,9 @@ public interface QuoteSpi {
      */
     void onUnSubMarketData(SpecificTickerResponse ticker, ErrorMessage errorMessage);
 
+
     /**
-     * 深度行情通知，包含买一卖一队列 <p> 需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线
+     * 深度行情通知，需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线
      * @param exchangeType 交易所代码
      * @param ticker 合约代码（不包含交易所信息）
      * @param lastPrice 最新价
@@ -59,14 +60,18 @@ public interface QuoteSpi {
      * @param askQty 十档申卖量
      * @param tradesCount 成交笔数
      * @param tickerStatus 当前交易状态说明
-     * @param stkIopv 扩展数据，暂时没用
-     * @param dataType 决定了额外数据是哪种数据类型 stk or opt
+     * @param stkIopv 基金实时参考净值（该数据取自stkEx里面的iopv）
+     * @param dataType 决定了额外数据是哪种数据类型 stk or opt or bond
+     * @param stkEx 现货(股票/基金等)快照扩展数据
+     * @param optionEx 期权快照扩展数据
+     * @param bondEx 上海债券L2快照扩展数据
      */
     void onDepthMarketData(int exchangeType,String ticker,double lastPrice,double preClosePrice,double openPrice,
                            double highPrice,double lowPrice,double closePrice,double upperLimitPrice,
                            double lowerLimitPrice,long dataTime,long qty,double turnover,double avgPrice,double[] bid,
                            double[] ask,long[] bidQty,long[] askQty,long tradesCount,String tickerStatus,double stkIopv,
-                           int dataType);
+                           int dataType, MarketDataStockExDataResponse stkEx, MarketDataOptionExDataResponse optionEx,
+                           MarketDataBondExDataResponse bondEx);
 
     /**
      * 订阅行情订单簿应答 <p> 每条订阅的合约均对应一条订阅应答，需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线

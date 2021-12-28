@@ -436,7 +436,7 @@ void XtpQuote::DealDepthMarketData(int64_t id)
                 env = preInvoke();
                 pluginClass = env->GetObjectClass(quote_plugin_obj_);
                 assert(pluginClass != NULL);
-                jm_event = env->GetMethodID(pluginClass, "onDepthMarketData","(IIIDDDDDDDDJJDDDDDDDDDDDDDDDDDDDDDDJJJJJJJJJJJJJJJJJJJJJLjava/lang/String;DI)V");
+                jm_event = env->GetMethodID(pluginClass, "onDepthMarketData","(IIIDDDDDDDDJJDDDDDDDDDDDDDDDDDDDDDDJJJJJJJJJJJJJJJJJJJJJLjava/lang/String;DILcom/zts/xtp/quote/model/response/MarketDataStockExDataResponse;Lcom/zts/xtp/quote/model/response/MarketDataOptionExDataResponse;Lcom/zts/xtp/quote/model/response/MarketDataBondExDataResponse;)V");
 
             }
             OnDepthMarketData2(&market_data, 0, 0, 0, 0, 0, 0, env, jm_event);
@@ -464,7 +464,7 @@ void XtpQuote::OnDepthMarketData2(XTPMD *market_data, int64_t bid1_qty[], int32_
         env = preInvoke();
         jclass pluginClass = env->GetObjectClass(quote_plugin_obj_);
         assert(pluginClass != NULL);
-        jm_event = env->GetMethodID(pluginClass, "onDepthMarketData","(IIIDDDDDDDDJJDDDDDDDDDDDDDDDDDDDDDDJJJJJJJJJJJJJJJJJJJJJLjava/lang/String;DI)V");
+        jm_event = env->GetMethodID(pluginClass, "onDepthMarketData","(IIIDDDDDDDDJJDDDDDDDDDDDDDDDDDDDDDDJJJJJJJJJJJJJJJJJJJJJLjava/lang/String;DILcom/zts/xtp/quote/model/response/MarketDataStockExDataResponse;Lcom/zts/xtp/quote/model/response/MarketDataOptionExDataResponse;Lcom/zts/xtp/quote/model/response/MarketDataBondExDataResponse;)V");
 
     } else {
         env = env2;
@@ -487,7 +487,27 @@ void XtpQuote::OnDepthMarketData2(XTPMD *market_data, int64_t bid1_qty[], int32_
         askQty[i] = market_data->ask_qty[i];
     }
 
+    //md ex data
+    jobject mdseObj = NULL;
+    jobject mdoeObj = NULL;
+    jobject mdbeObj = NULL;
+    jmethodID mdseConstr = env->GetMethodID(xtp_market_data_se_class_, "<init>","()V");
+    jmethodID mdoeConstr = env->GetMethodID(xtp_market_data_oe_class_, "<init>","()V");
+    jmethodID mdbeConstr = env->GetMethodID(xtp_market_data_be_class_, "<init>","()V");
+    if (mdseConstr == NULL || mdoeConstr == NULL || mdbeConstr == NULL) {
+        jvm_->DetachCurrentThread();
+        return;
+    }
+    mdseObj = env->NewObject(xtp_market_data_se_class_, mdseConstr);
+    mdoeObj = env->NewObject(xtp_market_data_oe_class_, mdseConstr);
+    mdbeObj = env->NewObject(xtp_market_data_be_class_, mdseConstr);
+    if (mdseObj == NULL || mdoeObj == NULL || mdbeObj == NULL) {
+        jvm_->DetachCurrentThread();
+        return;
+    }
+
     if (market_data->data_type_v2 == XTP_MARKETDATA_V2_ACTUAL) {
+        generateMarketDataSeObj(env, mdseObj, market_data);
         env->CallVoidMethod(quote_plugin_obj_, jm_event, market_data->exchange_id, nTicker, nTickerLength, market_data->last_price, market_data->pre_close_price,
                             market_data->open_price, market_data->high_price, market_data->low_price, market_data->close_price, market_data->upper_limit_price,
                             market_data->lower_limit_price, market_data->data_time, market_data->qty,
@@ -496,9 +516,10 @@ void XtpQuote::OnDepthMarketData2(XTPMD *market_data, int64_t bid1_qty[], int32_
                             ask[0], ask[1], ask[2], ask[3], ask[4], ask[5], ask[6],ask[7], ask[8], ask[9],
                             bidQty[0], bidQty[1], bidQty[2], bidQty[3], bidQty[4], bidQty[5], bidQty[6],bidQty[7], bidQty[8], bidQty[9],
                             askQty[0], askQty[1], askQty[2], askQty[3], askQty[4], askQty[5], askQty[6],askQty[7], askQty[8], askQty[9],
-                            market_data->trades_count, jstr_ticker_status, market_data->stk.iopv, market_data->data_type_v2);
+                            market_data->trades_count, jstr_ticker_status, market_data->stk.iopv, market_data->data_type_v2, mdseObj, mdoeObj, mdbeObj);
     }
     if (market_data->data_type_v2 == XTP_MARKETDATA_V2_OPTION) {
+        generateMarketDataOeObj(env, mdoeObj, market_data);
         env->CallVoidMethod(quote_plugin_obj_, jm_event, market_data->exchange_id, nTicker, nTickerLength, market_data->last_price, market_data->pre_close_price,
                             market_data->open_price, market_data->high_price, market_data->low_price, market_data->close_price, market_data->upper_limit_price,
                             market_data->lower_limit_price, market_data->data_time, market_data->qty,
@@ -507,7 +528,7 @@ void XtpQuote::OnDepthMarketData2(XTPMD *market_data, int64_t bid1_qty[], int32_
                             ask[0], ask[1], ask[2], ask[3], ask[4], ask[5], ask[6],ask[7], ask[8], ask[9],
                             bidQty[0], bidQty[1], bidQty[2], bidQty[3], bidQty[4], bidQty[5], bidQty[6],bidQty[7], bidQty[8], bidQty[9],
                             askQty[0], askQty[1], askQty[2], askQty[3], askQty[4], askQty[5], askQty[6],askQty[7], askQty[8], askQty[9],
-                            market_data->trades_count, jstr_ticker_status, 0.0, market_data->data_type_v2);
+                            market_data->trades_count, jstr_ticker_status, 0.0, market_data->data_type_v2, mdseObj, mdoeObj, mdbeObj);
     }
     if (market_data->data_type_v2 == XTP_MARKETDATA_V2_BOND && market_data->exchange_id == XTP_EXCHANGE_SH) {
         //L2
@@ -533,6 +554,7 @@ void XtpQuote::OnDepthMarketData2(XTPMD *market_data, int64_t bid1_qty[], int32_
             if (0 == strcmp(market_data->bond.instrument_status, "ENDTR")) {
                 jstr_ticker_status = env->NewStringUTF("E01");
             }
+            generateMarketDataBeObj(env, mdbeObj, market_data);
 
             env->CallVoidMethod(quote_plugin_obj_, jm_event, market_data->exchange_id, nTicker, nTickerLength, market_data->last_price, market_data->pre_close_price,
                                 market_data->open_price, market_data->high_price, market_data->low_price, market_data->close_price, market_data->upper_limit_price,
@@ -542,9 +564,10 @@ void XtpQuote::OnDepthMarketData2(XTPMD *market_data, int64_t bid1_qty[], int32_
                                 ask[0], ask[1], ask[2], ask[3], ask[4], ask[5], ask[6],ask[7], ask[8], ask[9],
                                 bidQty[0], bidQty[1], bidQty[2], bidQty[3], bidQty[4], bidQty[5], bidQty[6],bidQty[7], bidQty[8], bidQty[9],
                                 askQty[0], askQty[1], askQty[2], askQty[3], askQty[4], askQty[5], askQty[6],askQty[7], askQty[8], askQty[9],
-                                market_data->trades_count, jstr_ticker_status, 0.0, market_data->data_type_v2);
+                                market_data->trades_count, jstr_ticker_status, 0.0, market_data->data_type_v2, mdseObj, mdoeObj, mdbeObj);
 
         } else {  //L1
+            generateMarketDataSeObj(env, mdseObj, market_data);
             env->CallVoidMethod(quote_plugin_obj_, jm_event, market_data->exchange_id, nTicker, nTickerLength, market_data->last_price, market_data->pre_close_price,
                                 market_data->open_price, market_data->high_price, market_data->low_price, market_data->close_price, market_data->upper_limit_price,
                                 market_data->lower_limit_price, market_data->data_time, market_data->qty,
@@ -553,10 +576,11 @@ void XtpQuote::OnDepthMarketData2(XTPMD *market_data, int64_t bid1_qty[], int32_
                                 ask[0], ask[1], ask[2], ask[3], ask[4], ask[5], ask[6],ask[7], ask[8], ask[9],
                                 bidQty[0], bidQty[1], bidQty[2], bidQty[3], bidQty[4], bidQty[5], bidQty[6],bidQty[7], bidQty[8], bidQty[9],
                                 askQty[0], askQty[1], askQty[2], askQty[3], askQty[4], askQty[5], askQty[6],askQty[7], askQty[8], askQty[9],
-                                market_data->trades_count, jstr_ticker_status, 0.0, market_data->data_type_v2);
+                                market_data->trades_count, jstr_ticker_status, 0.0, market_data->data_type_v2, mdseObj, mdoeObj, mdbeObj);
         }
     }
     if (market_data->data_type_v2 == XTP_MARKETDATA_V2_INDEX) {
+        generateMarketDataSeObj(env, mdseObj, market_data);
         env->CallVoidMethod(quote_plugin_obj_, jm_event, market_data->exchange_id, nTicker, nTickerLength, market_data->last_price, market_data->pre_close_price,
                             market_data->open_price, market_data->high_price, market_data->low_price, market_data->close_price, market_data->upper_limit_price,
                             market_data->lower_limit_price, market_data->data_time, market_data->qty,
@@ -565,7 +589,7 @@ void XtpQuote::OnDepthMarketData2(XTPMD *market_data, int64_t bid1_qty[], int32_
                             ask[0], ask[1], ask[2], ask[3], ask[4], ask[5], ask[6],ask[7], ask[8], ask[9],
                             bidQty[0], bidQty[1], bidQty[2], bidQty[3], bidQty[4], bidQty[5], bidQty[6],bidQty[7], bidQty[8], bidQty[9],
                             askQty[0], askQty[1], askQty[2], askQty[3], askQty[4], askQty[5], askQty[6],askQty[7], askQty[8], askQty[9],
-                            market_data->trades_count, jstr_ticker_status, 0.0, market_data->data_type_v2);
+                            market_data->trades_count, jstr_ticker_status, 0.0, market_data->data_type_v2, mdseObj, mdoeObj, mdbeObj);
     }
 
     if (env2==NULL) {
@@ -2152,6 +2176,227 @@ void XtpQuote::generateMarketDataObj(JNIEnv* env, jobject& rspObj, XTPMD *source
     jmethodID jm_setDataType = env->GetMethodID(xtp_market_data_class_, "setDataType", "(I)V");
     env->CallVoidMethod(rspObj, jm_setDataType, sourceObj->data_type);
 
+}
+
+void XtpQuote::generateMarketDataSeObj(JNIEnv* env, jobject& mdseObj, XTPMD *sourceObj) {
+    jmethodID jm_setTotalBidQty = env->GetMethodID(xtp_market_data_se_class_, "setTotalBidQty", "(J)V");
+    env->CallVoidMethod(mdseObj, jm_setTotalBidQty, sourceObj->stk.total_bid_qty);
+
+    jmethodID jm_setTotalAskQty = env->GetMethodID(xtp_market_data_se_class_, "setTotalAskQty", "(J)V");
+    env->CallVoidMethod(mdseObj, jm_setTotalAskQty, sourceObj->stk.total_ask_qty);
+
+    jmethodID jm_setMaBidPrice = env->GetMethodID(xtp_market_data_se_class_, "setMaBidPrice", "(D)V");
+    assert(jm_setMaBidPrice != NULL);
+    double new_ma_bid_price = sourceObj->stk.ma_bid_price;
+    env->CallVoidMethod(mdseObj, jm_setMaBidPrice, new_ma_bid_price);
+
+    jmethodID jm_setMaAskPrice = env->GetMethodID(xtp_market_data_se_class_, "setMaAskPrice", "(D)V");
+    assert(jm_setMaAskPrice != NULL);
+    double new_ma_ask_price = sourceObj->stk.ma_ask_price;
+    env->CallVoidMethod(mdseObj, jm_setMaAskPrice, new_ma_ask_price);
+
+    jmethodID jm_setMaBondBidPrice = env->GetMethodID(xtp_market_data_se_class_, "setMaBondBidPrice", "(D)V");
+    assert(jm_setMaBondBidPrice != NULL);
+    double new_ma_bond_bid_price = sourceObj->stk.ma_bond_bid_price;
+    env->CallVoidMethod(mdseObj, jm_setMaBondBidPrice, new_ma_bond_bid_price);
+
+    jmethodID jm_setMaBondAskPrice = env->GetMethodID(xtp_market_data_se_class_, "setMaBondAskPrice", "(D)V");
+    assert(jm_setMaBondAskPrice != NULL);
+    double new_ma_bond_ask_price = sourceObj->stk.ma_bond_ask_price;
+    env->CallVoidMethod(mdseObj, jm_setMaBondAskPrice, new_ma_bond_ask_price);
+
+    jmethodID jm_setYieldToMaturity = env->GetMethodID(xtp_market_data_se_class_, "setYieldToMaturity", "(D)V");
+    assert(jm_setYieldToMaturity != NULL);
+    env->CallVoidMethod(mdseObj, jm_setYieldToMaturity, sourceObj->stk.yield_to_maturity);
+
+    jmethodID jm_setIopv = env->GetMethodID(xtp_market_data_se_class_, "setIopv", "(D)V");
+    assert(jm_setIopv != NULL);
+    env->CallVoidMethod(mdseObj, jm_setIopv, sourceObj->stk.iopv);
+
+    jmethodID jm_setEtfBuyCount = env->GetMethodID(xtp_market_data_se_class_, "setEtfBuyCount", "(I)V");
+    assert(jm_setEtfBuyCount != NULL);
+    env->CallVoidMethod(mdseObj, jm_setEtfBuyCount, sourceObj->stk.etf_buy_count);
+
+    jmethodID jm_setEtfSellCount = env->GetMethodID(xtp_market_data_se_class_, "setEtfSellCount", "(I)V");
+    assert(jm_setEtfSellCount != NULL);
+    env->CallVoidMethod(mdseObj, jm_setEtfSellCount, sourceObj->stk.etf_sell_count);
+
+    jmethodID jm_setEtfBuyQty = env->GetMethodID(xtp_market_data_se_class_, "setEtfBuyQty", "(D)V");
+    assert(jm_setEtfBuyQty != NULL);
+    env->CallVoidMethod(mdseObj, jm_setEtfBuyQty, sourceObj->stk.etf_buy_qty);
+
+    jmethodID jm_setEtfBuyMoney = env->GetMethodID(xtp_market_data_se_class_, "setEtfBuyMoney", "(D)V");
+    assert(jm_setEtfBuyMoney != NULL);
+    env->CallVoidMethod(mdseObj, jm_setEtfBuyMoney, sourceObj->stk.etf_buy_money);
+
+    jmethodID jm_setEtfSellQty = env->GetMethodID(xtp_market_data_se_class_, "setEtfSellQty", "(D)V");
+    assert(jm_setEtfSellQty != NULL);
+    env->CallVoidMethod(mdseObj, jm_setEtfSellQty, sourceObj->stk.etf_sell_qty);
+
+    jmethodID jm_setEtfSellMoney = env->GetMethodID(xtp_market_data_se_class_, "setEtfSellMoney", "(D)V");
+    assert(jm_setEtfSellMoney != NULL);
+    env->CallVoidMethod(mdseObj, jm_setEtfSellMoney, sourceObj->stk.etf_sell_money);
+
+    jmethodID jm_setTotalWarrantExecQty = env->GetMethodID(xtp_market_data_se_class_, "setTotalWarrantExecQty", "(D)V");
+    assert(jm_setTotalWarrantExecQty != NULL);
+    env->CallVoidMethod(mdseObj, jm_setTotalWarrantExecQty, sourceObj->stk.total_warrant_exec_qty);
+
+    jmethodID jm_setWarrantLowerPrice = env->GetMethodID(xtp_market_data_se_class_, "setWarrantLowerPrice", "(D)V");
+    assert(jm_setWarrantLowerPrice != NULL);
+    double new_warrant_lower_price = sourceObj->stk.warrant_lower_price;
+    env->CallVoidMethod(mdseObj, jm_setWarrantLowerPrice, new_warrant_lower_price);
+
+    jmethodID jm_setWarrantUpperPrice = env->GetMethodID(xtp_market_data_se_class_, "setWarrantUpperPrice", "(D)V");
+    assert(jm_setWarrantUpperPrice != NULL);
+    double new_warrant_upper_price = sourceObj->stk.warrant_upper_price;
+    env->CallVoidMethod(mdseObj, jm_setWarrantUpperPrice, new_warrant_upper_price);
+
+    jmethodID jm_setCancelBuyCount = env->GetMethodID(xtp_market_data_se_class_, "setCancelBuyCount", "(I)V");
+    assert(jm_setCancelBuyCount != NULL);
+    env->CallVoidMethod(mdseObj, jm_setCancelBuyCount, sourceObj->stk.cancel_buy_count);
+
+    jmethodID jm_setCancelSellCount = env->GetMethodID(xtp_market_data_se_class_, "setCancelSellCount", "(I)V");
+    assert(jm_setCancelSellCount != NULL);
+    env->CallVoidMethod(mdseObj, jm_setCancelSellCount, sourceObj->stk.cancel_sell_count);
+
+    jmethodID jm_setCancelBuyQty = env->GetMethodID(xtp_market_data_se_class_, "setCancelBuyQty", "(D)V");
+    assert(jm_setCancelBuyQty != NULL);
+    env->CallVoidMethod(mdseObj, jm_setCancelBuyQty, sourceObj->stk.cancel_buy_qty);
+
+    jmethodID jm_setCancelSellQty = env->GetMethodID(xtp_market_data_se_class_, "setCancelSellQty", "(D)V");
+    assert(jm_setCancelSellQty != NULL);
+    env->CallVoidMethod(mdseObj, jm_setCancelSellQty, sourceObj->stk.cancel_sell_qty);
+
+    jmethodID jm_setCancelBuyMoney = env->GetMethodID(xtp_market_data_se_class_, "setCancelBuyMoney", "(D)V");
+    assert(jm_setCancelBuyMoney != NULL);
+    env->CallVoidMethod(mdseObj, jm_setCancelBuyMoney, sourceObj->stk.cancel_buy_money);
+
+    jmethodID jm_setCancelSellMoney = env->GetMethodID(xtp_market_data_se_class_, "setCancelSellMoney", "(D)V");
+    assert(jm_setCancelSellMoney != NULL);
+    env->CallVoidMethod(mdseObj, jm_setCancelSellMoney, sourceObj->stk.cancel_sell_money);
+
+    jmethodID jm_setTotalBuyCount = env->GetMethodID(xtp_market_data_se_class_, "setTotalBuyCount", "(J)V");
+    env->CallVoidMethod(mdseObj, jm_setTotalBuyCount, sourceObj->stk.total_buy_count);
+
+    jmethodID jm_setTotalSellCount = env->GetMethodID(xtp_market_data_se_class_, "setTotalSellCount", "(J)V");
+    env->CallVoidMethod(mdseObj, jm_setTotalSellCount, sourceObj->stk.total_sell_count);
+
+    jmethodID jm_setDurationAfterBuy = env->GetMethodID(xtp_market_data_se_class_, "setDurationAfterBuy", "(I)V");
+    assert(jm_setDurationAfterBuy != NULL);
+    env->CallVoidMethod(mdseObj, jm_setDurationAfterBuy, sourceObj->stk.duration_after_buy);
+
+    jmethodID jm_setDurationAfterSell = env->GetMethodID(xtp_market_data_se_class_, "setDurationAfterSell", "(I)V");
+    assert(jm_setDurationAfterSell != NULL);
+    env->CallVoidMethod(mdseObj, jm_setDurationAfterSell, sourceObj->stk.duration_after_sell);
+
+    jmethodID jm_setNumBidOrders = env->GetMethodID(xtp_market_data_se_class_, "setNumBidOrders", "(I)V");
+    assert(jm_setNumBidOrders != NULL);
+    env->CallVoidMethod(mdseObj, jm_setNumBidOrders, sourceObj->stk.num_bid_orders);
+
+    jmethodID jm_setNumAskOrders = env->GetMethodID(xtp_market_data_se_class_, "setNumAskOrders", "(I)V");
+    assert(jm_setNumAskOrders != NULL);
+    env->CallVoidMethod(mdseObj, jm_setNumAskOrders, sourceObj->stk.num_ask_orders);
+
+    jmethodID jm_setPreIopv = env->GetMethodID(xtp_market_data_se_class_, "setPreIopv", "(D)V");
+    assert(jm_setPreIopv != NULL);
+    env->CallVoidMethod(mdseObj, jm_setPreIopv, sourceObj->stk.pre_iopv);
+}
+
+void XtpQuote::generateMarketDataOeObj(JNIEnv* env, jobject& mdoeObj, XTPMD *sourceObj) {
+    jmethodID jm_setAuctionPrice = env->GetMethodID(xtp_market_data_oe_class_, "setAuctionPrice", "(D)V");
+    assert(jm_setAuctionPrice != NULL);
+    env->CallVoidMethod(mdoeObj, jm_setAuctionPrice, sourceObj->opt.auction_price);
+
+    jmethodID jm_setAuctionQty = env->GetMethodID(xtp_market_data_oe_class_, "setAuctionQty", "(J)V");
+    assert(jm_setAuctionQty != NULL);
+    env->CallVoidMethod(mdoeObj, jm_setAuctionQty, sourceObj->opt.auction_qty);
+
+    jmethodID jm_setLastEnquiryTime = env->GetMethodID(xtp_market_data_oe_class_, "setLastEnquiryTime", "(J)V");
+    assert(jm_setLastEnquiryTime != NULL);
+    env->CallVoidMethod(mdoeObj, jm_setLastEnquiryTime, sourceObj->opt.last_enquiry_time);
+}
+
+void XtpQuote::generateMarketDataBeObj(JNIEnv* env, jobject& mdbeObj, XTPMD *sourceObj) {
+    jmethodID jm_setTotalBidQty = env->GetMethodID(xtp_market_data_be_class_, "setTotalBidQty", "(J)V");
+    env->CallVoidMethod(mdbeObj, jm_setTotalBidQty, sourceObj->bond.total_bid_qty);
+
+    jmethodID jm_setTotalAskQty = env->GetMethodID(xtp_market_data_be_class_, "setTotalAskQty", "(J)V");
+    env->CallVoidMethod(mdbeObj, jm_setTotalAskQty, sourceObj->bond.total_ask_qty);
+
+    jmethodID jm_setMaBidPrice = env->GetMethodID(xtp_market_data_be_class_, "setMaBidPrice", "(D)V");
+    assert(jm_setMaBidPrice != NULL);
+    double new_ma_bid_price = sourceObj->bond.ma_bid_price;
+    env->CallVoidMethod(mdbeObj, jm_setMaBidPrice, new_ma_bid_price);
+
+    jmethodID jm_setMaAskPrice = env->GetMethodID(xtp_market_data_be_class_, "setMaAskPrice", "(D)V");
+    assert(jm_setMaAskPrice != NULL);
+    double new_ma_ask_price = sourceObj->bond.ma_ask_price;
+    env->CallVoidMethod(mdbeObj, jm_setMaAskPrice, new_ma_ask_price);
+
+    jmethodID jm_setMaBondBidPrice = env->GetMethodID(xtp_market_data_be_class_, "setMaBondBidPrice", "(D)V");
+    assert(jm_setMaBondBidPrice != NULL);
+    double new_ma_bond_bid_price = sourceObj->bond.ma_bond_bid_price;
+    env->CallVoidMethod(mdbeObj, jm_setMaBondBidPrice, new_ma_bond_bid_price);
+
+    jmethodID jm_setMaBondAskPrice = env->GetMethodID(xtp_market_data_be_class_, "setMaBondAskPrice", "(D)V");
+    assert(jm_setMaBondAskPrice != NULL);
+    double new_ma_bond_ask_price = sourceObj->bond.ma_bond_ask_price;
+    env->CallVoidMethod(mdbeObj, jm_setMaBondAskPrice, new_ma_bond_ask_price);
+
+    jmethodID jm_setYieldToMaturity = env->GetMethodID(xtp_market_data_be_class_, "setYieldToMaturity", "(D)V");
+    assert(jm_setYieldToMaturity != NULL);
+    env->CallVoidMethod(mdbeObj, jm_setYieldToMaturity, sourceObj->stk.yield_to_maturity);
+
+    jmethodID jm_setCancelBuyCount = env->GetMethodID(xtp_market_data_be_class_, "setCancelBuyCount", "(I)V");
+    assert(jm_setCancelBuyCount != NULL);
+    env->CallVoidMethod(mdbeObj, jm_setCancelBuyCount, sourceObj->bond.cancel_buy_count);
+
+    jmethodID jm_setCancelSellCount = env->GetMethodID(xtp_market_data_be_class_, "setCancelSellCount", "(I)V");
+    assert(jm_setCancelSellCount != NULL);
+    env->CallVoidMethod(mdbeObj, jm_setCancelSellCount, sourceObj->bond.cancel_sell_count);
+
+    jmethodID jm_setCancelBuyQty = env->GetMethodID(xtp_market_data_be_class_, "setCancelBuyQty", "(D)V");
+    assert(jm_setCancelBuyQty != NULL);
+    env->CallVoidMethod(mdbeObj, jm_setCancelBuyQty, sourceObj->bond.cancel_buy_qty);
+
+    jmethodID jm_setCancelSellQty = env->GetMethodID(xtp_market_data_be_class_, "setCancelSellQty", "(D)V");
+    assert(jm_setCancelSellQty != NULL);
+    env->CallVoidMethod(mdbeObj, jm_setCancelSellQty, sourceObj->bond.cancel_sell_qty);
+
+    jmethodID jm_setCancelBuyMoney = env->GetMethodID(xtp_market_data_be_class_, "setCancelBuyMoney", "(D)V");
+    assert(jm_setCancelBuyMoney != NULL);
+    env->CallVoidMethod(mdbeObj, jm_setCancelBuyMoney, sourceObj->bond.cancel_buy_money);
+
+    jmethodID jm_setCancelSellMoney = env->GetMethodID(xtp_market_data_be_class_, "setCancelSellMoney", "(D)V");
+    assert(jm_setCancelSellMoney != NULL);
+    env->CallVoidMethod(mdbeObj, jm_setCancelSellMoney, sourceObj->bond.cancel_sell_money);
+
+    jmethodID jm_setTotalBuyCount = env->GetMethodID(xtp_market_data_be_class_, "setTotalBuyCount", "(J)V");
+    env->CallVoidMethod(mdbeObj, jm_setTotalBuyCount, sourceObj->bond.total_buy_count);
+
+    jmethodID jm_setTotalSellCount = env->GetMethodID(xtp_market_data_be_class_, "setTotalSellCount", "(J)V");
+    env->CallVoidMethod(mdbeObj, jm_setTotalSellCount, sourceObj->bond.total_sell_count);
+
+    jmethodID jm_setDurationAfterBuy = env->GetMethodID(xtp_market_data_be_class_, "setDurationAfterBuy", "(I)V");
+    assert(jm_setDurationAfterBuy != NULL);
+    env->CallVoidMethod(mdbeObj, jm_setDurationAfterBuy, sourceObj->bond.duration_after_buy);
+
+    jmethodID jm_setDurationAfterSell = env->GetMethodID(xtp_market_data_be_class_, "setDurationAfterSell", "(I)V");
+    assert(jm_setDurationAfterSell != NULL);
+    env->CallVoidMethod(mdbeObj, jm_setDurationAfterSell, sourceObj->bond.duration_after_sell);
+
+    jmethodID jm_setNumBidOrders = env->GetMethodID(xtp_market_data_se_class_, "setNumBidOrders", "(I)V");
+    assert(jm_setNumBidOrders != NULL);
+    env->CallVoidMethod(mdbeObj, jm_setNumBidOrders, sourceObj->bond.num_bid_orders);
+
+    jmethodID jm_setNumAskOrders = env->GetMethodID(xtp_market_data_se_class_, "setNumAskOrders", "(I)V");
+    assert(jm_setNumAskOrders != NULL);
+    env->CallVoidMethod(mdbeObj, jm_setNumAskOrders, sourceObj->bond.num_ask_orders);
+
+    //call setErrorMsg
+    jstring jinstrumentStatusStr = env->NewStringUTF(sourceObj->bond.instrument_status);
+    jmethodID jm_setInstrumentStatus = env->GetMethodID(xtp_market_data_se_class_, "setInstrumentStatus", "(Ljava/lang/String;)V");
+    env->CallVoidMethod(mdbeObj, jm_setInstrumentStatus, jinstrumentStatusStr);
 }
 
 void XtpQuote::generateDepthMarketDataExtObj(JNIEnv* env, jobject& rspObj, int64_t bid1_qty[], int32_t bid1_count, int32_t max_bid1_count, int64_t ask1_qty[], int32_t ask1_count, int32_t max_ask1_count)

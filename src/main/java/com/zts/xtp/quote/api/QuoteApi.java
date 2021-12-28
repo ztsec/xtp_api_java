@@ -319,8 +319,8 @@ public class QuoteApi {
                                    double ask1,double ask2, double ask3,double ask4,double ask5,double ask6,double ask7,double ask8,double ask9,double ask10,
                                    long bidQty1,long bidQty2,long bidQty3,long bidQty4,long bidQty5,long bidQty6,long bidQty7,long bidQty8,long bidQty9,long bidQty10,
                                    long askQty1,long askQty2,long askQty3,long askQty4,long askQty5,long askQty6,long askQty7,long askQty8,long askQty9,long askQty10,
-                                   long tradesCount,String tickerStatus,double stkIopv,
-                                   int dataType) {
+                                   long tradesCount,String tickerStatus,double stkIopv, int dataType, MarketDataStockExDataResponse stkEx,
+                                   MarketDataOptionExDataResponse optionEx, MarketDataBondExDataResponse bondEx) {
 
         String ticker = "";
         if (exchangeType == 1) {
@@ -331,16 +331,14 @@ public class QuoteApi {
             ticker = tickerStringMapCache.getTickerFromTickerStringMapCache(nTicker, nTickerLength, exchangeType);
         }
 
-//        String ticker = tickerStringMapCache.getTickerFromTickerStringMapCache(nTicker, nTickerLength);
-
         double bid[] = new double[]{bid1,bid2,bid3,bid4,bid5,bid6,bid7,bid8,bid9,bid10};
         double ask[] = new double[]{ask1,ask2,ask3,ask4,ask5,ask6,ask7,ask8,ask9,ask10};
         long bidQty[] = new long[]{bidQty1,bidQty2,bidQty3,bidQty4,bidQty5,bidQty6,bidQty7,bidQty8,bidQty9,bidQty10};
         long askQty[] = new long[]{askQty1,askQty2,askQty3,askQty4,askQty5,askQty6,askQty7,askQty8,askQty9,askQty10};
 
         quoteSpi.onDepthMarketData(exchangeType, ticker, lastPrice, preClosePrice, openPrice,
-         highPrice, lowPrice, closePrice, upperLimitPrice, lowerLimitPrice, dataTime, qty,
-         turnover, avgPrice, bid, ask, bidQty, askQty, tradesCount, tickerStatus, stkIopv, dataType);
+                highPrice, lowPrice, closePrice, upperLimitPrice, lowerLimitPrice, dataTime, qty,
+                turnover, avgPrice, bid, ask, bidQty, askQty, tradesCount, tickerStatus, stkIopv, dataType, stkEx, optionEx, bondEx);
     }
 
     private void onSubOrderBook(SpecificTickerResponse rsp, ErrorMessage errorMessage) {

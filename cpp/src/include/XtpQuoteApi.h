@@ -83,6 +83,7 @@ private:
     jclass xtp_market_data_class_;
     jclass xtp_market_data_se_class_;
     jclass xtp_market_data_oe_class_;
+    jclass xtp_market_data_be_class_;
     jclass depth_market_data_ext_class_;
     jclass xtp_quote_static_info_class_;
     jclass order_book_class_;
@@ -210,6 +211,8 @@ public:
     void setXTPMDSEClass(jclass jc) { xtp_market_data_se_class_ = jc; }
 
     void setXTPMDOEClass(jclass jc) { xtp_market_data_oe_class_ = jc; }
+
+    void setXTPMDBEClass(jclass jc) { xtp_market_data_be_class_ = jc; }
 
     void setDepthMarketDataClass(jclass jc) { depth_market_data_ext_class_ = jc; }
 
@@ -405,6 +408,12 @@ private:
     void generateErrorMsgObj(JNIEnv *env, jobject &errorMsgObj, XTPRI *error_info, int request_id);
 
     void generateMarketDataObj(JNIEnv *env, jobject &rspObj, XTPMD *sourceObj);
+
+    void generateMarketDataSeObj(JNIEnv *env, jobject &rspObj, XTPMD *sourceObj);
+
+    void generateMarketDataOeObj(JNIEnv *env, jobject &rspObj, XTPMD *sourceObj);
+
+    void generateMarketDataBeObj(JNIEnv *env, jobject &rspObj, XTPMD *sourceObj);
 
     void generateDepthMarketDataExtObj(JNIEnv *env, jobject &rspObj, int64_t bid1_qty[], int32_t bid1_count,
                                        int32_t max_bid1_count, int64_t ask1_qty[], int32_t ask1_count,

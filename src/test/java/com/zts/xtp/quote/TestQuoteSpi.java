@@ -174,24 +174,26 @@ public class TestQuoteSpi implements QuoteSpi {
         System.out.println(errorMessage);
     }
 
+
     @Override
     public void onDepthMarketData(int exchangeType,String ticker,double lastPrice,double preClosePrice,double openPrice,
                                   double highPrice,double lowPrice,double closePrice, double upperLimitPrice,double lowerLimitPrice,
                                   long dataTime,long qty,double turnover,double avgPrice,double[] bid,
                                   double[] ask,long[] bidQty,long[] askQty,long tradesCount,String tickerStatus,double stkIopv,
-                                  int dataType) {
-//        if (ticker.equals("000045")) {
-            System.out.println("TestQuoteApi onDepthMarketData");
-            System.out.println(ticker);
-            System.out.println(exchangeType);
-            System.out.println(bid[0]);
-            System.out.println(ask[0]);
-            System.out.println(bidQty[0]);
-            System.out.println(askQty[0]);
-//            System.out.println(lastPrice);
-//            System.out.println(dataTime);
-//            System.out.println(dataType);
-//        }
+                                  int dataType, MarketDataStockExDataResponse stkEx, MarketDataOptionExDataResponse optionEx,
+                                  MarketDataBondExDataResponse bondEx) {
+
+        System.out.println("TestQuoteApi onDepthMarketData");
+        System.out.println(ticker);
+        System.out.println(exchangeType);
+        System.out.println(bid[0]);
+        System.out.println(ask[0]);
+        System.out.println(bidQty[1]);
+        System.out.println(askQty[1]);
+        System.out.println("stkEx: " + stkEx);
+        System.out.println("optionEx: " + optionEx);
+        System.out.println("bondEx: " + bondEx);
+
     }
 
     @Override

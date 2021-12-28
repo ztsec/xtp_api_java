@@ -141,7 +141,7 @@ public class QuoteApiTest {
     public void subscribeAllMarketData() {
         System.out.println("subscribeAllMarketData");
         quoteApi.subscribeAllMarketData(1);
-//        quoteApi.subscribeAllMarketData(2);
+        quoteApi.subscribeAllMarketData(2);
     }
 
     /**

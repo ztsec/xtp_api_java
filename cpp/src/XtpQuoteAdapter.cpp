@@ -71,6 +71,9 @@ JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_quoteInit(JNIEnv *env
     jclass xtpmdoeClass =  env->FindClass("com/zts/xtp/quote/model/response/MarketDataOptionExDataResponse");
     pquote->setXTPMDOEClass((jclass)env->NewGlobalRef(xtpmdoeClass));
 
+    jclass xtpmdbeClass =  env->FindClass("com/zts/xtp/quote/model/response/MarketDataBondExDataResponse");
+    pquote->setXTPMDBEClass((jclass)env->NewGlobalRef(xtpmdbeClass));
+
     jclass depthMarketDataExtClass =  env->FindClass("com/zts/xtp/quote/model/response/DepthMarketDataExResponse");
     pquote->setDepthMarketDataClass((jclass)env->NewGlobalRef(depthMarketDataExtClass));
 
