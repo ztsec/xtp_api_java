@@ -47,25 +47,25 @@ void Trade::OnTradeEvent2(XTPTradeReport *trade_info, uint64_t session_id, JNIEn
     envTrade2 = env2;
     jm_eventTrade2 = jm_event2;
 
-    long orderXtpIdH = trade_info->order_xtp_id/10;
-    long orderXtpIdE = trade_info->order_xtp_id%10;
+    long long orderXtpIdH = trade_info->order_xtp_id/10;
+    long long orderXtpIdE = trade_info->order_xtp_id%10;
 
     uint32_t nTicker = atol(trade_info->ticker);
     uint32_t nTickerLength = strlen(trade_info->ticker);
 
-    long localOrderIdH = trade_info->local_order_id/10;
-    long localOrderIdE = trade_info->local_order_id%10;
+    long long localOrderIdH = trade_info->local_order_id/10;
+    long long localOrderIdE = trade_info->local_order_id%10;
 
     jstring execId = envTrade2->NewStringUTF(trade_info->exec_id);
 
-    long reportIndexH = trade_info->report_index/10;
-    long reportIndexE = trade_info->report_index%10;
+    long long reportIndexH = trade_info->report_index/10;
+    long long reportIndexE = trade_info->report_index%10;
 
     jstring orderExchId = envTrade2->NewStringUTF(trade_info->order_exch_id);
     jstring branchPbu = envTrade2->NewStringUTF(trade_info->branch_pbu);
 
-    long strSessionIdH = session_id/10;
-    long strSessionIdE = session_id%10;
+    long long strSessionIdH = session_id/10;
+    long long strSessionIdE = session_id%10;
 
     envTrade2->CallVoidMethod(trade_plugin_obj_, jm_eventTrade2, orderXtpIdH, orderXtpIdE, trade_info->order_client_id, nTicker, nTickerLength, trade_info->market,
                              localOrderIdH, localOrderIdE, execId, trade_info->price, trade_info->quantity, trade_info->trade_time, trade_info->trade_amount,
@@ -261,8 +261,8 @@ void Trade::OnQueryPosition2(XTPQueryStkPositionRsp *position, XTPRI *error_info
     JNIEnv* env;
     env = env2;
 
-    long strSessionIdH = session_id/10;
-    long strSessionIdE = session_id%10;
+    long long strSessionIdH = session_id/10;
+    long long strSessionIdE = session_id%10;
 
     int errorCode = error_info->error_id;
     jstring errorMsg = env->NewStringUTF(error_info->error_msg);
@@ -301,8 +301,8 @@ void Trade::OnQueryAsset2(XTPQueryAssetRsp *asset, XTPRI *error_info, int reques
     JNIEnv* env;
     env = env2;
 
-    long strSessionIdH = session_id/10;
-    long strSessionIdE = session_id%10;
+    long long strSessionIdH = session_id/10;
+    long long strSessionIdE = session_id%10;
 
     int errorCode = error_info->error_id;
     jstring errorMsg = env->NewStringUTF(error_info->error_msg);
@@ -345,19 +345,19 @@ void Trade::OnOrderEvent2(XTPOrderInfo *order_info, XTPRI *error_info, uint64_t 
     if (errorCode == 0 || NULL != order_info)
     {
 
-        long orderXtpIdH = order_info->order_xtp_id/10;
-        long orderXtpIdE = order_info->order_xtp_id%10;
+        long long orderXtpIdH = order_info->order_xtp_id/10;
+        long long orderXtpIdE = order_info->order_xtp_id%10;
 
-        long orderCancelXtpIdH = order_info->order_cancel_xtp_id/10;
-        long orderCancelXtpIdE = order_info->order_cancel_xtp_id%10;
+        long long orderCancelXtpIdH = order_info->order_cancel_xtp_id/10;
+        long long orderCancelXtpIdE = order_info->order_cancel_xtp_id%10;
 
         uint32_t nTicker = atol(order_info->ticker);
         uint32_t nTickerLength = strlen(order_info->ticker);
 
         jstring orderLocalId = envOrder2->NewStringUTF(order_info->order_local_id);
 
-        long strSessionIdH = session_id/10;
-        long strSessionIdE = session_id%10;
+        long long strSessionIdH = session_id/10;
+        long long strSessionIdE = session_id%10;
 
         envOrder2->CallVoidMethod(trade_plugin_obj_, jm_eventOrder2, orderXtpIdH, orderXtpIdE, order_info->order_client_id, order_info->order_cancel_client_id,
                                   orderCancelXtpIdH, orderCancelXtpIdE, nTicker, nTickerLength, order_info->market, order_info->price, order_info->quantity, order_info->price_type,
@@ -380,14 +380,14 @@ void Trade::OnCancelOrderError2(XTPOrderCancelInfo *cancel_info,XTPRI *error_inf
     JNIEnv * env = env2;
     jmethodID jm_onCancelOrderError = jm_event2;
 
-    long orderXtpIdH = 0;
-    long orderXtpIdE = 0;
+    long long orderXtpIdH = 0;
+    long long orderXtpIdE = 0;
 
-    long orderCancelXtpIdH = 0;
-    long orderCancelXtpIdE = 0;
+    long long orderCancelXtpIdH = 0;
+    long long orderCancelXtpIdE = 0;
 
-    long strSessionIdH = session_id/10;
-    long strSessionIdE = session_id%10;
+    long long strSessionIdH = session_id/10;
+    long long strSessionIdE = session_id%10;
 
     int errorCode = error_info->error_id;
     jstring errorMsg = env2->NewStringUTF(error_info->error_msg);
