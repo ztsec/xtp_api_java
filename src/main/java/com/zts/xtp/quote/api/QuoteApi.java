@@ -72,6 +72,8 @@ public class QuoteApi {
      * @param clientId（必须输入）用于区分同一用户的不同客户端，由用户自定义
      * @param logFolder 日志输出的目录，请设定一个真实存在的有可写权限的路径
      * @param logLevel xtp api 日志输出级别
+     * @param threadNum 处理行情的线程数，取值范围1~16
+     * @param ringBufferSize 每个处理行情的线程，行情数据缓冲区大小，取值范围1024~1024*256
      */
     private native void quoteInit(short clientId, String logFolder,XtpLogLevel logLevel,int threadNum,int ringBufferSize);
 
