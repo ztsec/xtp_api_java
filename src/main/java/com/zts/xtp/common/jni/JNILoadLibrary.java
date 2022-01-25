@@ -50,11 +50,11 @@ public class JNILoadLibrary {
                 boolean isLib = false;
                 if(osIsLinux)
                     isLib =  (name.startsWith("libtradeplugin") || name.startsWith("libquoteplugin") ||
-                            name.startsWith("libxtptraderapi") || name.startsWith("libxtpquoteapi") || name.startsWith("libsodium") || name.startsWith("libglog"))
+                            name.startsWith("libxtptraderapi_xalgo") || name.startsWith("libxtpquoteapi") || name.startsWith("libsodium") || name.startsWith("libglog"))
                             && name.endsWith(".so");
                 if(osIsMacOsX_final)
                     isLib =  (name.startsWith("libtradeplugin") || name.startsWith("libquoteplugin") ||
-                            name.startsWith("libxtptraderapi") || name.startsWith("libxtpquoteapi") || name.startsWith("libglog") )
+                            name.startsWith("libxtptraderapi_xalgo") || name.startsWith("libxtpquoteapi") || name.startsWith("libglog") )
                             && (name.endsWith(".dylib") || name.endsWith(".jnilib"));
                 if(osIsWindows_final)
 		  				isLib =  (name.startsWith("quoteplugin") || name.startsWith("tradeplugin") ||

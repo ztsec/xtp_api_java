@@ -146,39 +146,39 @@ IF (WIN32)
 	#end remove above
 ELSEIF (APPLE)
     #copy tradeplugin quoteplugin to os lib path
-    TARGET_LINK_LIBRARIES(tradeplugin xtptraderapi.dylib glog.dylib )
+    TARGET_LINK_LIBRARIES(tradeplugin xtptraderapi_xalgo.dylib glog.dylib )
     TARGET_LINK_LIBRARIES(quoteplugin xtpquoteapi.dylib glog.dylib )
     install(TARGETS tradeplugin DESTINATION /usr/local/lib)
     install(TARGETS quoteplugin DESTINATION /usr/local/lib)
     #copy xtp lib and glog lib to os lib path
     install(FILES lib/macosx/libglog.dylib DESTINATION /usr/local/lib)
-    install(FILES lib/macosx/libxtptraderapi.dylib DESTINATION /usr/local/lib)
+    install(FILES lib/macosx/libxtptraderapi_xalgo.dylib DESTINATION /usr/local/lib)
     install(FILES lib/macosx/libxtpquoteapi.dylib DESTINATION /usr/local/lib)
     #copy tradeplugin quoteplugin lib to os buildcpp path
     install(FILES /usr/local/lib/libtradeplugin.dylib DESTINATION ${PROJECT_SOURCE_DIR}/buildcpp/macosx)
     install(FILES /usr/local/lib/libquoteplugin.dylib DESTINATION ${PROJECT_SOURCE_DIR}/buildcpp/macosx)
     #copy all lib to os javaproject/build/
     install(FILES /usr/local/lib/libglog.dylib DESTINATION ${PROJECT_SOURCE_DIR}/../build/libs/macosx/usr/local/lib)
-    install(FILES /usr/local/lib/libxtptraderapi.dylib DESTINATION ${PROJECT_SOURCE_DIR}/../build/libs/macosx/usr/local/lib)
+    install(FILES /usr/local/lib/libxtptraderapi_xalgo.dylib DESTINATION ${PROJECT_SOURCE_DIR}/../build/libs/macosx/usr/local/lib)
     install(FILES /usr/local/lib/libxtpquoteapi.dylib DESTINATION ${PROJECT_SOURCE_DIR}/../build/libs/macosx/usr/local/lib)
     install(FILES /usr/local/lib/libtradeplugin.dylib DESTINATION ${PROJECT_SOURCE_DIR}/../build/libs/macosx/usr/local/lib)
     install(FILES /usr/local/lib/libquoteplugin.dylib DESTINATION ${PROJECT_SOURCE_DIR}/../build/libs/macosx/usr/local/lib)
 ELSEIF (UNIX)
     #copy tradeplugin quoteplugin to os lib path
-    TARGET_LINK_LIBRARIES(tradeplugin xtptraderapi.so glog.so )
+    TARGET_LINK_LIBRARIES(tradeplugin xtptraderapi_xalgo.so glog.so )
     TARGET_LINK_LIBRARIES(quoteplugin xtpquoteapi.so glog.so )
     install(TARGETS tradeplugin DESTINATION /usr/local/lib)
     install(TARGETS quoteplugin DESTINATION /usr/local/lib)
     #copy xtp lib and glog lib to os lib path
     install(FILES lib/linux/libglog.so DESTINATION /usr/local/lib)
-    install(FILES lib/linux/libxtptraderapi.so DESTINATION /usr/local/lib)
+    install(FILES lib/linux/libxtptraderapi_xalgo.so DESTINATION /usr/local/lib)
     install(FILES lib/linux/libxtpquoteapi.so DESTINATION /usr/local/lib)
     #copy tradeplugin quoteplugin lib to os buildcpp path
     install(FILES /usr/local/lib/libtradeplugin.so DESTINATION ${PROJECT_SOURCE_DIR}/buildcpp/linux)
     install(FILES /usr/local/lib/libquoteplugin.so DESTINATION ${PROJECT_SOURCE_DIR}/buildcpp/linux)
     #copy all lib to os javaproject/build/
     install(FILES /usr/local/lib/libglog.so DESTINATION ${PROJECT_SOURCE_DIR}/../build/libs/linux/usr/local/lib)
-    install(FILES /usr/local/lib/libxtptraderapi.so DESTINATION ${PROJECT_SOURCE_DIR}/../build/libs/linux/usr/local/lib)
+    install(FILES /usr/local/lib/libxtptraderapi_xalgo.so DESTINATION ${PROJECT_SOURCE_DIR}/../build/libs/linux/usr/local/lib)
     install(FILES /usr/local/lib/libxtpquoteapi.so DESTINATION ${PROJECT_SOURCE_DIR}/../build/libs/linux/usr/local/lib)
     install(FILES /usr/local/lib/libtradeplugin.so DESTINATION ${PROJECT_SOURCE_DIR}/../build/libs/linux/usr/local/lib)
     install(FILES /usr/local/lib/libquoteplugin.so DESTINATION ${PROJECT_SOURCE_DIR}/../build/libs/linux/usr/local/lib)
