@@ -478,8 +478,8 @@ void XtpQuote::OnDepthMarketData2(XTPMD *market_data, int64_t bid1_qty[], int32_
 
     double bid[10];
     double ask[10];
-    long bidQty[10];
-    long askQty[10];
+    long long bidQty[10];
+    long long askQty[10];
     for (int i=0; i<10; i++) {
         bid[i] = market_data->bid[i];
         ask[i] = market_data->ask[i];
@@ -754,8 +754,8 @@ void XtpQuote::DoOrderBook(XTPOB *order_book, JNIEnv* env, jmethodID jm_event) {
 
     double bid[10];
     double ask[10];
-    long bidQty[10];
-    long askQty[10];
+    long long bidQty[10];
+    long long askQty[10];
     for (int i=0; i<10; i++) {
         bid[i] = order_book->bid[i];
         ask[i] = order_book->ask[i];
