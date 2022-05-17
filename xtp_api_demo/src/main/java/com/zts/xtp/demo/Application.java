@@ -1,9 +1,9 @@
-package com.zts.xtp.demo;
+package src.main.java.com.zts.xtp.demo;
 
 import com.zts.xtp.common.jni.JNILoadLibrary;
-import com.zts.xtp.demo.quote.QuoteDemo;
-import com.zts.xtp.demo.trade.TradeDemo;
-import com.zts.xtp.userInfo.User;
+import src.main.java.com.zts.xtp.demo.quote.QuoteDemo;
+import src.main.java.com.zts.xtp.demo.trade.TradeDemo;
+import src.main.java.com.zts.xtp.userInfo.User;
 
 public class Application {
 
@@ -19,6 +19,8 @@ public class Application {
     private static final String ACCOUNT = User.userName;//xtp资金账号
     private static final String PASSWORD = User.userPwd;//xtp密码
     private static final String DATA_FOLDER = User.logFolder;//java api输出日志的本地目录
+    private static final int THREAD_NUM = User.threadNum;//接收行情的线程数
+    private static final int RING_BUFFER_SIZE = User.ringBufferSize;//接收行情每一个线程数据缓冲区大小
 
     private static TradeDemo tradeDemo;
     private static QuoteDemo quoteDemo;
@@ -30,7 +32,7 @@ public class Application {
             ACCOUNT, PASSWORD, CLIENT_ID, TRADE_KEY, DATA_FOLDER);
 
         quoteDemo = new QuoteDemo(XTP_QUOTE_SERVER_IP, XTP_QUOTE_SERVER_PORT,
-            ACCOUNT, PASSWORD, CLIENT_ID, DATA_FOLDER);
+            ACCOUNT, PASSWORD, CLIENT_ID, DATA_FOLDER, THREAD_NUM, RING_BUFFER_SIZE);
 
         return tradeDemo.isLogin() && quoteDemo.isLogin();
     }
@@ -52,7 +54,7 @@ public class Application {
         }
 
         quoteDemo.testSubscribeMarketData();
-        tradeDemo.testInsertOrder();
+//        tradeDemo.testInsertOrder();
 
         shutdown();
     }

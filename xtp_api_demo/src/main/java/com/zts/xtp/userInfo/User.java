@@ -1,4 +1,4 @@
-package com.zts.xtp.userInfo;
+package src.main.java.com.zts.xtp.userInfo;
 
 import com.zts.xtp.common.enums.TransferProtocol;
 
@@ -27,6 +27,8 @@ public class User {
     public static int quoteServerPort;
     public static TransferProtocol quoteTransferProtocol;
     public static int udpBufferSize;
+    public static int threadNum;
+    public static int ringBufferSize;
 
 
     //    public static void main(String args[]) {
@@ -63,6 +65,8 @@ public class User {
         else
             quoteTransferProtocol = TransferProtocol.XTP_PROTOCOL_TCP;
         udpBufferSize = Integer.parseInt(User.getValue("udpBufferSize"));
+        threadNum = Integer.parseInt(User.getValue("threadNum"));
+        ringBufferSize = Integer.parseInt(User.getValue("ringBufferSize"));
 
     }
 
