@@ -120,37 +120,37 @@ public interface QuoteSpi {
 
     /**
      * 逐笔委托行情通知  需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线
-     * @param exchange_id 交易所代码   1:深圳   2:上海   3:未知
+     * @param exchange_id 交易所代码   1:上证   2:深证  3:未知
      * @param ticker 合约代码（不包含交易所信息）
-     * @param seq 预留
-     * @param data_time 委托时间 or 成交时间
-     * @param type 委托 or 成交   1:委托    2:成交
+     * @param seq SH: 业务序号（委托成交统一编号，同一个channel_no内连续，此seq区别于联合体内的seq，channel_no等同于联合体内的channel_no）   SZ: 无意义
+     * @param data_time 委托时间
+     * @param type 1:逐笔委托
      * @param channel_no 频道代码
-     * @param order_seq 委托序号(在同一个channel_no内唯一，从1开始连续)
+     * @param order_seq SH: 委托序号(委托单独编号, 同一channel_no内连续)      SZ: 委托序号(委托成交统一编号, 同一channel_no内连续)
      * @param price 委托价格
-     * @param qty 委托数量
-     * @param side 方向  '1':买; '2':卖; 'G':借入; 'F':出借
-     * @param ord_type 订单类别  '1': 市价; '2': 限价; 'U': 本方最优
+     * @param qty SH: 剩余委托数量(balance)   SZ: 委托数量
+     * @param side SH: 'B':买; 'S':卖    SZ: '1':买; '2':卖; 'G':借入; 'F':出借
+     * @param ord_type SH: 'A': 增加; 'D': 删除    SZ: 订单类别: '1': 市价; '2': 限价; 'U': 本方最优
      */
     void onTickByTickEntrust(int exchange_id,String ticker,long seq,long data_time,int type,int channel_no,long order_seq,double price,long qty, char side,char ord_type);
 
     /**
      * 逐笔成交行情通知  需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线
-     * @param exchange_id 交易所代码   1:深圳   2:上海   3:未知
+     * @param exchange_id 交易所代码   1:上证   2:深证   3:未知
      * @param ticker 合约代码（不包含交易所信息）
-     * @param seq 预留
-     * @param data_time 委托时间 or 成交时间
-     * @param type 委托 or 成交   1:委托    2:成交
+     * @param seq SH: 业务序号（委托成交统一编号，同一个channel_no内连续，此seq区别于联合体内的seq，channel_no等同于联合体内的channel_no）   SZ: 无意义
+     * @param data_time 成交时间
+     * @param type 2:逐笔成交
      * @param channel_no 频道代码
-     * @param order_seq 委托序号(在同一个channel_no内唯一，从1开始连续)
-     * @param price 委托价格
-     * @param qty 委托数量
+     * @param trade_seq SH: 成交序号(成交单独编号, 同一channel_no内连续)   SZ: 成交序号(委托成交统一编号, 同一channel_no内连续)
+     * @param price 成交价格
+     * @param qty 成交量
      * @param money 成交金额(仅适用上交所)
      * @param bid_no 买方订单号
      * @param ask_no 卖方订单号
-     * @param trade_flag 上海: 内外盘标识('B':主动买; 'S':主动卖; 'N':未知)   深圳: 成交标识('4':撤; 'F':成交)
+     * @param trade_flag SH: 内外盘标识('B':主动买; 'S':主动卖; 'N':未知)   SZ: 成交标识('4':撤; 'F':成交)
      */
-     void onTickByTickTrade(int exchange_id,String ticker,long seq,long data_time,int type,int channel_no,long order_seq,double price,long qty, double money,long bid_no,long ask_no,char trade_flag);
+     void onTickByTickTrade(int exchange_id,String ticker,long seq,long data_time,int type,int channel_no,long trade_seq,double price,long qty, double money,long bid_no,long ask_no,char trade_flag);
 
     /**
      * 订阅全市场的行情应答
