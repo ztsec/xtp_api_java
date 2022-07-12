@@ -29,6 +29,7 @@ public class User {
     public static int udpBufferSize;
     public static int threadNum;
     public static int ringBufferSize;
+    public static int fullMarketDataAvailable;
 
 
     //    public static void main(String args[]) {
@@ -54,6 +55,7 @@ public class User {
         userPwd = User.getValue("userPwd");
         threadNum = Integer.parseInt(User.getValue("threadNum"));
         ringBufferSize = Integer.parseInt(User.getValue("ringBufferSize"));
+        fullMarketDataAvailable = Integer.parseInt(User.getValue("fullMarketDataAvailable"));
         String protocol = User.getValue("tradeTransferProtocol");
         if("udp".equals(protocol))
             tradeTransferProtocol = TransferProtocol.XTP_PROTOCOL_UDP;

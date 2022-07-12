@@ -31,13 +31,14 @@ public class QuoteApiTest {
     private static final int UDPBUFFERSIZE = User.udpBufferSize;//如果是udp协议，需要设置缓冲区
     private static final int THREAD_NUM = User.threadNum;//接收行情的线程数
     private static final int RING_BUFFERZ_SIZE = User.ringBufferSize;//接收行情每个线程的缓冲区大小
+    private static final int FULL_MARKET_DATA_AVAILABLE = User.fullMarketDataAvailable;
 
     @BeforeClass
     public static void setUp() throws Exception {
         JNILoadLibrary.loadLibrary();
         TestQuoteSpi testspi = new TestQuoteSpi();
         quoteApi = new QuoteApi(testspi);
-        quoteApi.init(CLIENT_ID,DATA_FOLDER,XtpLogLevel.XTP_LOG_LEVEL_INFO, JniLogLevel.JNI_LOG_LEVEL_INFO, THREAD_NUM, RING_BUFFERZ_SIZE);
+        quoteApi.init(CLIENT_ID,DATA_FOLDER,XtpLogLevel.XTP_LOG_LEVEL_INFO, JniLogLevel.JNI_LOG_LEVEL_INFO, THREAD_NUM, RING_BUFFERZ_SIZE, FULL_MARKET_DATA_AVAILABLE);
         quoteApi.setUDPBufferSize(UDPBUFFERSIZE);
 //        quoteApi.setHeartBeatInterval(60*10);
         int login_result = quoteApi.login(XTP_QUOTE_SERVER_IP,XTP_QUOTE_SERVER_PORT,ACCOUNT,PASSWORD,TransferProtocol.XTP_PROTOCOL_TCP, "10.25.26.27");//XTP_PROTOCOL_TCP
@@ -81,7 +82,7 @@ public class QuoteApiTest {
     @Test
     public void subscribeMarketData() {
         System.out.println("subscribeMarketData");
-        quoteApi.subscribeMarketData(new String[]{"600519"},1,1);//20008025
+        quoteApi.subscribeMarketData(new String[]{"186080"},1,1);//20008025
     }
 
     /**

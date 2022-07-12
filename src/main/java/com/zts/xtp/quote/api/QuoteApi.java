@@ -32,8 +32,11 @@ public class QuoteApi {
      * @param logFolder 日志输出的目录，请设定一个真实存在的有可写权限的路径
      * @param xtpAPIlogLevel xtp api 日志输出级别
      * @param jniLogLevel  jni c++部分的日志级别
+     * @param threadNum
+     * @param ringBufferSize
+     * @param fullMarketDataAvailable
      */
-    public void init(short clientId, String logFolder, XtpLogLevel xtpAPIlogLevel, JniLogLevel jniLogLevel, int threadNum, int ringBufferSize){
+    public void init(short clientId, String logFolder, XtpLogLevel xtpAPIlogLevel, JniLogLevel jniLogLevel, int threadNum, int ringBufferSize, int fullMarketDataAvailable){
         if(!JNILoadLibrary.glogHasInited){
             JNILoadLibrary.glogHasInited = true;
             //init glog
@@ -56,7 +59,7 @@ public class QuoteApi {
 
             initGlog(logFolder,logSubFolder,strJniLogLevel);
         }
-        quoteInit(clientId,logFolder,xtpAPIlogLevel,threadNum,ringBufferSize);
+        quoteInit(clientId,logFolder,xtpAPIlogLevel,threadNum,ringBufferSize, fullMarketDataAvailable);
     }
 
     /**
@@ -75,7 +78,7 @@ public class QuoteApi {
      * @param threadNum 处理行情的线程数，取值范围1~16
      * @param ringBufferSize 每个处理行情的线程，行情数据缓冲区大小，取值范围1024~1024*256
      */
-    private native void quoteInit(short clientId, String logFolder,XtpLogLevel logLevel,int threadNum,int ringBufferSize);
+    private native void quoteInit(short clientId, String logFolder,XtpLogLevel logLevel,int threadNum,int ringBufferSize, int fullMarketDataAvailable);
 
     /**
      * 断开于xtp连接
@@ -341,6 +344,37 @@ public class QuoteApi {
         quoteSpi.onDepthMarketData(exchangeType, ticker, lastPrice, preClosePrice, openPrice,
                 highPrice, lowPrice, closePrice, upperLimitPrice, lowerLimitPrice, dataTime, qty,
                 turnover, avgPrice, bid, ask, bidQty, askQty, tradesCount, tickerStatus, stkIopv, dataType, stkEx, optionEx, bondEx);
+    }
+
+    private void onDepthFullMarketData(int exchangeType,int nTicker,int nTickerLength,double lastPrice,double preClosePrice,double openPrice,
+                                   double highPrice,double lowPrice,double closePrice,double upperLimitPrice,
+                                   double lowerLimitPrice,long dataTime,long qty,double turnover,double avgPrice,
+                                   double bid1,double bid2, double bid3,double bid4,double bid5,double bid6,double bid7,double bid8,double bid9,double bid10,
+                                   double ask1,double ask2, double ask3,double ask4,double ask5,double ask6,double ask7,double ask8,double ask9,double ask10,
+                                   long bidQty1,long bidQty2,long bidQty3,long bidQty4,long bidQty5,long bidQty6,long bidQty7,long bidQty8,long bidQty9,long bidQty10,
+                                   long askQty1,long askQty2,long askQty3,long askQty4,long askQty5,long askQty6,long askQty7,long askQty8,long askQty9,long askQty10,
+                                   long tradesCount,String tickerStatus,double stkIopv, int dataType, MarketDataStockExDataResponse stkEx,
+                                   MarketDataOptionExDataResponse optionEx, MarketDataBondExDataResponse bondEx, long[] bid1Qty, int bid1Count,
+                                   int maxBid1Count, long[] ask1Qty, int ask1Count, int maxAsk1Count) {
+
+        String ticker = "";
+        if (exchangeType == 1) {
+            ticker = tickerStringMapCache.getTickerFromTickerStringMapCache(nTicker, nTickerLength, 2);
+        } else if (exchangeType == 2) {
+            ticker = tickerStringMapCache.getTickerFromTickerStringMapCache(nTicker, nTickerLength, 1);
+        } else {
+            ticker = tickerStringMapCache.getTickerFromTickerStringMapCache(nTicker, nTickerLength, exchangeType);
+        }
+
+        double bid[] = new double[]{bid1,bid2,bid3,bid4,bid5,bid6,bid7,bid8,bid9,bid10};
+        double ask[] = new double[]{ask1,ask2,ask3,ask4,ask5,ask6,ask7,ask8,ask9,ask10};
+        long bidQty[] = new long[]{bidQty1,bidQty2,bidQty3,bidQty4,bidQty5,bidQty6,bidQty7,bidQty8,bidQty9,bidQty10};
+        long askQty[] = new long[]{askQty1,askQty2,askQty3,askQty4,askQty5,askQty6,askQty7,askQty8,askQty9,askQty10};
+
+        quoteSpi.onDepthFullMarketData(exchangeType, ticker, lastPrice, preClosePrice, openPrice,
+                highPrice, lowPrice, closePrice, upperLimitPrice, lowerLimitPrice, dataTime, qty,
+                turnover, avgPrice, bid, ask, bidQty, askQty, tradesCount, tickerStatus, stkIopv,
+                dataType, stkEx, optionEx, bondEx, bid1Qty, bid1Count, maxBid1Count, ask1Qty, ask1Count, maxAsk1Count);
     }
 
     private void onSubOrderBook(SpecificTickerResponse rsp, ErrorMessage errorMessage) {

@@ -197,6 +197,30 @@ public class TestQuoteSpi implements QuoteSpi {
     }
 
     @Override
+    public void onDepthFullMarketData(int exchangeType,String ticker,double lastPrice,double preClosePrice,double openPrice,
+                                      double highPrice,double lowPrice,double closePrice,double upperLimitPrice,
+                                      double lowerLimitPrice,long dataTime,long qty,double turnover,double avgPrice,double[] bid,
+                                      double[] ask,long[] bidQty,long[] askQty,long tradesCount,String tickerStatus,double stkIopv,
+                                      int dataType, MarketDataStockExDataResponse stkEx, MarketDataOptionExDataResponse optionEx,
+                                      MarketDataBondExDataResponse bondEx, long[] bid1Qty, int bid1Count, int maxBid1Count,
+                                      long[] ask1Qty, int ask1Count, int maxAsk1Count) {
+        System.out.println("TestQuoteApi onDepthFullMarketData");
+        System.out.println("ticker: " + ticker);
+        System.out.println("exchangeType: " + exchangeType);
+//        System.out.println(bid[0]);
+//        System.out.println(ask[0]);
+//        System.out.println(bidQty[1]);
+//        System.out.println(askQty[1]);
+        System.out.println("bid1Qty[0]: " + bid1Qty[0]);
+//        System.out.println("bid1Count: " + bid1Count);
+//        System.out.println("maxBid1Count: " + maxBid1Count);
+        System.out.println("ask1Qty[0]: " + ask1Qty[0]);
+//        System.out.println("ask1Count: " + ask1Count);
+//        System.out.println("maxAsk1Count: " + maxAsk1Count);
+
+    }
+
+    @Override
     public void onError(ErrorMessage errorMessage) {
         System.out.println("onerror:"+errorMessage.getErrorMsg());
     }

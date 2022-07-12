@@ -18,10 +18,10 @@ JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_initGlog
 /*
  * Class:     com_zts_xtp_quote_api_QuoteApi
  * Method:    quoteInit
- * Signature: (SLjava/lang/String;Lcom/zts/xtp/common/enums/XtpLogLevel;II)V
+ * Signature: (SLjava/lang/String;Lcom/zts/xtp/common/enums/XtpLogLevel;III)V
  */
 JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_quoteInit
-  (JNIEnv *, jobject, jshort, jstring, jobject, jint, jint);
+  (JNIEnv *, jobject, jshort, jstring, jobject, jint, jint, jint);
 
 /*
  * Class:     com_zts_xtp_quote_api_QuoteApi

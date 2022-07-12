@@ -93,7 +93,7 @@ add_library(quoteplugin SHARED
         src/InitGlog.cpp
         src/XtpQuoteAdapter.cpp
         src/XtpQuoteApi.cpp
-        )
+        src/include/xquote_market_data_struct.h)
 IF (WIN32)
     #copy tradeplugin quoteplugin to os lib path
 #    TARGET_LINK_LIBRARIES(tradeplugin xtptraderapi.dll glog.dll )

@@ -42,15 +42,17 @@ void copy_tickers(JNIEnv *env,jobjectArray tickers,char *pTickers[],int count)
 }
 
 JNIEXPORT void JNICALL Java_com_zts_xtp_quote_api_QuoteApi_quoteInit(JNIEnv *env,
-    jobject obj, jshort clientId, jstring logFolder, jobject jLogLevel, jint threadNum, jint ringBufferSize)
+    jobject obj, jshort clientId, jstring logFolder, jobject jLogLevel, jint threadNum, jint ringBufferSize, jint fullMarketDataAvailable)
 {
-    XtpQuote *pquote = new XtpQuote(threadNum, ringBufferSize);
+    XtpQuote *pquote = new XtpQuote(threadNum, ringBufferSize, fullMarketDataAvailable);
     pquote->setClientId(clientId);
+//    pquote->setFullMarketDataAvailable(fullMarketDataAvailable);
     const char *char_xtp_data_folder = env->GetStringUTFChars(logFolder, 0);
     pquote->setFilePath(char_xtp_data_folder);
 
     LOG(ERROR) << "threadNum: " << threadNum;
     LOG(ERROR) << "ringBufferSize: " << ringBufferSize;
+    LOG(ERROR) << "fullMarketDataAvailable: " << fullMarketDataAvailable;
 
     JavaVM* jvm;
     env->GetJavaVM(&jvm);

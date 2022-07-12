@@ -17,6 +17,8 @@
 
 #include <time.h>
 
+#include "xquote_market_data_struct.h"
+
 //#define COUNT_QUOTE         //输出queue_deep_log，输出各个缓冲区内的行情数据个数，并计算均值和方差(间隔10s)
 
 
@@ -56,6 +58,7 @@ private:
     RingBuffer<XTPMD>** queue_;
     RingBuffer<XTPOB>** queue_order_book_;
     RingBuffer<XTPTBT>** queue_ticker_;
+    RingBuffer<XTPFMD>** queue_full_;
 
     bool live_;
     int64_t count_;
@@ -102,6 +105,7 @@ private:
     uint64_t thread_num_max_ = 16;
     uint64_t ring_buffer_size_min_ = 1024;
     uint64_t ring_buffer_size_max_ = 1024 * 256;
+    uint16_t full_market_data_available_;
 
 //    struct timeval time_start_;
 
@@ -118,6 +122,8 @@ public:
                            int64_t ask1_qty[], int32_t ask1_count, int32_t max_ask1_count);
 
     void OnDepthMarketData1(XTPMD *market_data);
+
+    void OnDepthFullMarketData(XTPFMD *full_market_data, JNIEnv* env2 = NULL, jmethodID jm_event = NULL);
 
     void OnDepthMarketData2(XTPMD *market_data, int64_t bid1_qty[], int32_t bid1_count, int32_t max_bid1_count,
                             int64_t ask1_qty[], int32_t ask1_count, int32_t max_ask1_count, JNIEnv* env2 = NULL,
@@ -232,14 +238,17 @@ public:
 
     void setClientId(uint16_t client_id) { client_id_ = client_id; }
 
-
     uint16_t getClientId() { return client_id_; }
 
     void setFilePath(const char *file_path) { file_path_ = file_path; }
 
     const char *getFilePath() { return (file_path_.c_str()); }
 
-    XtpQuote(uint64_t thread_num, uint64_t ring_buffer_size);
+    void setFullMarketDataAvailable(uint16_t full_market_data_available) { full_market_data_available_ = full_market_data_available; }
+
+    uint8_t getFullMarketDataAvailabled() { return full_market_data_available_; }
+
+    XtpQuote(uint64_t thread_num, uint64_t ring_buffer_size, uint16_t ful_marke_data_available);
 
     ~XtpQuote();
 

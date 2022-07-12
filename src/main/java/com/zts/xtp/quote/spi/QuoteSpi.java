@@ -74,6 +74,42 @@ public interface QuoteSpi {
                            MarketDataBondExDataResponse bondEx);
 
     /**
+     *
+     * @param exchangeType
+     * @param ticker
+     * @param lastPrice
+     * @param preClosePrice
+     * @param openPrice
+     * @param highPrice
+     * @param lowPrice
+     * @param closePrice
+     * @param upperLimitPrice
+     * @param lowerLimitPrice
+     * @param dataTime
+     * @param qty
+     * @param turnover
+     * @param avgPrice
+     * @param bid
+     * @param ask
+     * @param bidQty
+     * @param askQty
+     * @param tradesCount
+     * @param tickerStatus
+     * @param stkIopv
+     * @param dataType
+     * @param stkEx
+     * @param optionEx
+     * @param bondEx
+     */
+    void onDepthFullMarketData(int exchangeType,String ticker,double lastPrice,double preClosePrice,double openPrice,
+                           double highPrice,double lowPrice,double closePrice,double upperLimitPrice,
+                           double lowerLimitPrice,long dataTime,long qty,double turnover,double avgPrice,double[] bid,
+                           double[] ask,long[] bidQty,long[] askQty,long tradesCount,String tickerStatus,double stkIopv,
+                           int dataType, MarketDataStockExDataResponse stkEx, MarketDataOptionExDataResponse optionEx,
+                           MarketDataBondExDataResponse bondEx, long[] bid1Qty, int bid1Count, int maxBid1Count,
+                           long[] ask1Qty, int ask1Count, int maxAsk1Count);
+
+    /**
      * 订阅行情订单簿应答 <p> 每条订阅的合约均对应一条订阅应答，需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线
      * @param ticker 详细的合约订阅情况
      * @param errorMessage 订阅合约发生错误时的错误信息，当error_info为空，或者error_info.error_id为0时，表明没有错误

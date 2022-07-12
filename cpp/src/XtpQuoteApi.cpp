@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <math.h>
 #include <exception>
+#include <string.h>
 
 using namespace std;
 
@@ -39,9 +40,9 @@ double get_stdev(std::vector<int64_t>& vec)
     return stdev;
 }
 
-XtpQuote::XtpQuote(uint64_t thread_num, uint64_t ring_buffer_size)
+XtpQuote::XtpQuote(uint64_t thread_num, uint64_t ring_buffer_size, uint16_t full_market_data_available)
     :live_(true),count_(0),marketdata_available_(false),quote_thread_available_(false),
-     thread_num_(thread_num), ring_buffer_size_(ring_buffer_size)
+     thread_num_(thread_num), ring_buffer_size_(ring_buffer_size), full_market_data_available_(full_market_data_available)
 {
     server_ip_ = "";
     server_port_ = 0;
@@ -82,10 +83,19 @@ XtpQuote::XtpQuote(uint64_t thread_num, uint64_t ring_buffer_size)
 
     queue_lock_ = new std::mutex[thread_num_];
     queue_lock_order_book_ = new std::mutex[thread_num_];
-    queue_ = new RingBuffer<XTPMD>*[thread_num_];
-    for(int i=0; i<thread_num_; i++)
-    {
-        queue_[i] = new RingBuffer<XTPMD>(ring_buffer_size_);
+    //
+    if (full_market_data_available_ == 1) {
+        queue_full_ = new RingBuffer<XTPFMD>*[thread_num_];
+        for(int i=0; i<thread_num_; i++)
+        {
+            queue_full_[i] = new RingBuffer<XTPFMD>(ring_buffer_size_);
+        }
+    } else {
+        queue_ = new RingBuffer<XTPMD>*[thread_num_];
+        for(int i=0; i<thread_num_; i++)
+        {
+            queue_[i] = new RingBuffer<XTPMD>(ring_buffer_size_);
+        }
     }
 
     queue_order_book_ = new RingBuffer<XTPOB>*[thread_num_];
@@ -390,11 +400,39 @@ void XtpQuote::OnDepthMarketData(XTPMD *market_data, int64_t bid1_qty[], int32_t
         id = id%thread_num_;
         {
             auto ret = true;
-            ret = queue_[id]->push(market_data);
-            if(!ret)
-                LOG(ERROR) << "queue_[" << id << "] push failed for RingBuffer isFull";
-            if(queue_[id]->isEmpty())
-                LOG(ERROR) << "queue_[" << id << "] push success; and RingBuffer`s rear[" << queue_[id]->rear() << "] pass its front["<< queue_[id]->front() <<"]";
+            //
+            if (full_market_data_available_ == 1) {
+                XTPFMD full_market_data;
+                memset(&full_market_data,0, sizeof(XTPFMD));
+
+                full_market_data.market_data = *market_data;
+
+                full_market_data.bid1_count = bid1_count;
+                full_market_data.max_bid1_count = max_bid1_count;
+                full_market_data.ask1_count = ask1_count;
+                full_market_data.max_ask1_count = max_ask1_count;
+
+                if ( bid1_qty != nullptr && ask1_qty != nullptr) {
+                    copy(bid1_qty, bid1_qty+(sizeof(bid1_qty)), full_market_data.bid1_qty);
+                    memcpy(&full_market_data.ask1_qty, &ask1_qty, sizeof(ask1_qty)* sizeof(int64_t));
+                    copy(ask1_qty, ask1_qty+(sizeof(ask1_qty)), full_market_data.ask1_qty);
+                }
+
+                ret = queue_full_[id]->push(full_market_data);
+
+                if(!ret)
+                    LOG(ERROR) << "queue_full_[" << id << "] push failed for RingBuffer is full";
+                if(queue_full_[id]->isEmpty())
+                    LOG(ERROR) << "queue_full_[" << id << "] push success; and RingBuffer`s rear[" << queue_full_[id]->rear() << "] pass its front["<< queue_full_[id]->front() <<"]";
+            } else {
+                ret = queue_[id]->push(market_data);
+
+                if(!ret)
+                    LOG(ERROR) << "queue_[" << id << "] push failed for RingBuffer is full";
+                if(queue_[id]->isEmpty())
+                    LOG(ERROR) << "queue_[" << id << "] push success; and RingBuffer`s rear[" << queue_[id]->rear() << "] pass its front["<< queue_[id]->front() <<"]";
+            }
+
         }
     }
 
@@ -415,42 +453,246 @@ void XtpQuote::DealDepthMarketData(int64_t id)
     int mask = 10000;
     int64_t id_ = id;
 
+    //
     XTPMD market_data;
+    XTPFMD full_market_data;
     while(live_)
     {
-        while (!queue_[id_]->isEmpty())
-        {
+        //
+        if (full_market_data_available_ == 1) {
+            while (!queue_full_[id_]->isEmpty())
             {
-                auto ret = queue_[id_]->pop(market_data);
-
-                if(!ret)
                 {
-                    LOG(ERROR) << "queue_[" << id << "] pop failed for RingBuffer`s rear[" << queue_[id_]->rear() << "] pass its front["<< queue_[id_]->front() <<"]";
-                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
-                    continue;
+                    auto ret = queue_full_[id_]->pop(full_market_data);
+
+                    if(!ret)
+                    {
+                        LOG(ERROR) << "queue_full_[" << id << "] pop failed for RingBuffer`s rear[" << queue_full_[id_]->rear() << "] pass its front["<< queue_full_[id_]->front() <<"]";
+                        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                        continue;
+                    }
                 }
-            }
 
-            if(count%mask == 0)
-            {
-                env = preInvoke();
-                pluginClass = env->GetObjectClass(quote_plugin_obj_);
-                assert(pluginClass != NULL);
-                jm_event = env->GetMethodID(pluginClass, "onDepthMarketData","(IIIDDDDDDDDJJDDDDDDDDDDDDDDDDDDDDDDJJJJJJJJJJJJJJJJJJJJJLjava/lang/String;DILcom/zts/xtp/quote/model/response/MarketDataStockExDataResponse;Lcom/zts/xtp/quote/model/response/MarketDataOptionExDataResponse;Lcom/zts/xtp/quote/model/response/MarketDataBondExDataResponse;)V");
+                if(count%mask == 0)
+                {
+                    env = preInvoke();
+                    pluginClass = env->GetObjectClass(quote_plugin_obj_);
+                    assert(pluginClass != NULL);
+                    jm_event = env->GetMethodID(pluginClass, "onDepthFullMarketData","(IIIDDDDDDDDJJDDDDDDDDDDDDDDDDDDDDDDJJJJJJJJJJJJJJJJJJJJJLjava/lang/String;DILcom/zts/xtp/quote/model/response/MarketDataStockExDataResponse;Lcom/zts/xtp/quote/model/response/MarketDataOptionExDataResponse;Lcom/zts/xtp/quote/model/response/MarketDataBondExDataResponse;[JII[JII)V");
 
+                }
+
+                OnDepthFullMarketData(&full_market_data, env, jm_event);
+                if(count%mask == mask-1)
+                {
+                    jvm_->DetachCurrentThread();
+                    env = NULL;
+                }
+                count++;
             }
-            OnDepthMarketData2(&market_data, 0, 0, 0, 0, 0, 0, env, jm_event);
-            if(count%mask == mask-1)
+        } else {
+            while (!queue_[id_]->isEmpty())
             {
-                jvm_->DetachCurrentThread();
-                env = NULL;
+                {
+                    auto ret = queue_[id_]->pop(market_data);
+
+                    if(!ret)
+                    {
+                        LOG(ERROR) << "queue_[" << id << "] pop failed for RingBuffer`s rear[" << queue_[id_]->rear() << "] pass its front["<< queue_[id_]->front() <<"]";
+                        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                        continue;
+                    }
+                }
+
+                if(count%mask == 0)
+                {
+                    env = preInvoke();
+                    pluginClass = env->GetObjectClass(quote_plugin_obj_);
+                    assert(pluginClass != NULL);
+                    jm_event = env->GetMethodID(pluginClass, "onDepthMarketData","(IIIDDDDDDDDJJDDDDDDDDDDDDDDDDDDDDDDJJJJJJJJJJJJJJJJJJJJJLjava/lang/String;DILcom/zts/xtp/quote/model/response/MarketDataStockExDataResponse;Lcom/zts/xtp/quote/model/response/MarketDataOptionExDataResponse;Lcom/zts/xtp/quote/model/response/MarketDataBondExDataResponse;)V");
+
+                }
+                OnDepthMarketData2(&market_data, 0, 0, 0, 0, 0, 0, env, jm_event);
+                if(count%mask == mask-1)
+                {
+                    jvm_->DetachCurrentThread();
+                    env = NULL;
+                }
+                count++;
             }
-            count++;
         }
+
         std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
     if(env != NULL)
     {
+        jvm_->DetachCurrentThread();
+    }
+}
+
+//
+void XtpQuote::OnDepthFullMarketData(XTPFMD *full_market_data, JNIEnv* env2, jmethodID jm_event2) {
+
+    JNIEnv* env;
+    jmethodID jm_event;
+    if(env2==NULL || (jvm_->GetEnv((void **)&env2, JNI_VERSION_1_8) != JNI_OK))
+    {
+        env = preInvoke();
+        jclass pluginClass = env->GetObjectClass(quote_plugin_obj_);
+        assert(pluginClass != NULL);
+        jm_event = env->GetMethodID(pluginClass, "onDepthFullMarketData","(IIIDDDDDDDDJJDDDDDDDDDDDDDDDDDDDDDDJJJJJJJJJJJJJJJJJJJJJLjava/lang/String;DILcom/zts/xtp/quote/model/response/MarketDataStockExDataResponse;Lcom/zts/xtp/quote/model/response/MarketDataOptionExDataResponse;Lcom/zts/xtp/quote/model/response/MarketDataBondExDataResponse;[JII[JII)V");
+
+    } else {
+        env = env2;
+        jm_event = jm_event2;
+    }
+
+    uint32_t nTicker = atol(full_market_data->market_data.ticker);
+    uint32_t nTickerLength = strlen(full_market_data->market_data.ticker);
+
+    jstring jstr_ticker_status = env->NewStringUTF(full_market_data->market_data.ticker_status);
+
+    double bid[10];
+    double ask[10];
+    long long bidQty[10];
+    long long askQty[10];
+    for (int i=0; i<10; i++) {
+        bid[i] = full_market_data->market_data.bid[i];
+        ask[i] = full_market_data->market_data.ask[i];
+        bidQty[i] = full_market_data->market_data.bid_qty[i];
+        askQty[i] = full_market_data->market_data.ask_qty[i];
+    }
+
+    //md ex data
+    jobject mdseObj = NULL;
+    jobject mdoeObj = NULL;
+    jobject mdbeObj = NULL;
+    jmethodID mdseConstr = env->GetMethodID(xtp_market_data_se_class_, "<init>","()V");
+    jmethodID mdoeConstr = env->GetMethodID(xtp_market_data_oe_class_, "<init>","()V");
+    jmethodID mdbeConstr = env->GetMethodID(xtp_market_data_be_class_, "<init>","()V");
+    if (mdseConstr == NULL || mdoeConstr == NULL || mdbeConstr == NULL) {
+        jvm_->DetachCurrentThread();
+        return;
+    }
+    mdseObj = env->NewObject(xtp_market_data_se_class_, mdseConstr);
+    mdoeObj = env->NewObject(xtp_market_data_oe_class_, mdoeConstr);
+    mdbeObj = env->NewObject(xtp_market_data_be_class_, mdbeConstr);
+    if (mdseObj == NULL || mdoeObj == NULL || mdbeObj == NULL) {
+        jvm_->DetachCurrentThread();
+        return;
+    }
+
+    jlongArray jarray_setBid1Qty = env->NewLongArray(50);
+    env->SetLongArrayRegion(jarray_setBid1Qty, 0, 50,  (jlong *)full_market_data->bid1_qty);
+
+    jlongArray jarray_setAsk1Qty = env->NewLongArray(50);
+    env->SetLongArrayRegion(jarray_setAsk1Qty, 0, 50,  (jlong *)full_market_data->ask1_qty);
+
+    if (full_market_data->market_data.data_type_v2 == XTP_MARKETDATA_V2_ACTUAL) {
+        generateMarketDataSeObj(env, mdseObj, &full_market_data->market_data);
+        env->CallVoidMethod(quote_plugin_obj_, jm_event, full_market_data->market_data.exchange_id, nTicker, nTickerLength, full_market_data->market_data.last_price,
+                            full_market_data->market_data.pre_close_price, full_market_data->market_data.open_price, full_market_data->market_data.high_price,
+                            full_market_data->market_data.low_price, full_market_data->market_data.close_price, full_market_data->market_data.upper_limit_price,
+                            full_market_data->market_data.lower_limit_price, full_market_data->market_data.data_time, full_market_data->market_data.qty,
+                            full_market_data->market_data.turnover, full_market_data->market_data.avg_price,
+                            bid[0], bid[1], bid[2], bid[3], bid[4], bid[5], bid[6],bid[7], bid[8], bid[9],
+                            ask[0], ask[1], ask[2], ask[3], ask[4], ask[5], ask[6],ask[7], ask[8], ask[9],
+                            bidQty[0], bidQty[1], bidQty[2], bidQty[3], bidQty[4], bidQty[5], bidQty[6],bidQty[7], bidQty[8], bidQty[9],
+                            askQty[0], askQty[1], askQty[2], askQty[3], askQty[4], askQty[5], askQty[6],askQty[7], askQty[8], askQty[9],
+                            full_market_data->market_data.trades_count, jstr_ticker_status, full_market_data->market_data.stk.iopv, full_market_data->market_data.data_type_v2,
+                            mdseObj, mdoeObj, mdbeObj, jarray_setBid1Qty, full_market_data->bid1_count, full_market_data->max_bid1_count,
+                            jarray_setAsk1Qty, full_market_data->ask1_count, full_market_data->max_ask1_count);
+    }
+    if (full_market_data->market_data.data_type_v2 == XTP_MARKETDATA_V2_OPTION) {
+        generateMarketDataOeObj(env, mdoeObj, &full_market_data->market_data);
+
+        env->CallVoidMethod(quote_plugin_obj_, jm_event, full_market_data->market_data.exchange_id, nTicker, nTickerLength, full_market_data->market_data.last_price,
+                            full_market_data->market_data.pre_close_price, full_market_data->market_data.open_price, full_market_data->market_data.high_price,
+                            full_market_data->market_data.low_price, full_market_data->market_data.close_price, full_market_data->market_data.upper_limit_price,
+                            full_market_data->market_data.lower_limit_price, full_market_data->market_data.data_time, full_market_data->market_data.qty,
+                            full_market_data->market_data.turnover, full_market_data->market_data.avg_price,
+                            bid[0], bid[1], bid[2], bid[3], bid[4], bid[5], bid[6],bid[7], bid[8], bid[9],
+                            ask[0], ask[1], ask[2], ask[3], ask[4], ask[5], ask[6],ask[7], ask[8], ask[9],
+                            bidQty[0], bidQty[1], bidQty[2], bidQty[3], bidQty[4], bidQty[5], bidQty[6],bidQty[7], bidQty[8], bidQty[9],
+                            askQty[0], askQty[1], askQty[2], askQty[3], askQty[4], askQty[5], askQty[6],askQty[7], askQty[8], askQty[9],
+                            full_market_data->market_data.trades_count, jstr_ticker_status, 0.0, full_market_data->market_data.data_type_v2,
+                            mdseObj, mdoeObj, mdbeObj, jarray_setBid1Qty, full_market_data->bid1_count, full_market_data->max_bid1_count,
+                            jarray_setAsk1Qty, full_market_data->ask1_count, full_market_data->max_ask1_count);
+    }
+    if (full_market_data->market_data.data_type_v2 == XTP_MARKETDATA_V2_BOND && full_market_data->market_data.exchange_id == XTP_EXCHANGE_SH) {
+        //L2
+        if (full_market_data->market_data.bond.instrument_status != NULL) {
+            if (0 == strcmp(full_market_data->market_data.bond.instrument_status, "ADD")) {
+                jstr_ticker_status = env->NewStringUTF("  0");
+            }
+            if (0 == strcmp(full_market_data->market_data.bond.instrument_status, "START")) {
+                jstr_ticker_status = env->NewStringUTF("S 1");
+            }
+            if (0 == strcmp(full_market_data->market_data.bond.instrument_status, "OCALL")) {
+                jstr_ticker_status = env->NewStringUTF("C11");
+            }
+            if (0 == strcmp(full_market_data->market_data.bond.instrument_status, "TRADE")) {
+                jstr_ticker_status = env->NewStringUTF("T11");
+            }
+            if (0 == strcmp(full_market_data->market_data.bond.instrument_status, "SUSP")) {
+                jstr_ticker_status = env->NewStringUTF("P01");
+            }
+            if (0 == strcmp(full_market_data->market_data.bond.instrument_status, "CLOSE")) {
+                jstr_ticker_status = env->NewStringUTF("E01");
+            }
+            if (0 == strcmp(full_market_data->market_data.bond.instrument_status, "ENDTR")) {
+                jstr_ticker_status = env->NewStringUTF("E01");
+            }
+            generateMarketDataBeObj(env, mdbeObj, &full_market_data->market_data);
+
+            env->CallVoidMethod(quote_plugin_obj_, jm_event, full_market_data->market_data.exchange_id, nTicker, nTickerLength, full_market_data->market_data.last_price,
+                                full_market_data->market_data.pre_close_price, full_market_data->market_data.open_price, full_market_data->market_data.high_price,
+                                full_market_data->market_data.low_price, full_market_data->market_data.close_price, full_market_data->market_data.upper_limit_price,
+                                full_market_data->market_data.lower_limit_price, full_market_data->market_data.data_time, full_market_data->market_data.qty,
+                                full_market_data->market_data.turnover, full_market_data->market_data.avg_price,
+                                bid[0], bid[1], bid[2], bid[3], bid[4], bid[5], bid[6],bid[7], bid[8], bid[9],
+                                ask[0], ask[1], ask[2], ask[3], ask[4], ask[5], ask[6],ask[7], ask[8], ask[9],
+                                bidQty[0], bidQty[1], bidQty[2], bidQty[3], bidQty[4], bidQty[5], bidQty[6],bidQty[7], bidQty[8], bidQty[9],
+                                askQty[0], askQty[1], askQty[2], askQty[3], askQty[4], askQty[5], askQty[6],askQty[7], askQty[8], askQty[9],
+                                full_market_data->market_data.trades_count, jstr_ticker_status, 0.0, full_market_data->market_data.data_type_v2,
+                                mdseObj, mdoeObj, mdbeObj, jarray_setBid1Qty, full_market_data->bid1_count, full_market_data->max_bid1_count,
+                                jarray_setAsk1Qty, full_market_data->ask1_count, full_market_data->max_ask1_count);
+
+        } else {  //L1
+            generateMarketDataSeObj(env, mdseObj, &full_market_data->market_data);
+
+            env->CallVoidMethod(quote_plugin_obj_, jm_event, full_market_data->market_data.exchange_id, nTicker, nTickerLength, full_market_data->market_data.last_price,
+                                full_market_data->market_data.pre_close_price, full_market_data->market_data.open_price, full_market_data->market_data.high_price,
+                                full_market_data->market_data.low_price, full_market_data->market_data.close_price, full_market_data->market_data.upper_limit_price,
+                                full_market_data->market_data.lower_limit_price, full_market_data->market_data.data_time, full_market_data->market_data.qty,
+                                full_market_data->market_data.turnover, full_market_data->market_data.avg_price,
+                                bid[0], bid[1], bid[2], bid[3], bid[4], bid[5], bid[6],bid[7], bid[8], bid[9],
+                                ask[0], ask[1], ask[2], ask[3], ask[4], ask[5], ask[6],ask[7], ask[8], ask[9],
+                                bidQty[0], bidQty[1], bidQty[2], bidQty[3], bidQty[4], bidQty[5], bidQty[6],bidQty[7], bidQty[8], bidQty[9],
+                                askQty[0], askQty[1], askQty[2], askQty[3], askQty[4], askQty[5], askQty[6],askQty[7], askQty[8], askQty[9],
+                                full_market_data->market_data.trades_count, jstr_ticker_status, 0.0, full_market_data->market_data.data_type_v2,
+                                mdseObj, mdoeObj, mdbeObj, jarray_setBid1Qty, full_market_data->bid1_count, full_market_data->max_bid1_count,
+                                jarray_setAsk1Qty, full_market_data->ask1_count, full_market_data->max_ask1_count);
+        }
+    }
+    if (full_market_data->market_data.data_type_v2 == XTP_MARKETDATA_V2_INDEX) {
+        generateMarketDataSeObj(env, mdseObj, &full_market_data->market_data);
+
+        env->CallVoidMethod(quote_plugin_obj_, jm_event, full_market_data->market_data.exchange_id, nTicker, nTickerLength, full_market_data->market_data.last_price,
+                            full_market_data->market_data.pre_close_price, full_market_data->market_data.open_price, full_market_data->market_data.high_price,
+                            full_market_data->market_data.low_price, full_market_data->market_data.close_price, full_market_data->market_data.upper_limit_price,
+                            full_market_data->market_data.lower_limit_price, full_market_data->market_data.data_time, full_market_data->market_data.qty,
+                            full_market_data->market_data.turnover, full_market_data->market_data.avg_price,
+                            bid[0], bid[1], bid[2], bid[3], bid[4], bid[5], bid[6],bid[7], bid[8], bid[9],
+                            ask[0], ask[1], ask[2], ask[3], ask[4], ask[5], ask[6],ask[7], ask[8], ask[9],
+                            bidQty[0], bidQty[1], bidQty[2], bidQty[3], bidQty[4], bidQty[5], bidQty[6],bidQty[7], bidQty[8], bidQty[9],
+                            askQty[0], askQty[1], askQty[2], askQty[3], askQty[4], askQty[5], askQty[6],askQty[7], askQty[8], askQty[9],
+                            full_market_data->market_data.trades_count, jstr_ticker_status, 0.0, full_market_data->market_data.data_type_v2,
+                            mdseObj, mdoeObj, mdbeObj, jarray_setBid1Qty, full_market_data->bid1_count, full_market_data->max_bid1_count,
+                            jarray_setAsk1Qty, full_market_data->ask1_count, full_market_data->max_ask1_count);
+    }
+
+    if (env2==NULL) {
         jvm_->DetachCurrentThread();
     }
 }
@@ -499,8 +741,8 @@ void XtpQuote::OnDepthMarketData2(XTPMD *market_data, int64_t bid1_qty[], int32_
         return;
     }
     mdseObj = env->NewObject(xtp_market_data_se_class_, mdseConstr);
-    mdoeObj = env->NewObject(xtp_market_data_oe_class_, mdseConstr);
-    mdbeObj = env->NewObject(xtp_market_data_be_class_, mdseConstr);
+    mdoeObj = env->NewObject(xtp_market_data_oe_class_, mdoeConstr);
+    mdbeObj = env->NewObject(xtp_market_data_be_class_, mdbeConstr);
     if (mdseObj == NULL || mdoeObj == NULL || mdbeObj == NULL) {
         jvm_->DetachCurrentThread();
         return;
@@ -2385,17 +2627,17 @@ void XtpQuote::generateMarketDataBeObj(JNIEnv* env, jobject& mdbeObj, XTPMD *sou
     assert(jm_setDurationAfterSell != NULL);
     env->CallVoidMethod(mdbeObj, jm_setDurationAfterSell, sourceObj->bond.duration_after_sell);
 
-    jmethodID jm_setNumBidOrders = env->GetMethodID(xtp_market_data_se_class_, "setNumBidOrders", "(I)V");
+    jmethodID jm_setNumBidOrders = env->GetMethodID(xtp_market_data_be_class_, "setNumBidOrders", "(I)V");
     assert(jm_setNumBidOrders != NULL);
     env->CallVoidMethod(mdbeObj, jm_setNumBidOrders, sourceObj->bond.num_bid_orders);
 
-    jmethodID jm_setNumAskOrders = env->GetMethodID(xtp_market_data_se_class_, "setNumAskOrders", "(I)V");
+    jmethodID jm_setNumAskOrders = env->GetMethodID(xtp_market_data_be_class_, "setNumAskOrders", "(I)V");
     assert(jm_setNumAskOrders != NULL);
     env->CallVoidMethod(mdbeObj, jm_setNumAskOrders, sourceObj->bond.num_ask_orders);
 
     //call setErrorMsg
     jstring jinstrumentStatusStr = env->NewStringUTF(sourceObj->bond.instrument_status);
-    jmethodID jm_setInstrumentStatus = env->GetMethodID(xtp_market_data_se_class_, "setInstrumentStatus", "(Ljava/lang/String;)V");
+    jmethodID jm_setInstrumentStatus = env->GetMethodID(xtp_market_data_be_class_, "setInstrumentStatus", "(Ljava/lang/String;)V");
     env->CallVoidMethod(mdbeObj, jm_setInstrumentStatus, jinstrumentStatusStr);
 }
 
