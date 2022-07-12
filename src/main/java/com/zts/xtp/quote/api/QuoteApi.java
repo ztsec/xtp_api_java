@@ -77,6 +77,7 @@ public class QuoteApi {
      * @param logLevel xtp api 日志输出级别
      * @param threadNum 处理行情的线程数，取值范围1~16
      * @param ringBufferSize 每个处理行情的线程，行情数据缓冲区大小，取值范围1024~1024*256
+     * @param fullMarketDataAvailable 行情快照数据师傅允许接收买一卖一队列（1代表允许，其余的值代表不允许，不需要的话建议不接收买一卖一数据）
      */
     private native void quoteInit(short clientId, String logFolder,XtpLogLevel logLevel,int threadNum,int ringBufferSize, int fullMarketDataAvailable);
 

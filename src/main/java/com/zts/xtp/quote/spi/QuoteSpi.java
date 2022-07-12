@@ -39,7 +39,7 @@ public interface QuoteSpi {
 
 
     /**
-     * 深度行情通知，需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线
+     * 深度行情通知(不包含买一卖一队列)，需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线
      * @param exchangeType 交易所代码
      * @param ticker 合约代码（不包含交易所信息）
      * @param lastPrice 最新价
@@ -74,32 +74,38 @@ public interface QuoteSpi {
                            MarketDataBondExDataResponse bondEx);
 
     /**
-     *
-     * @param exchangeType
-     * @param ticker
-     * @param lastPrice
-     * @param preClosePrice
-     * @param openPrice
-     * @param highPrice
-     * @param lowPrice
-     * @param closePrice
-     * @param upperLimitPrice
-     * @param lowerLimitPrice
-     * @param dataTime
-     * @param qty
-     * @param turnover
-     * @param avgPrice
-     * @param bid
-     * @param ask
-     * @param bidQty
-     * @param askQty
-     * @param tradesCount
-     * @param tickerStatus
-     * @param stkIopv
-     * @param dataType
-     * @param stkEx
-     * @param optionEx
-     * @param bondEx
+     *深度行情通知(包含买一卖一队列)，需要快速返回，否则会堵塞后续消息，当堵塞严重时，会触发断线
+     * @param exchangeType 交易所代码
+     * @param ticker 合约代码（不包含交易所信息）
+     * @param lastPrice 最新价
+     * @param preClosePrice 昨收盘
+     * @param openPrice 今开盘
+     * @param highPrice 最高价
+     * @param lowPrice 最低价
+     * @param closePrice 今收盘
+     * @param upperLimitPrice 涨停价
+     * @param lowerLimitPrice 跌停价
+     * @param dataTime 时间类，格式为YYYYMMDDHHMMSSsss
+     * @param qty 数量，为总成交量（单位股，与交易所一致）
+     * @param turnover 成交金额，为总成交金额（单位元，与交易所一致）
+     * @param avgPrice 当日均价=(turnover/qty)
+     * @param bid 十档申买价
+     * @param ask 十档申卖价
+     * @param bidQty 十档申买量
+     * @param askQty 十档申卖量
+     * @param tradesCount 成交笔数
+     * @param tickerStatus 当前交易状态说明
+     * @param stkIopv 基金实时参考净值（该数据取自stkEx里面的iopv）
+     * @param dataType 决定了额外数据是哪种数据类型 stk or opt or bond
+     * @param stkEx 现货(股票/基金等)快照扩展数据
+     * @param optionEx 期权快照扩展数据
+     * @param bondEx 上海债券L2快照扩展数据
+     * @param bid1Qty 买一队列数据
+     * @param bid1Count 买一队列的有效委托笔数
+     * @param maxBid1Count 买一队列总委托笔数
+     * @param ask1Qty 卖一队列数据
+     * @param ask1Count 卖一队列的有效委托笔数
+     * @param maxAsk1Count 卖一队列总委托笔数
      */
     void onDepthFullMarketData(int exchangeType,String ticker,double lastPrice,double preClosePrice,double openPrice,
                            double highPrice,double lowPrice,double closePrice,double upperLimitPrice,
